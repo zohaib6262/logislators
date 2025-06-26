@@ -177,7 +177,7 @@ async function addToKeapCRM(userData) {
       family_name: userData.lastName,
       addresses: [
         {
-          line1: userData?.street || "",
+          line1: userData && userData.street ? userData.street : "",
           line2: "",
           locality: userData?.city || "",
           region: userData?.state || "",
