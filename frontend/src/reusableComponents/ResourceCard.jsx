@@ -8,11 +8,6 @@ const ResourceCard = ({ resource, refetch }) => {
   const [showModal, setShowModal] = useState(false);
   const { deleteResource, deleting, error } = useDeleteResource(refetch);
 
-  // const handleDelete = async (resource) => {
-  //   console.log("Resouvred.id", resource);
-  //   await deleteResource(resource._id);
-  //   setShowModal(false);
-  // };
   const handleDelete = async () => {
     if (!resource._id) {
       return;
