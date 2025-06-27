@@ -1,4 +1,4 @@
-import BASE_URL from "@/lib/utils";
+import BASE_URL, { API_KEY_COOR } from "@/lib/utils";
 import { useState } from "react";
 
 const useLegislators = () => {
@@ -8,10 +8,10 @@ const useLegislators = () => {
   const [error, setError] = useState(null);
 
   const fetchCoordinates = async (address) => {
-    // const apiKey = "c6a8704abd7a4e4ba77e763465ed3cfe";
+    const apiKey = "c6a8704abd7a4e4ba77e763465ed3cfe";
     const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
       address
-    )}&key=${process.env.VITE_API_KEY}`;
+    )}&key=${API_KEY_COOR}`;
 
     const response = await fetch(url);
     const data = await response.json();

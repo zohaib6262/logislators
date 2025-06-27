@@ -185,7 +185,7 @@ export const SearchRepresentative = () => {
             </Link>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-white text-center">
+          <h1 className="text-3xl md:text-4xl font-bold text-white text-center mt-3">
             Your Representatives
           </h1>
           {fullAddress && (
@@ -206,7 +206,7 @@ export const SearchRepresentative = () => {
           <div className="bg-red-50 border-l-4 border-red-500 p-4">
             <div className="flex">
               <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-sm text-red-700">{error.message}</p>
               </div>
             </div>
           </div>

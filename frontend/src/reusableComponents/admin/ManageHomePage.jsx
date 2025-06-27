@@ -101,7 +101,7 @@ function ManageHomePage() {
   return (
     <div className="min-h-screen bg-white py-10">
       <div className="max-w-4xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">
           Manage Home Page
         </h1>
 

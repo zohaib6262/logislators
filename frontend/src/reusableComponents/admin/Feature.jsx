@@ -63,14 +63,15 @@ const Feature = () => {
   };
 
   return (
-    <div className="container mx-auto px-10 py-8">
+    <div className="cmin-h-screen bg-white py-8 mt-18">
       <div className="max-w-4xl mx-auto px-4">
         {/* Header with title and actions */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-around mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">
               Manage Features
             </h1>
+
             <p className="text-gray-600">
               Manage the feature cards that appear on your website's homepage.
             </p>

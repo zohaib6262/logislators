@@ -65,7 +65,7 @@ router.get("/:id", async (req, res) => {
 
 // POST create a new representative
 // POST /api/representatives/bulk-save
-router.post("/", protect, async (req, res) => {
+router.post("/", async (req, res) => {
   const incomingReps = req.body;
 
   if (!Array.isArray(incomingReps) || incomingReps.length === 0) {
@@ -127,7 +127,7 @@ router.delete("/:id", protect, async (req, res) => {
 });
 
 // POST /api/representatives/by-ids
-router.post("/by-ids", protect, async (req, res) => {
+router.post("/by-ids", async (req, res) => {
   const { ids } = req.body;
 
   if (!Array.isArray(ids) || ids.length === 0) {

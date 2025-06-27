@@ -116,14 +116,6 @@ const Header = () => {
               >
                 Resources
               </Link>
-              <Link
-                to="/login"
-                className="mx-4 px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center justify-center space-x-1 hover:bg-blue-700 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <UserCircle size={18} />
-                <span>Login</span>
-              </Link>
             </div>
           </nav>
         )}

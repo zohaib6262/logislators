@@ -55,8 +55,10 @@ export default function SiteSettings() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Site Settings </h1>
+    <div className="max-w-4xl mx-auto p-6 space-y-6 py-10">
+      <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">
+        Site Settings{" "}
+      </h1>
       {loading && (
         <div className="flex justify-center py-10 text-blue-600 animate-pulse">
           <Loader2 className="mr-2 animate-spin" />
