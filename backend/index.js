@@ -42,7 +42,9 @@ import votingRecordsRoutes from "./src/routes/votingRecord.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import resources from "./src/routes/resources.js";
 import siteSettings from "./src/routes/siteSettings.js";
+import primaryColor from "./src/routes/primaryColor.js";
 
+app.use("/api/primary", primaryColor);
 app.use("/api/userContact", userContact);
 app.use("/api/features", feature);
 app.use("/api/home", homePage);

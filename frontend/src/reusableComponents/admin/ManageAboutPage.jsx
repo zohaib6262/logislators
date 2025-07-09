@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Save, Trash2, Plus, Loader2 } from "lucide-react";
 import FormSection from "./ManageAboutPage/FormSection";
 import {
@@ -7,6 +7,8 @@ import {
 } from "../../hooks/aboutPage/useAboutPage";
 import Button from "../../UI/Button";
 import { Switch } from "@headlessui/react";
+import { TokenContext } from "@/store/TokenContextProvider";
+import { newLightnerColor } from "@/utils/colorUtils";
 
 function ManageAboutPage() {
   const { aboutData, isLoading, error } = useFetchAboutPage();
@@ -34,6 +36,8 @@ function ManageAboutPage() {
   });
 
   // Sync fetched data into formData
+  const { primaryColor } = useContext(TokenContext);
+  const lighterPrimary = newLightnerColor(primaryColor, 30);
   useEffect(() => {
     if (aboutData) {
       setFormData({
@@ -107,7 +111,10 @@ function ManageAboutPage() {
           Manage About Page
         </h1>
         {isLoading && (
-          <div className="flex justify-center py-10 text-blue-600 animate-pulse">
+          <div
+            className="flex justify-center py-10 animate-pulse"
+            style={{ color: primaryColor }}
+          >
             <Loader2 className="mr-2 animate-spin" />
             Loading About us Settings
           </div>
@@ -142,8 +149,11 @@ function ManageAboutPage() {
                   enableAboutusHeader: checked,
                 }));
               }}
+              style={{
+                backgroundColor: formData.enableAboutusHeader && primaryColor,
+              }}
               className={`${
-                formData.enableAboutusHeader ? "bg-blue-600" : "bg-gray-200"
+                !formData.enableAboutusHeader && "bg-gray-200"
               } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
             >
               <span
@@ -243,6 +253,9 @@ function ManageAboutPage() {
                   size="sm"
                   onClick={addBulletPoint}
                   className="mt-2 flex items-center gap-2"
+                  style={{
+                    background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+                  }}
                 >
                   <Plus className="h-4 w-4" />
                   <span>Add Point</span>
@@ -324,7 +337,10 @@ function ManageAboutPage() {
             <button
               type="submit"
               disabled={isLoading || isUpdating}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded-md"
+              className="inline-flex items-center px-4 py-2 disabled:opacity-50 text-white text-sm font-medium rounded-md"
+              style={{
+                background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+              }}
             >
               {isLoading || isUpdating ? (
                 <>

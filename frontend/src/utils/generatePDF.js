@@ -1,78 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-// export const generatePDF = (rep) => {
-//   const doc = new jsPDF();
-//   const margin = 15;
-//   const lineHeight = 8;
-//   let y = margin;
-
-//   const addSection = (title, value) => {
-//     doc.setFont("helvetica", "bold");
-//     doc.text(`${title}:`, margin, y);
-//     doc.setFont("helvetica", "normal");
-//     doc.text(value || "N/A", margin + 40, y);
-//     y += lineHeight;
-//   };
-
-//   doc.setFontSize(16);
-//   doc.setFont("helvetica", "bold");
-//   doc.text("Representative Report", margin, y);
-//   y += lineHeight + 2;
-
-//   doc.setFontSize(12);
-//   doc.setFont("helvetica", "normal");
-
-//   // Basic Info
-//   addSection("Name", rep.name);
-//   addSection("Party", rep.party || "N/A");
-//   addSection("Position", rep.current_role?.title || "N/A");
-//   addSection("District", rep.current_role?.district || "N/A");
-//   addSection("County", rep.extras?.county || "N/A");
-//   addSection("Email", rep.email || "N/A");
-//   addSection("Phone", rep.extras?.phone || "N/A");
-//   addSection("Address", rep.extras?.address || "N/A");
-
-//   // Add biography
-//   if (rep.extras?.biography) {
-//     y += 5;
-//     doc.setFont("helvetica", "bold");
-//     doc.text("Biography:", margin, y);
-//     y += lineHeight;
-//     doc.setFont("helvetica", "normal");
-//     const bioLines = doc.splitTextToSize(rep.extras.biography, 180);
-//     doc.text(bioLines, margin, y);
-//     y += bioLines.length * lineHeight;
-//   }
-
-//   // Extra Points
-//   const extras = rep.extras?.extraPoints;
-//   if (extras?.bills || extras?.description || extras?.points) {
-//     doc.setFont("helvetica", "bold");
-//     doc.text("Extra Points:", margin, y);
-//     y += lineHeight;
-//     doc.setFont("helvetica", "normal");
-//     if (extras?.bills) addSection("Bills", extras.bills);
-//     if (extras?.description) addSection("Description", extras.description);
-//     if (extras?.points) addSection("Points", extras.points.toString());
-//   }
-
-//   // Highlights
-//   const highlights = rep.extras?.highlights;
-//   if (highlights?.title || highlights?.session) {
-//     y += 5;
-//     doc.setFont("helvetica", "bold");
-//     doc.text("Highlights:", margin, y);
-//     y += lineHeight;
-//     doc.setFont("helvetica", "normal");
-//     if (highlights?.title) addSection("Title", highlights.title);
-//     if (highlights?.session) addSection("Session", highlights.session);
-//   }
-
-//   doc.save(`${rep.name || "Representative"}-report.pdf`);
-// };
-
-// Helper function to load image and convert to base64 with CORS handling
 const loadImageAsBase64 = async (imageUrl) => {
   try {
     // Create a canvas to handle CORS issues
@@ -124,13 +52,19 @@ const loadImageAsBase64 = async (imageUrl) => {
   }
 };
 
-export const generatePDF = async (representative) => {
+export const generatePDF = async (representative, primaryColor) => {
   const pdf = new jsPDF("p", "mm", "a4");
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 20;
   const contentWidth = pageWidth - margin * 2;
   let yPosition = margin;
+
+  const hexToRgb = (hex) => {
+    const bigint = parseInt(hex.replace("#", ""), 16);
+    return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+  };
+  const primaryRGB = hexToRgb(primaryColor);
 
   const addWrappedText = (text, x, y, maxWidth, fontSize = 10) => {
     pdf.setFontSize(fontSize);
@@ -167,8 +101,8 @@ export const generatePDF = async (representative) => {
 
             // ✅ Create a radial or linear gradient background
             const gradient = ctx.createLinearGradient(0, 0, size, size);
-            gradient.addColorStop(0, "#3b82f6"); // Tailwind's blue-500
-            gradient.addColorStop(1, "#3b82f6"); // Tailwind's purple-600
+            gradient.addColorStop(0, primaryColor);
+            gradient.addColorStop(1, primaryColor);
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, size, size);
 
@@ -194,7 +128,7 @@ export const generatePDF = async (representative) => {
     }
 
     const headerHeight = imageDataUrl ? 60 : 60;
-    pdf.setFillColor(59, 130, 246);
+    pdf.setFillColor(...primaryRGB);
     pdf.rect(0, 0, pageWidth, headerHeight, "F");
 
     if (imageDataUrl) {

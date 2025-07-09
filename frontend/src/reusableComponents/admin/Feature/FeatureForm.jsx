@@ -1,13 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { MapPin, Building2, Check, X, ArrowLeft, Upload } from "lucide-react";
 import { initialFeature } from "../../../hooks/Feature/useFeature";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { uploadImageToCloudinary } from "../../../utils/uploadImageCloudinary";
+import { TokenContext } from "@/store/TokenContextProvider";
+import { newLightnerColor } from "@/utils/colorUtils";
 
 const FeatureForm = ({ feature, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState(initialFeature);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const { primaryColor } = useContext(TokenContext);
+  const { id } = useParams();
+
+  const lighterPrimary = newLightnerColor(primaryColor, 30);
 
   // Reset form when feature changes
   useEffect(() => {
@@ -138,7 +144,7 @@ const FeatureForm = ({ feature, onSubmit, onCancel }) => {
     >
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-800">
-          {feature?.id ? "Edit Feature" : "Add New Feature"}
+          {id ? "Edit Feature" : "Add New Feature"}
         </h2>
         <Link
           to="/admin/features"
@@ -281,9 +287,12 @@ const FeatureForm = ({ feature, onSubmit, onCancel }) => {
         </button>
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 text-white rounded-md transition-colors"
+          style={{
+            background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+          }}
         >
-          {feature?.id ? "Update Feature" : "Add Feature"}
+          {id ? "Update Feature" : "Add Feature"}
         </button>
       </div>
     </form>

@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Mail, Phone, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import useGetSiteSettings from "../hooks/siteSettingHooks/useGetSiteSettings";
+import { TokenContext } from "@/store/TokenContextProvider";
 
 const Footer = () => {
   const { settings, setSettings, loading, error } = useGetSiteSettings();
-
+  const { primaryColor } = useContext(TokenContext);
   return (
-    <footer className="bg-gray-800 text-white">
+    <footer className="text-white" style={{ backgroundColor: primaryColor }}>
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
@@ -167,7 +168,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
+        <div className="mt-8 pt-8 border-t border-white-700 text-center text-white-400">
           <p>
             &copy; {new Date().getFullYear()} Nevada Rep Finder. All rights
             reserved.

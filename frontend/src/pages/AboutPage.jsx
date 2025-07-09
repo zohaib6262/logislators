@@ -1,21 +1,33 @@
 import { Loader2 } from "lucide-react";
-import React from "react";
+import React, { useContext } from "react";
 import { useFetchAboutPage } from "../hooks/aboutPage/useAboutPage";
+import { TokenContext } from "@/store/TokenContextProvider";
 
 const AboutPage = () => {
   const { aboutData, isLoading, error } = useFetchAboutPage();
+  const { primaryColor } = useContext(TokenContext);
+
   const LoadingSpinner = () => (
-    <div className="flex justify-center py-10 text-blue-600 animate-pulse">
+    <div
+      className="flex justify-center py-10 animate-pulse"
+      style={{ color: primaryColor }}
+    >
       <Loader2 className="mr-2 animate-spin" />
       Loading about us page...
     </div>
   );
+
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
       {isLoading && <LoadingSpinner />}
 
       {aboutData?.enableAboutusHeader && (
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 pt-24 pb-16">
+        <div
+          className="pt-24 pb-16"
+          style={{
+            background: `linear-gradient(to right, ${primaryColor}, ${primaryColor})`,
+          }}
+        >
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center text-white">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -65,14 +77,21 @@ const AboutPage = () => {
             {aboutData?.privacy || " "}
           </p>
 
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-lg">
+          <div
+            className="border-l-4 p-6 rounded-r-lg"
+            style={{
+              backgroundColor: `${primaryColor}20`,
+              borderColor: primaryColor,
+            }}
+          >
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
               Get Involved
             </h3>
             <p className="text-gray-700 mb-4">{aboutData?.privacy || " "}</p>
             <a
               href={`mailto:${aboutData?.email || ""}`}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
+              style={{ backgroundColor: primaryColor }}
             >
               Contact Us
             </a>

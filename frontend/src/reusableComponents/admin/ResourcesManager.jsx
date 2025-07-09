@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   AlertTriangle,
   Loader2,
@@ -13,6 +13,8 @@ import ResourceCard from "../ResourceCard";
 import useGetResources from "../../hooks/useGetRecources";
 import useCategoryManager from "../../hooks/categories/useCategoryManager";
 import { toast } from "react-toastify";
+import { TokenContext } from "@/store/TokenContextProvider";
+import { newLightnerColor } from "@/utils/colorUtils";
 
 const ResourcesManager = () => {
   // Resource states
@@ -43,7 +45,9 @@ const ResourcesManager = () => {
   // Confirmation modal state
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const { primaryColor } = useContext(TokenContext);
 
+  const lighterPrimary = newLightnerColor(primaryColor, 30);
   // Filter resources
   const filteredResources = resources?.filter((resource) => {
     const matchesSearch =
@@ -74,12 +78,17 @@ const ResourcesManager = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-400 to-blue-600 py-14 shadow-lg">
+      <div
+        className="py-14 shadow-lg"
+        style={{
+          background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+        }}
+      >
         <div className="container mx-auto px-6">
-          <h1 className="text-4xl font-bold text-white text-center">
+          <h1 className="text-4xl font-extrabold text-white text-center tracking-wide">
             Admin Resource Dashboard
           </h1>
-          <p className="text-lg text-blue-100 text-center mt-3 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-300 text-center mt-3 max-w-2xl mx-auto">
             Manage, edit, and maintain Nevada's civic resources including
             government, voting, and education tools.
           </p>
@@ -93,7 +102,10 @@ const ResourcesManager = () => {
           <div className="flex justify-between items-center mb-6">
             <Link
               to="/admin/resources/new"
-              className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-700 text-white text-sm font-medium rounded-md hover:to-blue-800 transition-all"
+              className="flex items-center px-4 py-2 text-white text-sm font-medium rounded-md transition-all"
+              style={{
+                background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+              }}
             >
               <Plus className="mr-2 h-4 w-4" />
               Add New Resource
@@ -149,7 +161,10 @@ const ResourcesManager = () => {
 
           {/* Loading State */}
           {loading && (
-            <div className="flex justify-center py-10 text-blue-600">
+            <div
+              className="flex justify-center py-10"
+              style={{ color: primaryColor }}
+            >
               <Loader2 className="mr-2 h-6 w-6 animate-spin" />
               <span>Loading resources...</span>
             </div>
@@ -237,7 +252,10 @@ const ResourcesManager = () => {
               <div className="mt-6">
                 <button
                   onClick={handleAddCategory}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                  className="w-full text-white font-medium py-2 px-4 rounded-md transition-colors"
+                  style={{
+                    background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+                  }}
                 >
                   {editingCategory ? "Update Category" : "Add Category"}
                 </button>

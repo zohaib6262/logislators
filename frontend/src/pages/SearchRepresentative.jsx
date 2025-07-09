@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import {
   Link,
   useLocation,
@@ -13,6 +13,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import useLegislators from "../hooks/lagislators/useLegislators";
 import useUserContactSubmit from "../hooks/userContact/useUserContactSubmit";
+import { TokenContext } from "@/store/TokenContextProvider";
 
 export const SearchRepresentative = () => {
   const [searchParams] = useSearchParams();
@@ -22,7 +23,7 @@ export const SearchRepresentative = () => {
   const city = (searchParams.get("city") || "").replace(/\+/g, " ");
   const state = (searchParams.get("state") || "Nevada").replace(/\+/g, " ");
   const zipCode = (searchParams.get("zipCode") || "").replace(/\+/g, " ");
-
+  const { primaryColor } = useContext(TokenContext);
   const {
     submitUserContact,
     isLoading: isSubmitLoading,
@@ -130,7 +131,8 @@ export const SearchRepresentative = () => {
     return (
       <div
         onClick={onClick}
-        className={`absolute top-1/2 transform -translate-y-1/2 ${positionClass} z-10 bg-blue-600 hover:bg-blue-700 p-2 rounded-full cursor-pointer`}
+        className={`absolute top-1/2 transform -translate-y-1/2 ${positionClass} z-10 p-2 rounded-full cursor-pointer`}
+        style={{ backgroundColor: primaryColor }}
       >
         <Icon size={24} className="text-white" />
       </div>
@@ -172,13 +174,22 @@ export const SearchRepresentative = () => {
   return (
     <div className="min-h-screen bg-gray-50 pt-16 relative">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 py-12 relative">
+      <div
+        className="py-12 relative"
+        style={{
+          background: `linear-gradient(to right, ${primaryColor}, ${primaryColor})`,
+        }}
+      >
         <div className="container mx-auto px-4">
           {/* Back Button */}
           <div className="absolute left-4 top-4">
             <Link
               to="/"
-              className="flex items-center gap-2 bg-white text-blue-700 font-medium px-4 py-2 rounded-lg shadow hover:bg-blue-50 transition"
+              className="flex items-center gap-2 bg-white font-medium px-4 py-2 rounded-lg shadow transition"
+              style={{
+                color: primaryColor,
+                border: `1px solid ${primaryColor}`,
+              }}
             >
               <ArrowLeft className="w-4 h-4" />
               Back
@@ -199,7 +210,10 @@ export const SearchRepresentative = () => {
       {/* Content */}
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+            style={{ borderColor: primaryColor }}
+          ></div>
         </div>
       ) : error ? (
         <div className="max-w-3xl mx-auto px-4 py-8">

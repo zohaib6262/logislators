@@ -21,6 +21,7 @@ const SearchForm = ({ onSearch, isLoading }) => {
     lastName: "",
     zipcode: "",
   });
+  const [localError, setLocalError] = useState(null);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -29,8 +30,14 @@ const SearchForm = ({ onSearch, isLoading }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.street || !formData.city || !formData.zipcode) {
-      toast.error("Please fill out all required address fields");
+    if (
+      !formData.street.trim() ||
+      !formData.city.trim() ||
+      !formData.zipcode ||
+      !formData.email.trim() ||
+      !formData.firstName.trim()
+    ) {
+      setLocalError("Please fill out all required address fields");
       return;
     }
 
@@ -78,7 +85,7 @@ const SearchForm = ({ onSearch, isLoading }) => {
                     id="firstName"
                     name="firstName"
                     placeholder="John"
-                    value={formData.name}
+                    value={formData.firstName}
                     onChange={handleChange}
                     className="w-full"
                   />
@@ -89,7 +96,7 @@ const SearchForm = ({ onSearch, isLoading }) => {
                     id="lastName"
                     name="lastName"
                     placeholder="Doe"
-                    value={formData.name}
+                    value={formData.lastName}
                     onChange={handleChange}
                     className="w-full"
                   />
@@ -122,7 +129,6 @@ const SearchForm = ({ onSearch, isLoading }) => {
                   />
                 </div>
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="street">
                   Street Address<span className="text-red-500">*</span>
@@ -131,13 +137,11 @@ const SearchForm = ({ onSearch, isLoading }) => {
                   id="street"
                   name="street"
                   placeholder="123 Main Street"
-                  required
                   value={formData.street}
                   onChange={handleChange}
                   className="w-full"
                 />
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="city">
@@ -147,7 +151,6 @@ const SearchForm = ({ onSearch, isLoading }) => {
                     id="city"
                     name="city"
                     placeholder="Las Vegas"
-                    required
                     value={formData.city}
                     onChange={handleChange}
                     className="w-full"
@@ -165,7 +168,9 @@ const SearchForm = ({ onSearch, isLoading }) => {
                   />
                 </div>
               </div>
-
+              {localError && (
+                <p className="text-red-600 text-sm mt-2">{localError}</p>
+              )}
               <div className="pt-4">
                 <Button
                   type="submit"

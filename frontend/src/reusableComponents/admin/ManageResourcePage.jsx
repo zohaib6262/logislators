@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Save, Trash2, Plus, Loader2 } from "lucide-react";
 import FormSection from "./ManageAboutPage/FormSection";
 
@@ -7,11 +7,16 @@ import {
   useFetchResourcePage,
   useUpdateResourcePage,
 } from "@/hooks/manageResourcePage/useManageResourcePage";
+import { TokenContext } from "@/store/TokenContextProvider";
+import { newLightnerColor } from "@/utils/colorUtils";
 
 function ManageResourcePage() {
   const { resourceData, isLoading, error } = useFetchResourcePage();
   const { updateResourcePage, isUpdating, updateError, updateMessage } =
     useUpdateResourcePage();
+  const { primaryColor } = useContext(TokenContext);
+
+  const lighterPrimary = newLightnerColor(primaryColor, 30);
   const [formData, setFormData] = useState({
     enableResourceHeader: true,
     title: "",
@@ -55,7 +60,10 @@ function ManageResourcePage() {
           Manage Resource Page
         </h1>
         {isLoading && (
-          <div className="flex justify-center py-10 text-blue-600 animate-pulse">
+          <div
+            className="flex justify-center py-10 animate-pulse"
+            style={{ color: primaryColor }}
+          >
             <Loader2 className="mr-2 animate-spin" />
             Loading Resource Settings
           </div>
@@ -90,8 +98,11 @@ function ManageResourcePage() {
                   enableResourceHeader: checked,
                 }));
               }}
+              style={{
+                backgroundColor: formData.enableResourceHeader && primaryColor,
+              }}
               className={`${
-                formData.enableResourceHeader ? "bg-blue-600" : "bg-gray-200"
+                !formData.enableResourceHeader && "bg-gray-200"
               } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
             >
               <span
@@ -152,7 +163,10 @@ function ManageResourcePage() {
             <button
               type="submit"
               disabled={isLoading || isUpdating}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded-md"
+              className="inline-flex items-center px-4 py-2 disabled:opacity-50 text-white text-sm font-medium rounded-md"
+              style={{
+                background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+              }}
             >
               {isLoading || isUpdating ? (
                 <>

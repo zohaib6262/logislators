@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Save, X, Plus, Loader2 } from "lucide-react";
 import useAddResource from "../../hooks/useAddResource";
 import useGetCategories from "../../hooks/categories/useGetCategories";
+import { TokenContext } from "@/store/TokenContextProvider";
+import { newLightnerColor } from "@/utils/colorUtils";
 
 const AddResource = () => {
   const [resource, setResource] = useState({
@@ -16,6 +18,9 @@ const AddResource = () => {
   const { addResource, loading, error } = useAddResource();
   const { categories: allCategories, loading: categoriesLoading } =
     useGetCategories();
+  const { primaryColor } = useContext(TokenContext);
+  const lighterPrimary = newLightnerColor(primaryColor, 30);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -216,9 +221,12 @@ const AddResource = () => {
             <button
               type="submit"
               disabled={loading || categoriesLoading}
-              className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+              className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
+              style={{
+                background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+              }}
             >
               {loading ? (
                 <>

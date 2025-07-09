@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Loader2, Save, Upload } from "lucide-react";
 import useUpdateSiteSettings from "../../hooks/siteSettingHooks/useUpdateSiteSettings";
 
@@ -7,6 +7,8 @@ import GeneralSettings from "./SiteSetting/GeneralSettings";
 import LogoSettings from "./SiteSetting/LogoSettings";
 import ContactSettings from "./SiteSetting/ContactSettings";
 import SocialMediaSettings from "./SiteSetting/SocialMediaSettings";
+import { TokenContext } from "@/store/TokenContextProvider";
+import { newLightnerColor } from "@/utils/colorUtils";
 
 export default function SiteSettings() {
   const { settings, setSettings, loading, error } = useGetSiteSettings();
@@ -16,7 +18,9 @@ export default function SiteSettings() {
     savedMessage,
     error: saveError,
   } = useUpdateSiteSettings();
+  const { primaryColor } = useContext(TokenContext);
 
+  const lighterPrimary = newLightnerColor(primaryColor, 30);
   // if (error) return <p className="text-red-600">{error}</p>;
   // if (!settings) return <p>No settings found.</p>;
 
@@ -60,7 +64,10 @@ export default function SiteSettings() {
         Site Settings{" "}
       </h1>
       {loading && (
-        <div className="flex justify-center py-10 text-blue-600 animate-pulse">
+        <div
+          className="flex justify-center py-10 animate-pulse"
+          style={{ color: primaryColor }}
+        >
           <Loader2 className="mr-2 animate-spin" />
           Loading Site Settings
         </div>
@@ -81,7 +88,10 @@ export default function SiteSettings() {
           <button
             type="submit"
             disabled={isSaving}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded-md"
+            className="inline-flex items-center px-4 py-2 disabled:opacity-50 text-white text-sm font-medium rounded-md"
+            style={{
+              background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+            }}
           >
             {isSaving ? (
               "Saving..."

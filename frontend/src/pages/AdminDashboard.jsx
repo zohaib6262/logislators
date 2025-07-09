@@ -15,12 +15,8 @@ import {
   LogOut,
   Feather,
   FileDiffIcon,
-  Edit,
-  FileEdit,
-  Edit2Icon,
-  Edit3,
   EditIcon,
-  Edit2,
+  Edit2Icon,
 } from "lucide-react";
 
 // Admin Components
@@ -63,17 +59,49 @@ const NotFoundPage = lazy(() => import("./NotFoundPage"));
 import { TokenContext } from "@/store/TokenContextProvider";
 import LoadingScreen from "@/reusableComponents/LoadingScreen";
 
+// Utility function to lighten colors
+const lightenColor = (color, percent) => {
+  if (!color) return "#93c5fd"; // Default light blue if no color provided
+
+  // Remove # if present
+  color = color.replace("#", "");
+
+  // Parse r, g, b values
+  const r = parseInt(color.substring(0, 2), 16);
+  const g = parseInt(color.substring(2, 4), 16);
+  const b = parseInt(color.substring(4, 6), 16);
+
+  // Calculate lighter values
+  const lighten = (value) =>
+    Math.min(255, value + Math.round(255 * (percent / 100)));
+
+  // Return new color
+  return `#${[
+    lighten(r).toString(16).padStart(2, "0"),
+    lighten(g).toString(16).padStart(2, "0"),
+    lighten(b).toString(16).padStart(2, "0"),
+  ].join("")}`;
+};
+
 const AdminDashboard = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const {
+    isAuthenticated,
+    setIsAuthenticated,
+    primaryColor, // Default to blue-700
+  } = useContext(TokenContext);
+
+  const lighterPrimary = lightenColor(primaryColor, 30);
+  const lighterBg = lightenColor(primaryColor, 80);
+
   const isActive = (path) => {
     return (
       location.pathname === path || location.pathname.startsWith(`${path}/`)
     );
   };
 
-  const { isAuthenticated, setIsAuthenticated } = useContext(TokenContext);
   if (!isAuthenticated) {
     return <div>Please log in to access the admin dashboard.</div>;
   }
@@ -106,7 +134,7 @@ const AdminDashboard = () => {
     },
     {
       to: "/admin/resource-page",
-      label: "Manage Rescource Page",
+      label: "Manage Resource Page",
       icon: <Edit2Icon size={20} className="mr-3" />,
     },
     {
@@ -120,8 +148,8 @@ const AdminDashboard = () => {
     <div className="bg-white min-h-screen">
       <div className="flex">
         {/* Sidebar for desktop */}
-        <aside className="hidden md:flex flex-col w-64 min-h-screen bg-white shadow-md fixed">
-          <div className="p-6 bg-blue-600">
+        <aside className="hidden md:flex flex-col w-64 h-full bg-white shadow-md fixed">
+          <div className="p-6" style={{ backgroundColor: primaryColor }}>
             <h2 className="text-white text-lg font-bold">Admin Dashboard</h2>
           </div>
 
@@ -130,16 +158,20 @@ const AdminDashboard = () => {
               <li key="/admin">
                 <NavLink
                   to="/admin"
-                  end
+                  end // This ensures it only matches exactly "/admin"
                   className={({ isActive }) =>
                     `flex items-center px-4 py-3 rounded-lg transition-colors ${
                       isActive
-                        ? "text-blue-600 bg-blue-50"
-                        : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                        ? `text-[${primaryColor}] bg-[${lighterBg}]`
+                        : `text-gray-700 hover:bg-[${lighterBg}] hover:text-[${primaryColor}]`
                     }`
                   }
+                  style={({ isActive }) => ({
+                    color: isActive ? primaryColor : "#374151",
+                    backgroundColor: isActive ? lighterBg : "transparent",
+                  })}
                 >
-                  <Home size={20} className="mr-3" />{" "}
+                  <Home size={20} className="mr-3" />
                   <span>Dashboard Home</span>
                 </NavLink>
               </li>
@@ -151,10 +183,18 @@ const AdminDashboard = () => {
                       className={({ isActive }) =>
                         `flex items-center px-4 py-3 rounded-lg transition-colors ${
                           isActive
-                            ? "text-blue-600 bg-blue-50"
-                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                            ? `text-[${primaryColor}] bg-[${lighterBg}]`
+                            : "text-gray-700 hover:bg-[${lighterBg}] hover:text-[${primaryColor}]"
                         }`
                       }
+                      style={({ isActive }) => ({
+                        color: isActive ? primaryColor : "#374151",
+                        backgroundColor: isActive ? lighterBg : "transparent",
+                        "&:hover": {
+                          backgroundColor: lighterBg,
+                          color: primaryColor,
+                        },
+                      })}
                     >
                       {icon}
                       <span>{label}</span>
@@ -185,7 +225,8 @@ const AdminDashboard = () => {
           <div className="md:hidden fixed top-4 left-4 z-20">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-md bg-blue-600 text-white shadow-md"
+              className="p-2 rounded-md text-white shadow-md"
+              style={{ backgroundColor: primaryColor }}
             >
               {!isMenuOpen && <Menu size={24} />}
             </button>
@@ -196,7 +237,10 @@ const AdminDashboard = () => {
         {isMenuOpen && (
           <div className="md:hidden lg:hidden fixed inset-0 z-10 bg-gray-800 bg-opacity-75">
             <div className="bg-white w-64 h-full overflow-y-auto">
-              <div className="p-6 bg-blue-600 flex justify-between items-center">
+              <div
+                className="p-6 flex justify-between items-center"
+                style={{ backgroundColor: primaryColor }}
+              >
                 <h2 className="text-white text-lg font-bold">
                   Admin Dashboard
                 </h2>
@@ -212,16 +256,20 @@ const AdminDashboard = () => {
                   <li key="/admin">
                     <NavLink
                       to="/admin"
-                      end
+                      end // This ensures it only matches exactly "/admin"
                       className={({ isActive }) =>
                         `flex items-center px-4 py-3 rounded-lg transition-colors ${
                           isActive
-                            ? "text-blue-600 bg-blue-50"
-                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                            ? `text-[${primaryColor}] bg-[${lighterBg}]`
+                            : "text-gray-700 hover:bg-[${lighterBg}] hover:text-[${primaryColor}]"
                         }`
                       }
+                      style={({ isActive }) => ({
+                        color: isActive ? primaryColor : "#374151",
+                        backgroundColor: isActive ? lighterBg : "transparent",
+                      })}
                     >
-                      <Home size={20} className="mr-3" />{" "}
+                      <Home size={20} className="mr-3" />
                       <span>Dashboard Home</span>
                     </NavLink>
                   </li>
@@ -232,10 +280,18 @@ const AdminDashboard = () => {
                         className={({ isActive }) =>
                           `flex items-center px-4 py-3 rounded-lg transition-colors ${
                             isActive
-                              ? "text-blue-600 bg-blue-50"
-                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                              ? `text-[${primaryColor}] bg-[${lighterBg}]`
+                              : "text-gray-700 hover:bg-[${lighterBg}] hover:text-[${primaryColor}]"
                           }`
                         }
+                        style={({ isActive }) => ({
+                          color: isActive ? primaryColor : "#374151",
+                          backgroundColor: isActive ? lighterBg : "transparent",
+                          "&:hover": {
+                            backgroundColor: lighterBg,
+                            color: primaryColor,
+                          },
+                        })}
                       >
                         {icon}
                         <span>{label}</span>
@@ -271,7 +327,12 @@ const AdminDashboard = () => {
                   path="/"
                   element={
                     <div className="min-h-screen bg-white pt-0">
-                      <div className="bg-gradient-to-r from-[#5f93e1] to-[#0844da] py-14 shadow-lg">
+                      <div
+                        className="py-14 shadow-lg"
+                        style={{
+                          background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+                        }}
+                      >
                         <div className="container mx-auto px-6">
                           <h1 className="text-4xl font-extrabold text-white text-center tracking-wide">
                             Welcome to the Admin Dashboard
@@ -398,6 +459,7 @@ const AdminDashboard = () => {
   );
 };
 
+// Dashboard card for main screen
 // Dashboard card for main screen
 const DashboardCard = ({ to, icon, title, description, className }) => (
   <Link

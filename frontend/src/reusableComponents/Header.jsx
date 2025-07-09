@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Menu, X, UserCircle } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import useGetSiteSettings from "../hooks/siteSettingHooks/useGetSiteSettings";
+import { TokenContext } from "@/store/TokenContextProvider";
 
 const Header = () => {
   const { settings, loading, error } = useGetSiteSettings();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const { primaryColor } = useContext(TokenContext);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,34 +20,40 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const getLinkClass = (path) => {
-    const base = "font-medium transition-colors hover:text-blue-600";
-    const active = "text-blue-600";
-    const inactive = isScrolled ? "text-gray-700" : "text-gray-600";
-    return `${base} ${location.pathname === path ? active : inactive}`;
+  const getLinkStyle = (path) => {
+    return location.pathname === path ? { color: primaryColor } : {};
   };
 
-  const getMobileLinkClass = (path) => {
-    const base =
-      "px-4 py-2 transition-colors hover:bg-gray-100 hover:text-blue-600";
-    const active = "text-blue-600 font-semibold";
-    const inactive = "text-gray-700";
-    return `${base} ${location.pathname === path ? active : inactive}`;
+  const getLinkClass = (path) => {
+    const base = "font-medium transition-colors";
+    const inactive = isScrolled ? "text-gray-700" : "text-gray-600";
+    return `${base} ${inactive}`;
+  };
+
+  const getMobileLinkStyle = (path) => {
+    return location.pathname === path
+      ? { color: primaryColor, fontWeight: "bold" }
+      : {};
+  };
+
+  const getMobileLinkClass = () => {
+    return "px-4 py-2 transition-colors hover:bg-gray-100";
   };
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white ${
-        isScrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
+        isScrolled ? "shadow-md py-2" : "bg-transparent py-4"
       }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
+          {/* Logo & Site Name */}
           <Link to="/" className="flex items-center space-x-2">
             {settings?.logoUrl && (
               <img
                 src={settings.logoUrl}
-                color="yellow"
+                alt="Logo"
                 className="w-8 h-8 rounded-full"
               />
             )}
@@ -54,32 +62,49 @@ const Header = () => {
                 isScrolled ? "text-gray-800" : "text-gray-700"
               }`}
             >
-              {settings?.siteName && settings.siteName}
+              {settings?.siteName || ""}
             </span>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/" className={getLinkClass("/")}>
+            <Link
+              to="/"
+              className={getLinkClass("/")}
+              style={getLinkStyle("/")}
+            >
               Home
             </Link>
             {settings?.enableAboutus && (
-              <Link to="/about" className={getLinkClass("/about")}>
+              <Link
+                to="/about"
+                className={getLinkClass("/about")}
+                style={getLinkStyle("/about")}
+              >
                 About us
               </Link>
             )}
             {settings?.enableResources && (
-              <Link to="/resources" className={getLinkClass("/resources")}>
+              <Link
+                to="/resources"
+                className={getLinkClass("/resources")}
+                style={getLinkStyle("/resources")}
+              >
                 Resources
               </Link>
             )}
-            {/* <Link
+
+            {/* Optional Login Button */}
+            {/* 
+            <Link
               to="/login"
-              className="flex items-center space-x-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center space-x-1 px-4 py-2 rounded-lg text-white transition-colors"
+              style={{ backgroundColor: primaryColor }}
             >
               <UserCircle size={18} />
               <span>Login</span>
-            </Link> */}
+            </Link> 
+            */}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -97,25 +122,32 @@ const Header = () => {
             <div className="flex flex-col space-y-4">
               <Link
                 to="/"
-                className={getMobileLinkClass("/")}
+                className={getMobileLinkClass()}
+                style={getMobileLinkStyle("/")}
                 onClick={() => setIsMenuOpen(false)}
               >
                 Home
               </Link>
-              <Link
-                to="/about"
-                className={getMobileLinkClass("/about")}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                About
-              </Link>
-              <Link
-                to="/resources"
-                className={getMobileLinkClass("/resources")}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Resources
-              </Link>
+              {settings?.enableAboutus && (
+                <Link
+                  to="/about"
+                  className={getMobileLinkClass()}
+                  style={getMobileLinkStyle("/about")}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  About
+                </Link>
+              )}
+              {settings?.enableResources && (
+                <Link
+                  to="/resources"
+                  className={getMobileLinkClass()}
+                  style={getMobileLinkStyle("/resources")}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Resources
+                </Link>
+              )}
             </div>
           </nav>
         )}

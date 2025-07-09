@@ -1,17 +1,21 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Edit, Plus, RefreshCw } from "lucide-react";
 import FeatureCard from "./Feature/FeatureCard";
 import DeleteConfirmationModal from "../DeleteConfirmationModal";
 import { useFeatures } from "../../hooks/Feature/useFeature";
 import { useHeaderFeature } from "@/hooks/Feature/useHeaderFeature";
+import { TokenContext } from "@/store/TokenContextProvider";
+import { newLightnerColor } from "@/utils/colorUtils";
 
 const Feature = () => {
   const { features, loading, error, deleteFeature, refreshFeatures } =
     useFeatures();
   const { headerError, header, refreshHeader, updateHeader } =
     useHeaderFeature();
+  const { primaryColor } = useContext(TokenContext);
 
+  const lighterPrimary = newLightnerColor(primaryColor, 30);
   const [localHeader, setLocalHeader] = useState(header);
   const [isEditingHeader, setIsEditingHeader] = useState(false);
   const [featureToDelete, setFeatureToDelete] = useState(null);
@@ -66,7 +70,7 @@ const Feature = () => {
     <div className="cmin-h-screen bg-white py-8 mt-18">
       <div className="max-w-4xl mx-auto px-4">
         {/* Header with title and actions */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-around mb-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">
               Manage Features
@@ -79,7 +83,10 @@ const Feature = () => {
           <div className="flex space-x-3 mt-4 md:mt-0">
             <button
               onClick={() => navigate("/admin/features/new")}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex items-center px-4 py-2 text-white rounded-md transition-colors focus:outline-none focus:ring-2"
+              style={{
+                background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+              }}
             >
               <Plus size={18} className="mr-2" />
               Add New Feature
@@ -119,7 +126,10 @@ const Feature = () => {
                 </button>
                 <button
                   onClick={handleHeaderUpdate}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  className="px-4 py-2 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  style={{
+                    background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+                  }}
                   disabled={!localHeader.trim() || localHeader === header}
                 >
                   Save Changes
@@ -161,7 +171,10 @@ const Feature = () => {
         {/* Features Grid */}
         {loading && features.length === 0 ? (
           <div className="text-center py-12">
-            <div className="inline-block w-8 h-8 border-4 border-t-blue-500 border-r-blue-500 border-b-transparent border-l-transparent rounded-full animate-spin mb-4"></div>
+            <div
+              className="inline-block w-8 h-8 border-4 border-b-transparent border-l-transparent rounded-full animate-spin mb-4"
+              style={{ borderRight: primaryColor, borderLeft: primaryColor }}
+            ></div>
             <p className="text-gray-600">Loading features...</p>
           </div>
         ) : error ? (
@@ -171,7 +184,10 @@ const Feature = () => {
             <p className="text-gray-600 mb-4">No features found.</p>
             <button
               onClick={() => navigate("/admin/features/new")}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+              }}
             >
               Add Your First Feature
             </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { Save, Upload, Loader2 } from "lucide-react";
 
 import FormSection from "./ManageAboutPage/FormSection";
@@ -6,6 +6,8 @@ import useUpdateHomePage from "../../hooks/homePage/useUpdateHomePage";
 import useFetchHomePage from "../../hooks/homePage/useFetchHomePage";
 import { uploadImageToCloudinary } from "../../utils/uploadImageCloudinary";
 import { Switch } from "@headlessui/react";
+import { TokenContext } from "@/store/TokenContextProvider";
+import { newLightnerColor } from "@/utils/colorUtils";
 
 function ManageHomePage() {
   const { homeData, isLoading, error } = useFetchHomePage();
@@ -19,7 +21,9 @@ function ManageHomePage() {
     imageTitle: "",
     imageDescription: "",
   });
+  const { primaryColor } = useContext(TokenContext);
 
+  const lighterPrimary = newLightnerColor(primaryColor, 30);
   const [imagePreview, setImagePreview] = useState("");
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [imageError, setImageError] = useState("");
@@ -106,7 +110,10 @@ function ManageHomePage() {
         </h1>
 
         {isLoading ? (
-          <div className="flex justify-center py-10 text-blue-600 animate-pulse">
+          <div
+            className="flex justify-center py-10 animate-pulse"
+            style={{ color: primaryColor }}
+          >
             <Loader2 className="mr-2 animate-spin" />
             Loading Home Settings
           </div>
@@ -139,9 +146,12 @@ function ManageHomePage() {
                     enableHomeHeader: checked,
                   }));
                 }}
+                style={{
+                  backgroundColor: formData.enableHomeHeader && primaryColor,
+                }}
                 className={`${
-                  formData.enableHomeHeader ? "bg-blue-600" : "bg-gray-200"
-                } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+                  !formData.enableHomeHeader && "bg-gray-200"
+                } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2`}
               >
                 <span
                   className={`${
@@ -252,7 +262,10 @@ function ManageHomePage() {
               <button
                 type="submit"
                 disabled={isLoading || isUpdating || isUploadingImage}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md disabled:opacity-50"
+                className="inline-flex items-center px-4 py-2 text-white text-sm font-medium rounded-md disabled:opacity-50"
+                style={{
+                  background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+                }}
               >
                 {isUpdating ? (
                   <>
