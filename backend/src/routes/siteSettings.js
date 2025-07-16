@@ -19,20 +19,22 @@ router.get("/", async (req, res) => {
       const defaultSettings = new SiteSetting({
         enableAboutus: true,
         enableResources: true,
-        siteName: "My Website",
-        siteDescription: "This is a default description.",
+        siteName: "Nevada Rep Finder",
+        siteDescription:
+          "Helping Nevada residents connect with their elected officials and access important resources",
         primaryColor: "#000000",
-        footerText: "© 2025 My Website",
-        logoUrl: "",
+        footerText: "© 2025 Nevada Rep Finder. All rights reserved.",
+        logoUrl:
+          "https://res.cloudinary.com/dlb6fup90/image/upload/v1749034908/u43kfaj77ryiaqj6orap.png",
 
         // ✅ These must be valid non-empty strings
-        contactEmail: "info@mywebsite.com",
-        contactPhone: "+1234567890",
+        contactEmail: "info@nevadarepfinder.org",
+        contactPhone: "(775) 555-0122",
 
         socialLinks: {
-          facebook: "",
-          twitter: "",
-          instagram: "",
+          facebook: "http://16.16.173.63",
+          twitter: "http://16.16.173.63",
+          instagram: "http://16.16.173.63",
         },
       });
 

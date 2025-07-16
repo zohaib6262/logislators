@@ -37,11 +37,14 @@ router.get("/", async (req, res) => {
         enableZipCode: true,
         enableCity: true,
         enableStreetAddress: true,
-        pageTitle: "",
-        pageDescription: "",
-        image: "",
-        imageTitle: "",
-        imageDescription: "",
+        pageTitle: "Find Your Nevada Representatives",
+        pageDescription:
+          "Discover who represents you in government and access resources to stay informed and engaged",
+        image:
+          "https://res.cloudinary.com/dlb6fup90/image/upload/v1752698699/pxfqs1izpu3aqcssxqcb.jpg",
+        imageTitle: "Find Your Voice in Nevada",
+        imageDescription:
+          "Connect with your representatives and make your voice heard in our democracy",
       });
       await existing.save();
     }
@@ -55,9 +58,6 @@ router.get("/", async (req, res) => {
 // PUT /api/home
 router.put("/", protect, upload.single("image"), async (req, res) => {
   try {
-    console.log("req.file:", req.file);
-    console.log("req.body:", req.body);
-
     const {
       enableHomeHeader = true,
       enableZipCode = true,
@@ -71,17 +71,6 @@ router.put("/", protect, upload.single("image"), async (req, res) => {
     } = req.body;
 
     const imagePath = req.file?.path || imageFromBody || "";
-
-    const requiredFields = [
-      pageTitle,
-      pageDescription,
-      imageTitle,
-      imageDescription,
-    ];
-
-    if (requiredFields.some((f) => !f || f.trim() === "")) {
-      return res.status(400).json({ message: "Missing required fields." });
-    }
 
     const updateData = {
       enableHomeHeader,

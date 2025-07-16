@@ -23,7 +23,6 @@ const aboutPageSchema = new mongoose.Schema({
   getInvolved: { type: String, trim: true },
   email: {
     type: String,
-    required: [true, "Email is required."],
     trim: true,
   },
   lastUpdated: {

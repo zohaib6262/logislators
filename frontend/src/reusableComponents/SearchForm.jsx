@@ -6,7 +6,6 @@ import Button from "../UI/Button";
 import { NavLink, useParams } from "react-router-dom";
 import useFetchHomePage from "../hooks/homePage/useFetchHomePage";
 const SearchForm = ({ onSearch, isLoading, homeData }) => {
-  console.log("HomeData", homeData);
   const [formData, setFormData] = useState({
     street: "",
     city: "",
@@ -43,23 +42,25 @@ const SearchForm = ({ onSearch, isLoading, homeData }) => {
     <div className="w-full max-w-6xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
       <div className="flex flex-col md:flex-row">
         {/* Left side - Image */}
-        <div className="md:w-1/2 relative">
-          <img
-            src={homeData?.image}
-            alt="Nevada State Capitol"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center p-8">
-            <div className="text-white">
-              <h2 className="text-3xl font-bold mb-4">
-                {homeData?.imageTitle || ""}
-              </h2>
-              <p className="text-lg opacity-90">
-                {homeData?.imageDescription || ""}
-              </p>
+        {homeData.image && (
+          <div className="md:w-1/2 relative">
+            <img
+              src={homeData?.image}
+              alt="Nevada State Capitol"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center p-8">
+              <div className="text-white">
+                <h2 className="text-3xl font-bold mb-4">
+                  {homeData?.imageTitle || ""}
+                </h2>
+                <p className="text-lg opacity-90">
+                  {homeData?.imageDescription || ""}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Right side - Form */}
         <div className="md:w-1/2 p-8 bg-white">

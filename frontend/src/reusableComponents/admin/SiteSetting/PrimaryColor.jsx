@@ -6,7 +6,6 @@ const PrimaryColor = () => {
   const [showColorPreview, setShowColorPreview] = useState(false);
   const { primaryColor, loading, error, updatePrimaryColor } =
     usePrimaryColor();
-  console.log("Primary Color", primaryColor);
 
   const handleColorChange = (color) => {
     updatePrimaryColor(color); // ✅ save new color to backend

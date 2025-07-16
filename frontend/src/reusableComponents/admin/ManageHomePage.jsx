@@ -175,29 +175,27 @@ function ManageHomePage() {
               <h2 className="text-xl font-semibold text-gray-800 mb-4">
                 Page Content
               </h2>
-              <FormSection label="Page Title" required>
+              <FormSection label="Page Title">
                 <input
                   type="text"
                   name="pageTitle"
                   value={formData.pageTitle}
                   onChange={handleInputChange}
-                  required
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm"
                 />
               </FormSection>
 
-              <FormSection label="Page Description" required>
+              <FormSection label="Page Description">
                 <textarea
                   name="pageDescription"
                   rows={4}
                   value={formData.pageDescription}
                   onChange={handleInputChange}
-                  required
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm"
                 />
               </FormSection>
 
-              <FormSection label="Upload Image" required>
+              <FormSection label="Upload Image">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -238,27 +236,29 @@ function ManageHomePage() {
                 )}
               </FormSection>
 
-              <FormSection label="Image Title" required>
-                <input
-                  type="text"
-                  name="imageTitle"
-                  value={formData.imageTitle}
-                  onChange={handleInputChange}
-                  required
-                  className="block w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm"
-                />
-              </FormSection>
+              {imagePreview && (
+                <>
+                  <FormSection label="Image Title">
+                    <input
+                      type="text"
+                      name="imageTitle"
+                      value={formData.imageTitle}
+                      onChange={handleInputChange}
+                      className="block w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm"
+                    />
+                  </FormSection>
 
-              <FormSection label="Image Description" required>
-                <textarea
-                  name="imageDescription"
-                  rows={4}
-                  value={formData.imageDescription}
-                  onChange={handleInputChange}
-                  required
-                  className="block w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm"
-                />
-              </FormSection>
+                  <FormSection label="Image Description">
+                    <textarea
+                      name="imageDescription"
+                      rows={4}
+                      value={formData.imageDescription}
+                      onChange={handleInputChange}
+                      className="block w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm"
+                    />
+                  </FormSection>
+                </>
+              )}
             </div>
             <div className="flex items-center justify-between mb-6">
               <div>

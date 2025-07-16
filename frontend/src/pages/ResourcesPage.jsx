@@ -9,23 +9,18 @@ import {
 import useGetResources from "../hooks/useGetRecources";
 import { useFetchResourcePage } from "@/hooks/manageResourcePage/useManageResourcePage";
 import { TokenContext } from "@/store/TokenContextProvider";
+import useGetCategories from "@/hooks/categories/useGetCategories";
 
 const ResourcesPage = () => {
   const { resources, loading, error } = useGetResources();
   const { resourceData, isLoading } = useFetchResourcePage();
+  const { categories: totalCategories } = useGetCategories();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const { primaryColor } = useContext(TokenContext);
 
-  const categories = [
-    "All",
-    "Government",
-    "Voting",
-    "Education",
-    "Community",
-    "Health",
-    "Other",
-  ];
+  const filterCategoryName = totalCategories.map((category) => category.name);
+  const categories = ["All", ...filterCategoryName];
 
   const filteredResources = resources.filter((resource) => {
     const matchesSearch =
@@ -176,25 +171,28 @@ const ResourcesPage = () => {
           )}
 
           {/* Suggest a Resource */}
-          <div
-            className="mt-12 rounded-lg shadow-md p-6"
-            style={{ backgroundColor: `${primaryColor}20` }}
-          >
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Suggest a Resource
-            </h2>
-            <p className="text-gray-700 mb-4">
-              Do you know of a valuable resource that should be included in our
-              directory? Let us know and we'll consider adding it to the list.
-            </p>
-            <a
-              href={`mailto:${resourceData?.email}?subject=Resource%20Suggestion`}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
-              style={{ backgroundColor: primaryColor }}
+          {resourceData?.email && (
+            <div
+              className="mt-12 rounded-lg shadow-md p-6"
+              style={{ backgroundColor: `${primaryColor}20` }}
             >
-              Submit a Resource
-            </a>
-          </div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                Suggest a Resource
+              </h2>
+              <p className="text-gray-700 mb-4">
+                Do you know of a valuable resource that should be included in
+                our directory? Let us know and we'll consider adding it to the
+                list.
+              </p>
+              <a
+                href={`mailto:${resourceData?.email}?subject=Resource%20Suggestion`}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
+                style={{ backgroundColor: primaryColor }}
+              >
+                Submit a Resource
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </div>

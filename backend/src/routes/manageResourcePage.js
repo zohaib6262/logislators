@@ -12,8 +12,9 @@ router.get("/", async (req, res) => {
       resourcePage = new ManageResourcePage({
         enableResourceHeader: true,
         title: "Resource Page",
-        description: "",
-        email: "naveda@gmail.com",
+        description:
+          "Explore helpful resources about Nevada government, voting, and civic engagement",
+        email: "eric@nevadapolicy.org",
       });
       await resourcePage.save();
     }

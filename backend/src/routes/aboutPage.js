@@ -11,8 +11,9 @@ router.get("/", async (req, res) => {
     if (!aboutPage) {
       aboutPage = new AboutPage({
         enableAboutusHeader: true,
-        title: "About Us",
-        description: "",
+        title: "About Nevada Rep Finder",
+        description:
+          "Discover who represents you in government and access resources to stay informed and engaged",
         labelMission: "Mission Statement",
         labelWhatWeDo: "What We Do",
         labelKeyPoints: "Key Points",
@@ -20,13 +21,24 @@ router.get("/", async (req, res) => {
         labelPrivacy: "Privacy Statement",
         labelGetInvolved: "Get Involved",
         labelEmail: "Contact Email",
-        mission: "",
-        whatWeDo: "",
-        bulletPoints: [],
-        dataInfo: "",
-        privacy: "",
-        getInvolved: "",
-        email: "",
+        mission:
+          "Nevada Rep Finder is dedicated to making government more accessible to all Nevada residents. We believe that an informed citizenry is essential to a functioning democracy, and that begins with knowing who represents you in government and how to contact them",
+        whatWeDo:
+          "Our platform provides a simple way for Nevada residents to find their elected officials at all levels of government by simply entering their address. We provide comprehensive information about:",
+        bulletPoints: [
+          "Federal Representatives (Senators and House Members)",
+          "State Officials (Governor, State Senators, Assembly Members)",
+          "Local Officials (County and City)",
+          "Contact information and official resources",
+          "Enhanced information about representatives' backgrounds and positions",
+        ],
+        dataInfo:
+          "We use the Google Civic Information API to accurately match addresses to districts and representatives. We supplement this data with additional information curated by our team to provide a more comprehensive view of your elected officials",
+        privacy:
+          "We take your privacy seriously. While we need your address to find your correct representatives, we only store this information with your explicit consent. We never share your personal data with third parties without your permission",
+        getInvolved:
+          "We take your privacy seriously. While we need your address to find your correct representatives, we only store this information with your explicit consent. We never share your personal data with third parties without your permission",
+        email: "eric@nevadapolicy.org",
       });
       await aboutPage.save();
     }
