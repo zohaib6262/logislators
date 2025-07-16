@@ -5,6 +5,9 @@ const API_BASE_URL = `${BASE_URL}/features`;
 function useFetchHomePage() {
   const [homeData, setHomeData] = useState({
     enableHomeHeader: true,
+    enableZipCode: true,
+    enableStreetAddress: true,
+    enableCity: true,
     pageTitle: "",
     pageDescription: "",
     image: "",

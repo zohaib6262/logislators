@@ -4,7 +4,6 @@ import { lightenColor } from "@/utils/colorUtils"; // If needed
 
 const LoadingScreen = () => {
   const { primaryColor } = useContext(TokenContext);
-  console.log("Primary color", primaryColor);
   // Optional: use lighter variant for gradient end
   const lighterPrimary = lightenColor(primaryColor, 30);
 

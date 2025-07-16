@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Save, Plus, Trash2 } from "lucide-react";
 import { useGetRepresentative } from "../../hooks/useGetRepresentative";
 import { useUpdateRepresentative } from "../../hooks/useUpdateRepresentative";
 import { uploadImageToCloudinary } from "../../utils/uploadImageCloudinary";
+import { TokenContext } from "@/store/TokenContextProvider";
+import { lightenColor } from "@/utils/colorUtils";
 
 const EditRepresentative = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { primaryColor } = useContext(TokenContext);
+  const lighterPrimary = lightenColor(primaryColor, 60);
 
   // Get representative data
   const {
@@ -556,7 +560,10 @@ const EditRepresentative = () => {
               <button
                 type="button"
                 onClick={handleAddVotingRecord}
-                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white"
+                style={{
+                  background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+                }}
               >
                 <Plus size={16} className="mr-1" />
                 Add Record
@@ -747,7 +754,10 @@ const EditRepresentative = () => {
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2"
+            style={{
+              background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+            }}
           >
             {saving ? (
               <>

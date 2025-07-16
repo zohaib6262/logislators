@@ -3,10 +3,12 @@ import { replace, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { TokenContext } from "@/store/TokenContextProvider";
 import BASE_URL from "@/lib/utils";
+import { lightenColor } from "@/utils/colorUtils";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { setIsAuthenticated } = useContext(TokenContext);
+  const { setIsAuthenticated, primaryColor } = useContext(TokenContext);
+
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState(null);
@@ -17,6 +19,7 @@ const LoginPage = () => {
     password: "",
     name: "Admin User",
   });
+  const lightPrimary = lightenColor(primaryColor, 60); // 60% lighter
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -68,7 +71,10 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-16 pb-16">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="bg-blue-600 px-6 py-8 text-center">
+        <div
+          className="px-6 py-8 text-center"
+          style={{ backgroundColor: primaryColor }}
+        >
           <h2 className="text-2xl font-bold text-white">
             {isLogin ? "Welcome Back" : "Create an Account"}
           </h2>
@@ -169,7 +175,10 @@ const LoginPage = () => {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                style={{
+                  background: `linear-gradient(to right, ${lightPrimary}, ${primaryColor})`,
+                }}
               >
                 <LogIn size={18} className="mr-2" />
                 {isLogin ? "Sign In" : "Create Account"}

@@ -5,13 +5,8 @@ import Input from "../UI/Input";
 import Button from "../UI/Button";
 import { NavLink, useParams } from "react-router-dom";
 import useFetchHomePage from "../hooks/homePage/useFetchHomePage";
-const SearchForm = ({ onSearch, isLoading }) => {
-  const {
-    homeData,
-    isLoading: homeLoading,
-    setIsLoading,
-    error,
-  } = useFetchHomePage();
+const SearchForm = ({ onSearch, isLoading, homeData }) => {
+  console.log("HomeData", homeData);
   const [formData, setFormData] = useState({
     street: "",
     city: "",
@@ -31,9 +26,9 @@ const SearchForm = ({ onSearch, isLoading }) => {
     e.preventDefault();
 
     if (
-      !formData.street.trim() ||
-      !formData.city.trim() ||
-      !formData.zipcode ||
+      (homeData.enableStreetAddress && !formData.street.trim()) ||
+      (homeData.enableCity && !formData.city.trim()) ||
+      (homeData.enableZipCode && !formData.zipcode) ||
       !formData.email.trim() ||
       !formData.firstName.trim()
     ) {
@@ -57,7 +52,7 @@ const SearchForm = ({ onSearch, isLoading }) => {
           <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center p-8">
             <div className="text-white">
               <h2 className="text-3xl font-bold mb-4">
-                {homeData?.imageTitle || ""}{" "}
+                {homeData?.imageTitle || ""}
               </h2>
               <p className="text-lg opacity-90">
                 {homeData?.imageDescription || ""}
@@ -80,7 +75,9 @@ const SearchForm = ({ onSearch, isLoading }) => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName">
+                    First Name<span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="firstName"
                     name="firstName"
@@ -103,7 +100,9 @@ const SearchForm = ({ onSearch, isLoading }) => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email">
+                    Email Address<span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="email"
                     name="email"
@@ -114,48 +113,48 @@ const SearchForm = ({ onSearch, isLoading }) => {
                     className="w-full"
                   />
                 </div>
+                {homeData?.enableZipCode && (
+                  <div className="space-y-2">
+                    <Label htmlFor="zipcode">ZIP Code</Label>
+                    <Input
+                      id="zipcode"
+                      name="zipcode"
+                      type="number"
+                      placeholder="ZIP Code"
+                      value={formData.zipcode}
+                      onChange={handleChange}
+                      className="w-full"
+                    />
+                  </div>
+                )}
+              </div>
+              {homeData?.enableStreetAddress && (
                 <div className="space-y-2">
-                  <Label htmlFor="zipcode">
-                    ZIP Code<span className="text-red-500">*</span>
-                  </Label>
+                  <Label htmlFor="street">Street Address</Label>
                   <Input
-                    id="zipcode"
-                    name="zipcode"
-                    type="number"
-                    placeholder="ZIP Code"
-                    value={formData.zipcode}
+                    id="street"
+                    name="street"
+                    placeholder="123 Main Street"
+                    value={formData.street}
                     onChange={handleChange}
                     className="w-full"
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="street">
-                  Street Address<span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="street"
-                  name="street"
-                  placeholder="123 Main Street"
-                  value={formData.street}
-                  onChange={handleChange}
-                  className="w-full"
-                />
-              </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="city">
-                    City<span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="city"
-                    name="city"
-                    placeholder="Las Vegas"
-                    value={formData.city}
-                    onChange={handleChange}
-                    className="w-full"
-                  />
-                </div>
+                {homeData?.enableCity && (
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City</Label>
+                    <Input
+                      id="city"
+                      name="city"
+                      placeholder="Las Vegas"
+                      value={formData.city}
+                      onChange={handleChange}
+                      className="w-full"
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="state">State</Label>

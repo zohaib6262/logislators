@@ -34,6 +34,9 @@ router.get("/", async (req, res) => {
     if (!existing) {
       existing = new HomePage({
         enableHomeHeader: true,
+        enableZipCode: true,
+        enableCity: true,
+        enableStreetAddress: true,
         pageTitle: "",
         pageDescription: "",
         image: "",
@@ -57,6 +60,9 @@ router.put("/", protect, upload.single("image"), async (req, res) => {
 
     const {
       enableHomeHeader = true,
+      enableZipCode = true,
+      enableCity = true,
+      enableStreetAddress = true,
       pageTitle = "",
       pageDescription = "",
       imageTitle = "",
@@ -79,6 +85,9 @@ router.put("/", protect, upload.single("image"), async (req, res) => {
 
     const updateData = {
       enableHomeHeader,
+      enableZipCode,
+      enableCity,
+      enableStreetAddress,
       pageTitle,
       pageDescription,
       image: imagePath,

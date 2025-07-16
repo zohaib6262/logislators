@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import useGetResource from "../hooks/useGetResource";
 import useEditResource from "../hooks/useEditResource";
 import useGetCategories from "../hooks/categories/useGetCategories";
+import { lightenColor } from "@/utils/colorUtils";
+import { TokenContext } from "@/store/TokenContextProvider";
 
 const EditResource = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { primaryColor } = useContext(TokenContext);
+
   const { resource, loading, fetchDataError } = useGetResource(id);
   const { updateResource, updateDataError } = useEditResource();
   const { categories: allCategories } = useGetCategories();
@@ -21,6 +25,7 @@ const EditResource = () => {
   });
   const [submitting, setSubmitting] = useState(false);
 
+  const lighterPrimary = lightenColor(primaryColor, 60);
   useEffect(() => {
     if (resource) {
       setFormData({
@@ -285,7 +290,10 @@ const EditResource = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+              }}
             >
               {submitting ? "Saving..." : "Save Changes"}
             </button>

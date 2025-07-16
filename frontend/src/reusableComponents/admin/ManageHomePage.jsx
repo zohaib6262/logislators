@@ -16,6 +16,9 @@ function ManageHomePage() {
 
   const [formData, setFormData] = useState({
     enableHomeHeader: true,
+    enableZipCode: true,
+    enableStreetAddress: true,
+    enableCity: true,
     pageTitle: "",
     pageDescription: "",
     imageTitle: "",
@@ -33,6 +36,9 @@ function ManageHomePage() {
     if (homeData) {
       setFormData({
         enableHomeHeader: homeData.enableHomeHeader ?? true,
+        enableZipCode: homeData.enableZipCode ?? true,
+        enableStreetAddress: homeData.enableStreetAddress ?? true,
+        enableCity: homeData.enableCity ?? true,
         pageTitle: homeData.pageTitle || "",
         pageDescription: homeData.pageDescription || "",
         imageTitle: homeData.imageTitle || "",
@@ -92,6 +98,9 @@ function ManageHomePage() {
 
     const payload = {
       enableHomeHeader: formData.enableHomeHeader,
+      enableZipCode: formData.enableZipCode,
+      enableStreetAddress: formData.enableStreetAddress,
+      enableCity: formData.enableCity,
       pageTitle: formData.pageTitle,
       pageDescription: formData.pageDescription,
       imageTitle: formData.imageTitle,
@@ -251,6 +260,111 @@ function ManageHomePage() {
                 />
               </FormSection>
             </div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <label
+                  htmlFor="enableHomeHeader"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Enable ZIP Code Field
+                </label>
+                <p className="text-xs text-gray-500">
+                  Toggle to show/hide the ZIP Code Field
+                </p>
+              </div>
+              <Switch
+                checked={formData.enableZipCode}
+                onChange={(checked) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    enableZipCode: checked,
+                  }));
+                }}
+                style={{
+                  backgroundColor: formData.enableZipCode && primaryColor,
+                }}
+                className={`${
+                  !formData.enableZipCode && "bg-gray-200"
+                } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2`}
+              >
+                <span
+                  className={`${
+                    formData.enableZipCode ? "translate-x-6" : "translate-x-1"
+                  } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                />
+              </Switch>
+            </div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <label
+                  htmlFor="enableHomeHeader"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Enable Street Address Field
+                </label>
+                <p className="text-xs text-gray-500">
+                  Toggle to show/hide the Street Address Field
+                </p>
+              </div>
+              <Switch
+                checked={formData.enableStreetAddress}
+                onChange={(checked) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    enableStreetAddress: checked,
+                  }));
+                }}
+                style={{
+                  backgroundColor: formData.enableStreetAddress && primaryColor,
+                }}
+                className={`${
+                  !formData.enableStreetAddress && "bg-gray-200"
+                } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2`}
+              >
+                <span
+                  className={`${
+                    formData.enableStreetAddress
+                      ? "translate-x-6"
+                      : "translate-x-1"
+                  } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                />
+              </Switch>
+            </div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <label
+                  htmlFor="enableHomeHeader"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Enable the City Field
+                </label>
+                <p className="text-xs text-gray-500">
+                  Toggle to show/hide the City field
+                </p>
+              </div>
+              <Switch
+                checked={formData.enableCity}
+                onChange={(checked) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    enableCity: checked,
+                  }));
+                }}
+                style={{
+                  backgroundColor: formData.enableCity && primaryColor,
+                }}
+                className={`${
+                  !formData.enableCity && "bg-gray-200"
+                } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2`}
+              >
+                <span
+                  className={`${
+                    formData.enableCity ? "translate-x-6" : "translate-x-1"
+                  } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                />
+              </Switch>
+            </div>
+
             <div className="flex justify-end items-center gap-4 mt-6">
               {updateMessage && (
                 <span className="text-green-600 text-sm">{updateMessage}</span>

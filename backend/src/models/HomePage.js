@@ -27,6 +27,10 @@ const homepageSchema = new mongoose.Schema({
     required: [true, "Image description is required"],
     trim: true,
   },
+  enableZipCode: { type: Boolean, default: true },
+  enableStreetAddress: { type: Boolean, default: true },
+  enableCity: { type: Boolean, default: true },
+
   lastUpdated: {
     type: Date,
     default: Date.now,

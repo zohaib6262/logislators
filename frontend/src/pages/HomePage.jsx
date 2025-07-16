@@ -56,7 +56,11 @@ const HomePage = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12 -mt-8">
-        <SearchForm onSearch={handleSearch} isLoading={isLoading} />
+        <SearchForm
+          onSearch={handleSearch}
+          isLoading={isLoading}
+          homeData={homeData}
+        />
 
         {error && (
           <div className="max-w-2xl mx-auto mt-6 bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
