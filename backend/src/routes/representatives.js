@@ -65,30 +65,37 @@ router.get("/:id", async (req, res) => {
 
 // POST create a new representative
 // POST /api/representatives/bulk-save
-router.post("/", async (req, res) => {
-  const incomingReps = req.body;
 
-  if (!Array.isArray(incomingReps) || incomingReps.length === 0) {
-    return res.status(400).json({ error: "No representatives to save" });
+router.post("/", async (req, res) => {
+  const representativeData = req.body;
+  console.log("Incoming representative:", representativeData);
+
+  // Validate: representativeData must be an object and not null
+  if (
+    !representativeData ||
+    typeof representativeData !== "object" ||
+    Array.isArray(representativeData)
+  ) {
+    return res
+      .status(400)
+      .json({ error: "Request body must be a valid representative object" });
   }
 
   try {
-    const existingIds = await Representative.find({
-      id: { $in: incomingReps.map((rep) => rep.id) },
-    }).distinct("id");
+    const newRepresentative = new Representative(representativeData);
+    const savedRep = await newRepresentative.save();
+    console.log("Saved representative:", savedRep);
 
-    const newReps = incomingReps.filter((rep) => !existingIds.includes(rep.id));
-
-    if (newReps.length > 0) {
-      await Representative.insertMany(newReps);
-    }
-
-    res
-      .status(201)
-      .json({ message: "Saved successfully", saved: newReps.length });
+    res.status(201).json({
+      message: "Representative saved successfully",
+      data: savedRep,
+    });
   } catch (err) {
-    console.error("Bulk save error:", err);
-    res.status(500).json({ error: "Failed to save representatives" });
+    console.error("Error saving representative:", err);
+    res.status(500).json({
+      error: "Failed to save representative",
+      details: err.message,
+    });
   }
 });
 

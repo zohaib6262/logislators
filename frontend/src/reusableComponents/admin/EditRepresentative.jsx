@@ -232,6 +232,10 @@ const EditRepresentative = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.name || !formData.current_role.title) {
+      setError("Name and Position are required");
+      return;
+    }
     try {
       await updateRepresentative(id, formData);
       navigate("/admin/representatives");
@@ -243,7 +247,12 @@ const EditRepresentative = () => {
   if (fetchLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div
+          className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+          style={{
+            borderColor: primaryColor,
+          }}
+        ></div>
       </div>
     );
   }
@@ -494,7 +503,7 @@ const EditRepresentative = () => {
                 </label>
                 <input
                   type="tel"
-                  name="phone"
+                  name="extras.phone"
                   value={formData.extras.phone}
                   onChange={handleChange}
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -522,7 +531,7 @@ const EditRepresentative = () => {
                 </label>
                 <input
                   type="text"
-                  name="address"
+                  name="extras.address"
                   value={formData.extras.address}
                   onChange={handleChange}
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"

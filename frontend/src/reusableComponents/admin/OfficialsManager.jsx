@@ -10,6 +10,7 @@ import {
   Loader2,
   AlertTriangle,
   Star,
+  Plus,
 } from "lucide-react";
 import {
   Table,
@@ -261,12 +262,26 @@ const OfficialsManager = () => {
         </div>
       </div>
 
-      <div className="px-4 py-8">
+      <div className="px-4 py-5">
         {/* Loading State */}
+        <div className="py-2 w-60 flex justify-between items-center mb-6">
+          <Link
+            to="/admin/representatives/new"
+            className="flex items-center px-4 py-3 text-white text-sm font-medium rounded-md transition-all"
+            style={{
+              background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+            }}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Representative
+          </Link>
+        </div>
+
         {isLoading && <LoadingSpinner primaryColor={primaryColor} />}
 
         {/* Error State */}
         {!isLoading && error && <ErrorMessage error={error} />}
+
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
@@ -279,7 +294,7 @@ const OfficialsManager = () => {
                     setCurrentPage(1);
                   }}
                   placeholder="Search representatives..."
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pl-12"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 pl-12"
                 />
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <Search className="h-5 w-5 text-gray-400" />
@@ -294,7 +309,7 @@ const OfficialsManager = () => {
                   setCurrentFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="w-full px-4 py-3 rounded-lg border focus:ring-2 bg-white"
               >
                 <option value="all">All Parties</option>
                 <option value="democratic">Democratic</option>

@@ -102,7 +102,7 @@ const ResourcesManager = () => {
           <div className="flex justify-between items-center mb-6">
             <Link
               to="/admin/resources/new"
-              className="flex items-center px-4 py-2 text-white text-sm font-medium rounded-md transition-all"
+              className="flex items-center px-4 py-3 text-white text-sm font-medium rounded-md transition-all"
               style={{
                 background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
               }}
@@ -112,7 +112,7 @@ const ResourcesManager = () => {
             </Link>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+              className="flex items-center px-5 py-3 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
             >
               <Plus className="mr-2 h-4 w-4" />
               Manage Categories
