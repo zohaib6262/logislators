@@ -70,21 +70,57 @@ router.post("/", async (req, res) => {
   const representativeData = req.body;
   console.log("Incoming representative:", representativeData);
 
-  // Validate: representativeData must be an object and not null
-  if (
-    !representativeData ||
-    typeof representativeData !== "object" ||
-    Array.isArray(representativeData)
-  ) {
+  // Agar array hai to har element save karo
+  if (Array.isArray(representativeData)) {
+    try {
+      const savedReps = [];
+      for (const rep of representativeData) {
+        if (rep && typeof rep === "object") {
+          // Duplicate check
+          const exists = await Representative.findOne({ id: rep.id });
+          if (exists) {
+            console.log(`Skipping duplicate representative: ${rep.id}`);
+            continue; // Skip agar already hai
+          }
+
+          const newRepresentative = new Representative(rep);
+          const savedRep = await newRepresentative.save();
+          savedReps.push(savedRep);
+        }
+      }
+
+      return res.status(201).json({
+        message: "Representatives saved successfully",
+        data: savedReps,
+      });
+    } catch (err) {
+      console.error("Error saving representatives:", err);
+      return res.status(500).json({
+        error: "Failed to save representatives",
+        details: err.message,
+      });
+    }
+  }
+
+  // Agar single object hai to usko save karo
+  if (!representativeData || typeof representativeData !== "object") {
     return res
       .status(400)
       .json({ error: "Request body must be a valid representative object" });
   }
 
   try {
+    // Duplicate check
+    const exists = await Representative.findOne({ id: representativeData.id });
+    if (exists) {
+      return res.status(200).json({
+        message: "Representative already exists",
+        data: exists,
+      });
+    }
+
     const newRepresentative = new Representative(representativeData);
     const savedRep = await newRepresentative.save();
-    console.log("Saved representative:", savedRep);
 
     res.status(201).json({
       message: "Representative saved successfully",
