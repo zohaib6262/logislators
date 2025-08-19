@@ -49,12 +49,12 @@ const SearchForm = ({ onSearch, isLoading, homeData }) => {
               alt="Nevada State Capitol"
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center p-8">
+            <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center justify-center p-4 text-center">
               <div className="text-white">
-                <h2 className="text-3xl font-bold mb-4">
+                <h2 className="text-2xl md:text-3xl font-bold mb-2 md:mb-4">
                   {homeData?.imageTitle || ""}
                 </h2>
-                <p className="text-lg opacity-90">
+                <p className="text-sm md:text-lg opacity-90">
                   {homeData?.imageDescription || ""}
                 </p>
               </div>

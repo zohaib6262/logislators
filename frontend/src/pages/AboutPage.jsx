@@ -86,9 +86,11 @@ const AboutPage = () => {
               }}
             >
               <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                Get Involved
+                {aboutData?.labelGetInvolved}
               </h3>
-              <p className="text-gray-700 mb-4">{aboutData?.privacy || " "}</p>
+              <p className="text-gray-700 mb-4">
+                {aboutData?.getInvolved || " "}
+              </p>
               <a
                 href={`mailto:${aboutData?.email || ""}`}
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
