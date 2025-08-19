@@ -20,7 +20,6 @@ const EditRepresentative = () => {
     loading: fetchLoading,
     error: fetchError,
   } = useGetRepresentative(id);
-  console.log("Representative:", representative);
   // Update representative function
   const {
     updateRepresentative,
@@ -125,7 +124,6 @@ const EditRepresentative = () => {
 
   const handleChange = async (e) => {
     const { name, value, type, files } = e.target;
-    console.log("Name:", name, "  value:", value);
 
     if (name === "extras.grade") {
       if (value > 100) {
@@ -252,7 +250,6 @@ const EditRepresentative = () => {
       return;
     }
     try {
-      console.log("Form Data:", formData);
       await updateRepresentative(id, formData);
       navigate("/admin/representatives");
     } catch (error) {

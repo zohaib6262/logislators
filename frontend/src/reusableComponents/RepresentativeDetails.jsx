@@ -25,7 +25,6 @@ import { TokenContext } from "@/store/TokenContextProvider";
 
 const RepresentativeDetails = ({ id, representative }) => {
   const cardRef = useRef(null);
-  console.log("Representative:", representative);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { primaryColor } = useContext(TokenContext);
