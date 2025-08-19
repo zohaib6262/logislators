@@ -6,6 +6,7 @@ import { useUpdateRepresentative } from "../../hooks/useUpdateRepresentative";
 import { uploadImageToCloudinary } from "../../utils/uploadImageCloudinary";
 import { TokenContext } from "@/store/TokenContextProvider";
 import { lightenColor } from "@/utils/colorUtils";
+import { responsiveFontSizes } from "@mui/material";
 
 const EditRepresentative = () => {
   const { id } = useParams();
@@ -19,7 +20,7 @@ const EditRepresentative = () => {
     loading: fetchLoading,
     error: fetchError,
   } = useGetRepresentative(id);
-
+  console.log("Representative:", representative);
   // Update representative function
   const {
     updateRepresentative,
@@ -37,6 +38,7 @@ const EditRepresentative = () => {
     },
     jurisdiction: {
       name: "",
+      classification: "state", // Default to "state"
     },
     extras: {
       phone: "",
@@ -61,6 +63,15 @@ const EditRepresentative = () => {
     openstates_url: "",
   });
 
+  function checkStateOrFederal(value) {
+    if (value === "") {
+      return "state";
+    } else if (value !== "state") {
+      return "federal";
+    } else {
+      return "state";
+    }
+  }
   // Initialize form when data loads
   // Initialize form when data loads
   React.useEffect(() => {
@@ -74,6 +85,9 @@ const EditRepresentative = () => {
         },
         jurisdiction: {
           name: representative.jurisdiction?.name || "",
+          classification: checkStateOrFederal(
+            representative.jurisdiction?.classification || ""
+          ),
         },
         extras: {
           phone: representative.extras?.phone || "",
@@ -111,6 +125,7 @@ const EditRepresentative = () => {
 
   const handleChange = async (e) => {
     const { name, value, type, files } = e.target;
+    console.log("Name:", name, "  value:", value);
 
     if (name === "extras.grade") {
       if (value > 100) {
@@ -237,6 +252,7 @@ const EditRepresentative = () => {
       return;
     }
     try {
+      console.log("Form Data:", formData);
       await updateRepresentative(id, formData);
       navigate("/admin/representatives");
     } catch (error) {
@@ -444,15 +460,17 @@ const EditRepresentative = () => {
               {/* County Field */}
               <div className="sm:col-span-3">
                 <label className="block text-sm font-medium text-gray-700">
-                  County
+                  Classification
                 </label>
-                <input
-                  type="text"
-                  name="extras.county"
-                  value={formData.extras.county}
+                <select
+                  name="jurisdiction.classification"
+                  value={formData.jurisdiction.classification}
                   onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="state">State Level</option>
+                  <option value="federal">Federal / Country Level</option>
+                </select>
               </div>
 
               {/* Grade Field */}

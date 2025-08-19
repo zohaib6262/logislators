@@ -25,7 +25,7 @@ import { TokenContext } from "@/store/TokenContextProvider";
 
 const RepresentativeDetails = ({ id, representative }) => {
   const cardRef = useRef(null);
-
+  console.log("Representative:", representative);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { primaryColor } = useContext(TokenContext);
@@ -97,6 +97,15 @@ const RepresentativeDetails = ({ id, representative }) => {
     );
   }
 
+  function checkStateOrFederal(value) {
+    if (value === "") {
+      return "State Level";
+    } else if (value !== "state") {
+      return "Federal Level";
+    } else {
+      return "State Level";
+    }
+  }
   return (
     <>
       <Helmet>
@@ -178,11 +187,11 @@ const RepresentativeDetails = ({ id, representative }) => {
                   )}
                   <p className="text-white dark:text-gray-300 flex items-center my-1">
                     <MapPin className="h-4 w-4 mr-2" />
-                    {`District ${representative.current_role.district} (${
-                      representative.jurisdiction?.classification === "state"
-                        ? "State Level"
-                        : "Federal Level"
-                    })`}
+                    {`District ${
+                      representative.current_role.district
+                    } (${checkStateOrFederal(
+                      representative.jurisdiction?.classification || ""
+                    )})`}
                   </p>
                 </div>
               </div>

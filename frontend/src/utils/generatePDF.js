@@ -60,6 +60,16 @@ export const generatePDF = async (representative, primaryColor) => {
   const contentWidth = pageWidth - margin * 2;
   let yPosition = margin;
 
+  function checkStateOrFederal(value) {
+    if (value === "") {
+      return "State Level";
+    } else if (value !== "state") {
+      return "Federal Level";
+    } else {
+      return "State Level";
+    }
+  }
+
   const hexToRgb = (hex) => {
     const bigint = parseInt(hex.replace("#", ""), 16);
     return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
@@ -156,11 +166,9 @@ export const generatePDF = async (representative, primaryColor) => {
     pdf.setFontSize(14);
     pdf.setFont("helvetica", "normal");
     pdf.text(
-      `${representative.current_role.title} (${
-        representative.jurisdiction?.classification === "state"
-          ? "State Level"
-          : "Federal Level"
-      })`,
+      `${representative.current_role.title} (${checkStateOrFederal(
+        representative.jurisdiction?.classification || ""
+      )})`,
       textStartX + 6,
       textStartY + 8
     );
