@@ -13,7 +13,6 @@ const ResourceSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ["Government", "Voting", "Education", "Community", "Health", "Other"],
   },
   customFields: [
     {
