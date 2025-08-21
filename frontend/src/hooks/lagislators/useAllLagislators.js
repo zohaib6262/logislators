@@ -14,7 +14,26 @@ const useAllLegislators = () => {
       if (!response.ok) throw new Error("Failed to fetch legislators");
 
       const data = await response.json();
-      setRepresentatives(data);
+      let data2 = [];
+
+      if (data) {
+        for (let i = 0; i < data.length; i++) {
+          const classification = data[i].jurisdiction.classification;
+
+          if (
+            classification !== "country" &&
+            classification !== "federal" &&
+            (data[i].current_role.title === "Assembly Member" ||
+              data[i].current_role.title === "Senator")
+          ) {
+            console.log("Data", classification);
+
+            data2.push(data[i]);
+          }
+        }
+      }
+
+      setRepresentatives(data2);
     } catch (err) {
       setError(err.message || "Something went wrong");
     } finally {
