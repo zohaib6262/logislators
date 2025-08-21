@@ -26,8 +26,6 @@ const useAllLegislators = () => {
             (data[i].current_role.title === "Assembly Member" ||
               data[i].current_role.title === "Senator")
           ) {
-            console.log("Data", classification);
-
             data2.push(data[i]);
           }
         }
