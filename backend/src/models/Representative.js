@@ -75,8 +75,8 @@ const extraPointsSchema = new mongoose.Schema(
 // Highlights schema
 const highlightSchema = new mongoose.Schema(
   {
-    title: { type: String, default: "" },
     session: { type: String, default: "" },
+    keyTakeaways: { type: String, default: "" },
     badgeNum: { type: Number },
   },
   { _id: true }

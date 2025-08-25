@@ -52,8 +52,8 @@ const EditRepresentative = () => {
         description: "",
       },
       highlights: {
-        title: "",
         session: "",
+        keyTakeaways: "",
         badgeNum: 0,
       },
     },
@@ -103,8 +103,8 @@ const EditRepresentative = () => {
             description: representative.extras?.extraPoints?.description || "",
           },
           highlights: {
-            title: representative.extras?.highlights?.title || "",
             session: representative.extras?.highlights?.session || "",
+            keyTakeaways: representative.extras?.highlights?.keyTakeaways || "",
             badgeNum: representative?.extras?.highlights?.badgeNum || 0,
           },
         },
@@ -126,13 +126,30 @@ const EditRepresentative = () => {
     const { name, value, type, files } = e.target;
 
     if (name === "extras.grade") {
-      if (value > 100) {
+      let gradeValue = parseFloat(value);
+
+      if (isNaN(gradeValue)) gradeValue = 0;
+
+      // Round to 2 decimals
+      gradeValue = parseFloat(gradeValue.toFixed(2));
+
+      if (gradeValue > 100) {
         setError("Grade cannot be more than 100");
-      } else if (value < 0) {
+      } else if (gradeValue < 0) {
         setError("Grade cannot be negative");
       } else {
         setError("");
       }
+
+      // Update formData
+      setFormData((prev) => ({
+        ...prev,
+        extras: {
+          ...prev.extras,
+          grade: gradeValue,
+        },
+      }));
+      return; // prevent double update in nested handler
     }
 
     if (type === "file") {
@@ -477,6 +494,7 @@ const EditRepresentative = () => {
                 </label>
                 <input
                   type="number"
+                  step="0.01"
                   name="extras.grade"
                   min="0"
                   max="100"
@@ -725,19 +743,6 @@ const EditRepresentative = () => {
             <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
               <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  value={formData.extras.highlights.title}
-                  onChange={(e) =>
-                    handleHighlightsChange("title", e.target.value)
-                  }
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div className="sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">
                   Session
                 </label>
                 <input
@@ -745,6 +750,19 @@ const EditRepresentative = () => {
                   value={formData.extras.highlights.session}
                   onChange={(e) =>
                     handleHighlightsChange("session", e.target.value)
+                  }
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div className="sm:col-span-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Key Takeaways
+                </label>
+                <input
+                  type="text"
+                  value={formData.extras.highlights.keyTakeaways}
+                  onChange={(e) =>
+                    handleHighlightsChange("keyTakeaways", e.target.value)
                   }
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />

@@ -207,14 +207,15 @@ export const generatePDF = async (representative, primaryColor) => {
       pdf.setFillColor(255, 255, 255);
       pdf.rect(gradeX, gradeY + 15, 30, 4, "S");
 
+      let convertInt = parseFloat(grade);
       const gradeColor =
-        grade >= 80
+        convertInt >= 80
           ? [34, 197, 94]
-          : grade >= 50
+          : convertInt >= 50
           ? [234, 179, 8]
           : [239, 68, 68];
       pdf.setFillColor(...gradeColor);
-      pdf.rect(gradeX, gradeY + 15, (30 * grade) / 100, 4, "F");
+      pdf.rect(gradeX, gradeY + 15, (30 * convertInt) / 100, 4, "F");
     }
 
     yPosition = headerHeight + 15;
