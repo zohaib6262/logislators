@@ -45,6 +45,8 @@ router.get("/", async (req, res) => {
         imageTitle: "Find Your Voice in Nevada",
         imageDescription:
           "Connect with your representatives and make your voice heard in our democracy",
+        changeStreetAddressPlaceholder: "",
+        changeCityPlaceholder: "",
       });
       await existing.save();
     }
@@ -68,6 +70,8 @@ router.put("/", protect, upload.single("image"), async (req, res) => {
       imageTitle = "",
       imageDescription = "",
       image: imageFromBody = "",
+      changeStreetAddressPlaceholder = "",
+      changeCityPlaceholder = "",
     } = req.body;
 
     const imagePath = req.file?.path || imageFromBody || "";
@@ -82,6 +86,8 @@ router.put("/", protect, upload.single("image"), async (req, res) => {
       image: imagePath,
       imageTitle,
       imageDescription,
+      changeStreetAddressPlaceholder,
+      changeCityPlaceholder,
     };
 
     const updatedHome = await HomePage.findOneAndUpdate({}, updateData, {

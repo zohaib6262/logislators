@@ -135,7 +135,10 @@ const SearchForm = ({ onSearch, isLoading, homeData }) => {
                   <Input
                     id="street"
                     name="street"
-                    placeholder="123 Main Street"
+                    placeholder={
+                      homeData?.changeStreetAddressPlaceholder ||
+                      "Enter your street address"
+                    }
                     value={formData.street}
                     onChange={handleChange}
                     className="w-full"
@@ -149,7 +152,9 @@ const SearchForm = ({ onSearch, isLoading, homeData }) => {
                     <Input
                       id="city"
                       name="city"
-                      placeholder="Las Vegas"
+                      placeholder={
+                        homeData?.changeCityPlaceholder || "Enter your city"
+                      }
                       value={formData.city}
                       onChange={handleChange}
                       className="w-full"

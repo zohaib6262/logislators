@@ -25,7 +25,14 @@ const homepageSchema = new mongoose.Schema({
   enableZipCode: { type: Boolean, default: true },
   enableStreetAddress: { type: Boolean, default: true },
   enableCity: { type: Boolean, default: true },
-
+  changeStreetAddressPlaceholder: {
+    type: String,
+    trim: true,
+  },
+  changeCityPlaceholder: {
+    type: String,
+    trim: true,
+  },
   lastUpdated: {
     type: Date,
     default: Date.now,

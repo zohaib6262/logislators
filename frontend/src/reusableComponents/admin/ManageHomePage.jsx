@@ -23,6 +23,8 @@ function ManageHomePage() {
     pageDescription: "",
     imageTitle: "",
     imageDescription: "",
+    changeStreetAddressPlaceholder: "",
+    changeCityPlaceholder: "",
   });
   const { primaryColor } = useContext(TokenContext);
 
@@ -43,6 +45,9 @@ function ManageHomePage() {
         pageDescription: homeData.pageDescription || "",
         imageTitle: homeData.imageTitle || "",
         imageDescription: homeData.imageDescription || "",
+        changeStreetAddressPlaceholder:
+          homeData.changeStreetAddressPlaceholder || "",
+        changeCityPlaceholder: homeData.changeCityPlaceholder || "",
       });
       if (homeData.image) {
         setImagePreview(homeData.image);
@@ -106,6 +111,8 @@ function ManageHomePage() {
       imageTitle: formData.imageTitle,
       imageDescription: formData.imageDescription,
       image: imagePreview,
+      changeStreetAddressPlaceholder: formData.changeStreetAddressPlaceholder,
+      changeCityPlaceholder: formData.changeCityPlaceholder,
     };
 
     await updateHomePage(payload);
@@ -260,6 +267,46 @@ function ManageHomePage() {
                 </>
               )}
             </div>
+            <div className="mb-4 flex gap-4">
+              {/* Street Address Placeholder */}
+              <div className="w-1/2">
+                <label
+                  htmlFor="changeStreetAddressPlaceholder"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Enter Street Address Placeholder
+                </label>
+                <input
+                  type="text"
+                  id="changeStreetAddressPlaceholder"
+                  name="changeStreetAddressPlaceholder"
+                  value={formData.changeStreetAddressPlaceholder || ""}
+                  onChange={handleInputChange}
+                  placeholder="Enter Street Address Placeholder"
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm"
+                />
+              </div>
+
+              {/* City Placeholder */}
+              <div className="w-1/2">
+                <label
+                  htmlFor="changeCityPlaceholder"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Enter City Placeholder
+                </label>
+                <input
+                  type="text"
+                  id="changeCityPlaceholder"
+                  name="changeCityPlaceholder"
+                  value={formData.changeCityPlaceholder || ""}
+                  onChange={handleInputChange}
+                  placeholder="Enter City Placeholder"
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm"
+                />
+              </div>
+            </div>
+
             <div className="flex items-center justify-between mb-6">
               <div>
                 <label

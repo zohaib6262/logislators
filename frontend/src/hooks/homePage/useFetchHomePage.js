@@ -13,6 +13,8 @@ function useFetchHomePage() {
     image: "",
     imageTitle: "",
     imageDescription: "",
+    changeStreetAddressPlaceholder: "",
+    changeCityPlaceholder: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
