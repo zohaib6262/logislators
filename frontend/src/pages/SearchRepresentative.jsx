@@ -296,13 +296,12 @@ export const SearchRepresentative = () => {
                 consistency. Extra points may be added or deducted for
                 exceptional contributions or notable concerns.
               </p>
-              <a
-                href={`mailto:${""}`}
+              <button
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
                 style={{ backgroundColor: primaryColor }}
               >
                 Learn More
-              </a>
+              </button>
             </div>
           }
         </div>
