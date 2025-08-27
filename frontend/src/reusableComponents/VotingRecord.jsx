@@ -3,7 +3,7 @@ import React from "react";
 
 export const VotingRecord = ({ categories }) => {
   if (categories.length === 0) {
-    return;
+    return null;
   }
   const totalScore = getTotalScores(categories);
 
@@ -13,26 +13,17 @@ export const VotingRecord = ({ categories }) => {
         <h3 className="text-lg font-bold text-center">Voting Record</h3>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div>
+        <table className="table-auto w-full divide-y divide-gray-200 -mr-5">
           <thead className="bg-gray-50">
             <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
                 Area
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/4">
                 Notable Bills
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="pr-12 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-auto">
                 Score
               </th>
             </tr>
@@ -43,13 +34,13 @@ export const VotingRecord = ({ categories }) => {
                 key={index}
                 className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <td className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-normal break-words">
                   {category.area}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 text-sm text-gray-500 whitespace-normal break-words">
                   {category.notableBills}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="pr-14 py-4 text-sm text-gray-900 whitespace-normal break-words">
                   {category.score}
                 </td>
               </tr>
@@ -59,11 +50,11 @@ export const VotingRecord = ({ categories }) => {
               <tr className="bg-gray-100">
                 <td
                   colSpan={2}
-                  className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900"
+                  className="px-3 py-4 text-sm font-bold text-gray-900"
                 >
                   Total
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                <td className="pr-14 py-4 text-sm font-bold text-gray-900">
                   {totalScore}
                 </td>
               </tr>

@@ -276,6 +276,35 @@ export const SearchRepresentative = () => {
               </div>
             </div>
           )}
+          {
+            <div
+              className="border-l-4 p-6 rounded-r-lg "
+              style={{
+                backgroundColor: `${primaryColor}20`,
+                borderColor: primaryColor,
+              }}
+            >
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                How Legislators Are Scored?
+              </h3>
+              <p className="text-gray-700 mb-4">
+                Each legislator’s score is calculated by analyzing their voting
+                records, sponsorship of key bills, and overall alignment with
+                good governance principles. Categories like education,
+                healthcare, fiscal responsibility, and labor are weighted to
+                provide a balanced grade that reflects both impact and
+                consistency. Extra points may be added or deducted for
+                exceptional contributions or notable concerns.
+              </p>
+              <a
+                href={`mailto:${""}`}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
+                style={{ backgroundColor: primaryColor }}
+              >
+                Learn More
+              </a>
+            </div>
+          }
         </div>
       ) : (
         <div className="max-w-3xl mx-auto px-4 py-8">
