@@ -2,7 +2,13 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Edit2, Save, X } from "lucide-react";
 
-function FormSection({ label, isEditable = false, onLabelChange, children }) {
+function FormSection({
+  label,
+  isEditable = false,
+  onLabelChange,
+  children,
+  classNameData = "",
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [tempLabel, setTempLabel] = useState(label);
 
@@ -34,7 +40,7 @@ function FormSection({ label, isEditable = false, onLabelChange, children }) {
   };
 
   return (
-    <div className="mb-6">
+    <div className={`mb-6 ${classNameData}`}>
       <div className="flex items-center justify-between mb-2">
         {isEditing ? (
           <div className="flex items-center gap-2 w-full">

@@ -22,6 +22,7 @@ const HomePage = () => {
 
   const handleSearch = async (formData) => {
     try {
+      setIsLoading(true);
       const { street, city, state, zipcode } = formData;
       const queryParams = new URLSearchParams({
         street,
@@ -30,7 +31,10 @@ const HomePage = () => {
         zipCode: zipcode,
       });
       const queryString = queryParams.toString().replace(/%20/g, "+");
-      navigation(`/representatives?${queryString}`, { state: formData });
+      navigation(`/representatives?${queryString}`, {
+        state: formData,
+      });
+      setIsLoading(false);
     } catch (err) {
       setIsLoading(false);
     }

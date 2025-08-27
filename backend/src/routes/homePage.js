@@ -72,6 +72,8 @@ router.put("/", protect, upload.single("image"), async (req, res) => {
       image: imageFromBody = "",
       changeStreetAddressPlaceholder = "",
       changeCityPlaceholder = "",
+      howLegislatorsScored = "",
+      howLegislatorsScoredLink = "",
     } = req.body;
 
     const imagePath = req.file?.path || imageFromBody || "";
@@ -88,6 +90,8 @@ router.put("/", protect, upload.single("image"), async (req, res) => {
       imageDescription,
       changeStreetAddressPlaceholder,
       changeCityPlaceholder,
+      howLegislatorsScored,
+      howLegislatorsScoredLink,
     };
 
     const updatedHome = await HomePage.findOneAndUpdate({}, updateData, {

@@ -25,6 +25,8 @@ function ManageHomePage() {
     imageDescription: "",
     changeStreetAddressPlaceholder: "",
     changeCityPlaceholder: "",
+    howLegislatorsScored: "",
+    howLegislatorsScoredLink: "",
   });
   const { primaryColor } = useContext(TokenContext);
 
@@ -48,6 +50,8 @@ function ManageHomePage() {
         changeStreetAddressPlaceholder:
           homeData.changeStreetAddressPlaceholder || "",
         changeCityPlaceholder: homeData.changeCityPlaceholder || "",
+        howLegislatorsScored: homeData.howLegislatorsScored || "",
+        howLegislatorsScoredLink: homeData.howLegislatorsScoredLink || "",
       });
       if (homeData.image) {
         setImagePreview(homeData.image);
@@ -113,6 +117,8 @@ function ManageHomePage() {
       image: imagePreview,
       changeStreetAddressPlaceholder: formData.changeStreetAddressPlaceholder,
       changeCityPlaceholder: formData.changeCityPlaceholder,
+      howLegislatorsScored: formData.howLegislatorsScored,
+      howLegislatorsScoredLink: formData.howLegislatorsScoredLink,
     };
 
     await updateHomePage(payload);
@@ -412,6 +418,33 @@ function ManageHomePage() {
               </Switch>
             </div>
 
+            <div className="mb-8 pb-6 border-b border-t my-5 border-gray-200">
+              <FormSection
+                label="How Legislators Are Scored?"
+                classNameData="mt-4"
+              >
+                <textarea
+                  id="howLegislatorsScored"
+                  name="howLegislatorsScored"
+                  rows={6}
+                  value={formData.howLegislatorsScored}
+                  onChange={handleInputChange}
+                  placeholder="Explain how legislators are scored..."
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm"
+                />
+              </FormSection>
+              <FormSection label="Learn More Button Link">
+                <input
+                  type="text"
+                  id="howLegislatorsScoredLink"
+                  name="howLegislatorsScoredLink"
+                  value={formData.howLegislatorsScoredLink}
+                  onChange={handleInputChange}
+                  placeholder="Enter URL for Learn More button"
+                  className="block w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm"
+                />
+              </FormSection>
+            </div>
             <div className="flex justify-end items-center gap-4 mt-6">
               {updateMessage && (
                 <span className="text-green-600 text-sm">{updateMessage}</span>

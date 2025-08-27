@@ -33,6 +33,14 @@ const homepageSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  howLegislatorsScored: {
+    type: String,
+    trim: true,
+  },
+  howLegislatorsScoredLink: {
+    type: String,
+    trim: true,
+  },
   lastUpdated: {
     type: Date,
     default: Date.now,
