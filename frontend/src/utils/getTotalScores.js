@@ -8,6 +8,8 @@ export const getTotalScores = (categories) => {
     },
     { total: 0, outOf: 0 }
   );
+  const total = finalScore.total.toFixed(2);
+  const outOf = finalScore.outOf.toFixed(2);
 
-  return `${finalScore.total}/${finalScore.outOf}`;
+  return `${total}/${outOf}`;
 };

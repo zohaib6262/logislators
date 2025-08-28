@@ -303,7 +303,9 @@ export const generatePDF = async (representative, primaryColor) => {
         }
       });
 
-      const totalScore = `${totalNumerator}/${totalDenominator}`;
+      const totalScore = `${totalNumerator.toFixed(
+        2
+      )}/${totalDenominator.toFixed(2)}`;
 
       autoTable(pdf, {
         startY: yPosition,
