@@ -1,100 +1,3 @@
-// import UserContact from "../models/UserContact.js";
-// import express from "express";
-// import dotenv from "dotenv";
-// import axios from "axios";
-// dotenv.config();
-// const router = express.Router();
-// // API Endpoint to Save User
-
-// router.post("/", async (req, res) => {
-//   try {
-//     const userData = req.body;
-
-//     // First check if email exists in MongoDB
-//     const existingUser = await UserContact.findOne({ email: userData.email });
-//     if (existingUser) {
-//       addToKeapCRM(userData)
-//         .then((result) => console.log("Keap result:", result))
-//         .catch((err) => console.error("Keap error:", err));
-//       return res.status(400).json({
-//         success: false,
-//         message: "Email already exists in our system",
-//         code: 400,
-//       });
-//     }
-
-//     // Save to MongoDB
-//     const newUser = new UserContact(userData);
-//     await newUser.save();
-
-//     // Add to Keap CRM (don't block response if this fails)
-//     addToKeapCRM(userData)
-//       .then((result) => console.log("Keap result:", result))
-//       .catch((err) => console.error("Keap error:", err));
-
-//     res.status(201).json({
-//       success: true,
-//       message: "User data saved successfully",
-//       user: newUser,
-//     });
-//   } catch (error) {
-//     console.error("Error saving user:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Error saving user data",
-//       error: error.message,
-//     });
-//   }
-// });
-// // Keap CRM Integration
-// async function addToKeapCRM(userData) {
-//   try {
-//     const accessToken =
-//       process.env.KEAP_ACCESS_TOKEN ||
-//       "KeapAK-e1dc62c5958eab1b2ca6fb67e5ca20ad284661ad0c1aa16b75";
-
-//     // First check if userContact exists
-// const checkResponse = await axios.get(
-//   `https://api.infusionsoft.com/crm/rest/v1/contacts?email=${userData.email}`,
-//   {
-//     headers: {
-//       Authorization: `Bearer ${accessToken}`,
-//       "Content-Type": "application/json",
-//     },
-//   }
-// );
-
-//     // If userContact already exists, return
-//     if (checkResponse.data.contacts && checkResponse.data.contacts.length > 0) {
-//       console.log("Contact already exists in Keap");
-//       // return { success: false, message: "Contact already exists" };
-//       return;
-//     }
-
-//     // Create new contact
-//     const response = await axios.post(
-//       "https://api.infusionsoft.com/crm/rest/v1/contacts",
-//       {
-//         email_addresses: [{ email: userData.email, field: "EMAIL1" }],
-//         given_name: userData.firstName,
-//         family_name: userData.lastName,
-//       },
-//       {
-//         headers: {
-//           Authorization: `Bearer ${accessToken}`,
-//           "Content-Type": "application/json",
-//         },
-//       }
-//     );
-
-//     return { success: true, data: response.data };
-//   } catch (error) {
-//     console.error("Keap CRM error:", error.response?.data || error.message);
-//     return { success: false, error: error.response?.data || error.message };
-//   }
-// }
-
-// export default router;
 import UserContact from "../models/UserContact.js";
 import express from "express";
 import dotenv from "dotenv";
@@ -229,6 +132,7 @@ async function addToKeapCRM(userData) {
       userData,
       DEFAULT_TAG_ID
     );
+    console.log("Tag Results:", tagResults);
 
     // Get complete contact data with tags
     const contactResponse = await axios.get(
@@ -282,6 +186,8 @@ async function handleContactTags(
   const results = {
     assemblyTag: null,
     senateTag: null,
+    scorecardTag: null,
+
     appliedTags: [],
     errors: [],
   };
@@ -300,55 +206,41 @@ async function handleContactTags(
 
     const currentTagIds = currentTagsResponse.data.tags.map((tag) => tag.id);
     console.log("Current tag IDs:", currentTagIds);
+    try {
+      const scorecardTag = await ensureTagExists(
+        accessToken,
+        "2025 legislative scorecard"
+      );
+      console.log("Scorecard tag:", scorecardTag);
+      results.scorecardTag = scorecardTag;
+      console.log("Scorecard tag:", scorecardTag);
 
-    // Process Default Tag if provided
-    // if (defaultTagId) {
-    //   try {
-    //     // Verify the default tag exists
-    //     const tagInfo = await axios.get(
-    //       `https://api.infusionsoft.com/crm/rest/v1/tags/${defaultTagId}`,
-    //       {
-    //         headers: {
-    //           Authorization: `Bearer ${accessToken}`,
-    //           "Content-Type": "application/json",
-    //         },
-    //       }
-    //     );
+      if (!currentTagIds.includes(scorecardTag.id)) {
+        const applyResult = await applyTagToContact(
+          accessToken,
+          contactId,
+          scorecardTag.id
+        );
+        results.appliedTags.push({
+          tagId: scorecardTag.id,
+          tagName: "2025 legislative scorecard",
+          result: applyResult,
+        });
+      } else {
+        results.appliedTags.push({
+          tagId: scorecardTag.id,
+          tagName: "2025 legislative scorecard",
+          result: "already_applied",
+        });
+      }
+    } catch (tagError) {
+      console.error("Failed to apply scorecard tag:", tagError);
+      results.errors.push({
+        tagType: "scorecard",
+        error: tagError.message,
+      });
+    }
 
-    //     results.defaultTag = {
-    //       id: defaultTagId,
-    //       name: tagInfo.data.name || "Default Tag",
-    //     };
-
-    //     if (!currentTagIds.includes(defaultTagId)) {
-    //       const applyResult = await applyTagToContact(
-    //         accessToken,
-    //         contactId,
-    //         defaultTagId
-    //       );
-    //       results.appliedTags.push({
-    //         tagId: defaultTagId,
-    //         tagName: results.defaultTag.name,
-    //         result: applyResult,
-    //       });
-    //     } else {
-    //       results.appliedTags.push({
-    //         tagId: defaultTagId,
-    //         tagName: results.defaultTag.name,
-    //         result: "already_applied",
-    //       });
-    //     }
-    //   } catch (tagError) {
-    //     console.error("Failed to process default tag:", tagError);
-    //     results.errors.push({
-    //       tagType: "default",
-    //       error: tagError.message,
-    //     });
-    //   }
-    // }
-
-    // Process Assembly District Tag
-    // let data1 = 10;
     if (userData.assemblyDistrict) {
       const assemblyTagName = `${ASSEMBLY_DISTRICT_TAG_PREFIX}${userData.assemblyDistrict}`;
       console.log("Processing assembly tag:", assemblyTagName);
@@ -386,8 +278,6 @@ async function handleContactTags(
       }
     }
 
-    // Process Senate District Tag
-    // let data2 = 20;
     if (userData.stateDistrict) {
       const senateTagName = `${SENATE_DISTRICT_TAG_PREFIX}${userData.stateDistrict}`;
       console.log("Processing senate tag:", senateTagName);
@@ -553,51 +443,5 @@ async function applyTagToContact(accessToken, contactId, tagId) {
     };
   }
 }
-// async function applyTagToContact(accessToken, contactId, tagId) {
-//   try {
-//     console.log(`Applying tag ${tagId} to contact ${contactId}`);
-//     const response = await axios.post(
-//       `https://api.infusionsoft.com/crm/rest/v1/contacts/${contactId}/tags`,
-//       { tagIds: [tagId] }, // Note the different payload format
-//       {
-//         headers: {
-//           Authorization: `Bearer ${accessToken}`,
-//           "Content-Type": "application/json",
-//         },
-//       }
-//     );
-
-//     // Return the complete response for verification
-//     return {
-//       success: true,
-//       status: response.status,
-//       data: response.data,
-//     };
-//   } catch (error) {
-//     if (
-//       error.response?.status === 400 &&
-//       error.response?.data?.message?.includes("already applied")
-//     ) {
-//       console.log(`Tag ${tagId} already applied to contact ${contactId}`);
-//       return {
-//         success: true,
-//         alreadyApplied: true,
-//       };
-//     }
-
-//     console.error(`Error applying tag ${tagId}:`, {
-//       message: error.message,
-//       response: error.response?.data,
-//       stack: error.stack,
-//     });
-
-//     throw {
-//       tagId,
-//       contactId,
-//       error: error.message,
-//       response: error.response?.data,
-//     };
-//   }
-// }
 
 export default router;

@@ -345,34 +345,47 @@ export const generatePDF = async (representative, primaryColor) => {
     }
 
     if (
-      representative?.extras?.extraPoints?.points ||
-      representative?.extras?.extraPoints?.description
+      Array.isArray(representative?.extras?.extraPoints) &&
+      representative.extras.extraPoints.length > 0
     ) {
+      // Section header once
       yPosition = checkNewPage(20);
-      const sectionHeight = 50;
-
       pdf.setFillColor(75, 46, 46);
-      pdf.rect(margin, yPosition - 5, contentWidth, sectionHeight, "F");
+      pdf.rect(margin, yPosition - 5, contentWidth, 20, "F");
 
       pdf.setTextColor(255, 255, 255);
       pdf.setFontSize(14);
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Extra Points Added/Deducted", margin + 10, yPosition + 10);
+      const headerText = "EXTRA POINTS ADDED/DEDUCTED";
+      const textWidth = pdf.getTextWidth(headerText);
+      const centerX = margin + contentWidth / 2 - textWidth / 2;
 
-      pdf.setFontSize(10);
-      pdf.text(
-        `Bills: ${representative.extras.extraPoints.bills}`,
-        margin + 10,
-        yPosition + 20
-      );
+      pdf.text(headerText, centerX, yPosition + 6);
 
-      pdf.setFont("helvetica", "normal");
-      const extraText = `${representative.current_role.title} ${representative.name} ${representative.extras.extraPoints.description} extra points ${representative.extras.extraPoints.points}.`;
-      const lines = pdf.splitTextToSize(extraText, contentWidth - 20);
-      pdf.text(lines, margin + 10, yPosition + 30);
+      yPosition += 20;
 
-      yPosition += sectionHeight + 10;
-      pdf.setTextColor(0, 0, 0);
+      // Loop through each point
+      representative.extras.extraPoints.forEach((point) => {
+        // Ensure space before drawing this block
+        yPosition = checkNewPage(30);
+
+        pdf.setFillColor(75, 46, 46);
+        pdf.rect(margin, yPosition - 5, contentWidth, 20, "F");
+
+        pdf.setFontSize(12);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(point.bills, margin + 10, yPosition);
+
+        const rightX = margin + 100;
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(11);
+
+        let lines = pdf.splitTextToSize(point.description, contentWidth - 120);
+        lines[lines.length - 1] += " " + point.points + ".";
+
+        pdf.text(lines, rightX, yPosition);
+
+        yPosition += Math.max(lines.length * 5, 4);
+      });
     }
 
     if (
@@ -437,3 +450,11 @@ export const generatePDF = async (representative, primaryColor) => {
     throw new Error("Failed to generate PDF. Please try again.");
   }
 };
+function checkNewPage(requiredSpace = 20) {
+  const pageHeight = pdf.internal.pageSize.height;
+  if (yPosition + requiredSpace > pageHeight - margin) {
+    pdf.addPage();
+    yPosition = margin + 20; // reset top margin
+  }
+  return yPosition;
+}

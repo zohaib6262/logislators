@@ -68,7 +68,6 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
   const representativeData = req.body;
-  console.log("Incoming representative:", representativeData);
 
   // Agar array hai to har element save karo
   if (Array.isArray(representativeData)) {
