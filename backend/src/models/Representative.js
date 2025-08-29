@@ -123,7 +123,7 @@ const RepresentativeSchema = new mongoose.Schema({
     county: { type: String, default: "" },
     biography: { type: String, default: "" },
     votingRecord: { type: [votingRecordSchema], default: [] },
-    extraPoints: { type: extraPointsSchema, default: {} },
+    extraPoints: { type: [extraPointsSchema], default: [] },
     highlights: { type: highlightSchema, default: {} },
     // default: {},
   },
