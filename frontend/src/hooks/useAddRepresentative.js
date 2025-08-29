@@ -9,7 +9,6 @@ export const useAddRepresentative = () => {
 
   const addRepresentative = async (representativeData) => {
     try {
-      console.log("Adding representative:", representativeData);
       setLoading(true);
       setError(null);
 

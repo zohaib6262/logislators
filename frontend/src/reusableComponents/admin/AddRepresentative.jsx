@@ -38,11 +38,7 @@ const AddRepresentative = () => {
       biography: "",
       grade: 0,
       votingRecords: [],
-      extraPoints: {
-        bills: "",
-        points: 0,
-        description: "",
-      },
+      extraPoints: [],
       highlights: {
         session: "",
         keyTakeaways: "",
@@ -139,7 +135,39 @@ const AddRepresentative = () => {
       },
     }));
   };
+  const handleAddExtraPoint = () => {
+    setFormData((prev) => ({
+      ...prev,
+      extras: {
+        ...prev.extras,
+        extraPoints: [
+          ...prev.extras.extraPoints,
+          { bills: "", description: "", points: 0 },
+        ],
+      },
+    }));
+  };
 
+  // Remove extra point
+  const handleRemoveExtraPoint = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      extras: {
+        ...prev.extras,
+        extraPoints: prev.extras.extraPoints.filter((_, i) => i !== index),
+      },
+    }));
+  };
+
+  // Change extra point field
+  const handleExtraPointChange = (index, field, value) => {
+    const updated = [...formData.extras.extraPoints];
+    updated[index][field] = value;
+    setFormData((prev) => ({
+      ...prev,
+      extras: { ...prev.extras, extraPoints: updated },
+    }));
+  };
   const handleExtraPointsChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -549,52 +577,88 @@ const AddRepresentative = () => {
         {/* Extra Points Section */}
         <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
           <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
-              Extra Points
-            </h3>
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">
+                Extra Points
+              </h3>
+              <button
+                type="button"
+                onClick={handleAddExtraPoint}
+                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white"
+                style={{
+                  background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+                }}
+              >
+                <Plus size={16} className="mr-1" />
+                Add Extra Point
+              </button>
+            </div>
           </div>
           <div className="px-4 py-5 sm:p-6">
-            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Bills
-                </label>
-                <input
-                  type="text"
-                  value={formData.extras.extraPoints.bills}
-                  onChange={(e) =>
-                    handleExtraPointsChange("bills", e.target.value)
-                  }
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
+            {formData.extras.extraPoints.map((point, index) => (
+              <div
+                key={index}
+                className="mb-6 pb-6 border-b border-gray-200 last:border-0 last:mb-0 last:pb-0"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <h4 className="text-md font-medium text-gray-900">
+                    Extra Point #{index + 1}
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveExtraPoint(index)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Bills
+                    </label>
+                    <input
+                      type="text"
+                      value={point.bills}
+                      onChange={(e) =>
+                        handleExtraPointChange(index, "bills", e.target.value)
+                      }
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="sm:col-span-3">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Description
+                    </label>
+                    <input
+                      type="text"
+                      value={point.description}
+                      onChange={(e) =>
+                        handleExtraPointChange(
+                          index,
+                          "description",
+                          e.target.value
+                        )
+                      }
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="sm:col-span-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Points
+                    </label>
+                    <input
+                      type="number"
+                      value={point.points}
+                      onChange={(e) =>
+                        handleExtraPointChange(index, "points", e.target.value)
+                      }
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">
-                  Description
-                </label>
-                <input
-                  type="text"
-                  value={formData.extras.extraPoints.description}
-                  onChange={(e) =>
-                    handleExtraPointsChange("description", e.target.value)
-                  }
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div className="sm:col-span-1">
-                <label className="block text-sm font-medium text-gray-700">
-                  Points
-                </label>
-                <input
-                  type="number"
-                  value={formData.extras.extraPoints.points}
-                  onChange={(e) =>
-                    handleExtraPointsChange("points", e.target.value)
-                  }
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 

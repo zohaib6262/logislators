@@ -27,7 +27,6 @@ const EditRepresentative = () => {
     error: saveError,
     setError,
   } = useUpdateRepresentative();
-  console.log("Data:", representative);
 
   const [formData, setFormData] = useState({
     name: "",
