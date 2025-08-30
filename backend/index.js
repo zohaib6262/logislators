@@ -58,6 +58,7 @@ app.use("/api/auth", userRoutes);
 app.use("/api/resources", resources);
 app.use("/api/settings", siteSettings);
 app.use("/api/officials", officialsRoutes);
+app.use("/api/voting-records", votingRecordsRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
