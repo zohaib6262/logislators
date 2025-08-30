@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import BASE_URL from "@/lib/utils";
-const API_BASE_URL = `${BASE_URL}/features`;
+const API_BASE_URL = `${BASE_URL}/voting-section`;
 
 // Initial state for a new feature
 export const initialVotingSection = {
@@ -17,7 +17,7 @@ export function useVotingSection() {
   const fetchVotingSection = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/voting-section`);
+      const res = await fetch(API_BASE_URL);
       if (!res.ok) setError("Failed to fetch voting section");
 
       const data = await res.json();
@@ -42,7 +42,7 @@ export function useVotingSection() {
       if (!token) {
         throw new Error("No authentication token found");
       }
-      const res = await fetch(`${API_BASE_URL}/voting-section`, {
+      const res = await fetch(API_BASE_URL, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -73,7 +73,7 @@ export function useVotingSection() {
       if (!token) {
         throw new Error("No authentication token found");
       }
-      const res = await fetch(`${API_BASE_URL}/voting-section/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,7 +104,7 @@ export function useVotingSection() {
       if (!token) {
         throw new Error("No authentication token found");
       }
-      const res = await fetch(`${API_BASE_URL}/voting-section/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
