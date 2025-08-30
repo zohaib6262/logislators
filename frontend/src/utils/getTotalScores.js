@@ -1,3 +1,31 @@
+// export const getTotalScores = (categories) => {
+//   const finalScore = categories.reduce(
+//     (acc, item) => {
+//       const [numerator, denominator] = item.score.split("/").map(Number);
+//       acc.total += numerator;
+//       acc.outOf += denominator;
+//       return acc;
+//     },
+//     { total: 0, outOf: 0 }
+//   );
+//   const total = finalScore.total.toFixed(2);
+//   const outOf = finalScore.outOf.toFixed(2);
+
+//   return `${total}/${outOf}`;
+// };
+
+// export const getTotalPoints = (points) => {
+//   if (!points) return "0/0"; // fallback
+
+//   // split string by "/"
+//   const [numerator, denominator] = points.split("/").map(Number);
+
+//   // round to 2 decimals
+//   const total = numerator.toFixed(2);
+//   const outOf = denominator.toFixed(2);
+
+//   return `${total}/${outOf}`;
+// };
 export const getTotalScores = (categories) => {
   const finalScore = categories.reduce(
     (acc, item) => {
@@ -8,21 +36,29 @@ export const getTotalScores = (categories) => {
     },
     { total: 0, outOf: 0 }
   );
+
   const total = finalScore.total.toFixed(2);
   const outOf = finalScore.outOf.toFixed(2);
+
+  // agar denominator 0 ya 1 ho to sirf total dikhayein
+  if (Number(finalScore.outOf) <= 1) {
+    return total;
+  }
 
   return `${total}/${outOf}`;
 };
 
 export const getTotalPoints = (points) => {
-  if (!points) return "0/0"; // fallback
+  if (!points) return "0";
 
-  // split string by "/"
   const [numerator, denominator] = points.split("/").map(Number);
-
-  // round to 2 decimals
   const total = numerator.toFixed(2);
   const outOf = denominator.toFixed(2);
+
+  // agar denominator 0 ya 1 ho to sirf total dikhayein
+  if (Number(denominator) <= 1) {
+    return total;
+  }
 
   return `${total}/${outOf}`;
 };
