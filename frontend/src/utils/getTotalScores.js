@@ -41,7 +41,7 @@ export const getTotalScores = (categories) => {
   const outOf = finalScore.outOf.toFixed(2);
 
   // agar denominator 0 ya 1 ho to sirf total dikhayein
-  if (Number(finalScore.outOf) <= 1) {
+  if (Number(finalScore.outOf) < 0.1 || !Number(finalScore.outOf)) {
     return total;
   }
 
