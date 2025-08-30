@@ -187,7 +187,7 @@ export const generatePDF = async (representative, primaryColor) => {
     if (representative.extras?.highlights?.session) {
       pdf.setFontSize(14);
       pdf.text(
-        `${representative.extras.highlights.session} Report Card`,
+        `Nevada’s ${representative.extras.highlights.session} Legislative Report Card`,
         textStartX + 5,
         textStartY + 22
       );
@@ -383,51 +383,55 @@ export const generatePDF = async (representative, primaryColor) => {
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(11);
 
-        let lines = pdf.splitTextToSize(point.description, contentWidth - 120);
-        const totalPoints = getTotalPoints(point.points);
+        let lines = [];
+        if (point?.description && point.description.trim() !== "") {
+          lines = pdf.splitTextToSize(point.description, contentWidth - 120);
 
-        // Description print karo (multi-line)
-        pdf.setFont("helvetica", "normal");
-        pdf.text(lines, rightX, yPosition);
+          // Description print karo (multi-line)
+          pdf.setFont("helvetica", "normal");
+          pdf.text(lines, rightX, yPosition);
 
-        // Ab last line ka content aur width nikal lo
-        const lastLine = lines[lines.length - 1];
-        const lastLineWidth = pdf.getTextWidth(lastLine);
+          // Ab last line ka content aur width nikal lo
+          const lastLine = lines[lines.length - 1];
+          const lastLineWidth = pdf.getTextWidth(lastLine);
 
-        // Line height calculate karo (approx: fontSize * 0.35)
-        const lineHeight = pdf.getFontSize() * 0.35;
-        const lastLineY = yPosition + (lines.length - 1) * lineHeight;
+          // Line height calculate karo (approx: fontSize * 0.35)
+          const lineHeight = pdf.getFontSize() * 0.35;
+          const lastLineY = yPosition + (lines.length - 1) * lineHeight;
 
-        // Ab points ko usi last line ke end par bold + smaller font me likho
-        const originalFontSize = pdf.getFontSize() + 0.8; // save current size
+          // Ab points ko usi last line ke end par bold likho
+          pdf.setFont("helvetica", "bold");
+          pdf.setFontSize(11);
+          pdf.text(
+            String(getTotalPoints(point.points)),
+            rightX + lastLineWidth + 5, // thoda gap
+            lastLineY
+          );
 
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(originalFontSize - 2); // thoda chhota kar diya
-        pdf.text(
-          `${totalPoints}`,
-          rightX + lastLineWidth + 1, // thoda gap dekar
-          lastLineY + 0.5
-        );
-
-        // reset back to normal size
-        pdf.setFontSize(originalFontSize);
+          // Reset
+          pdf.setFont("helvetica", "normal");
+        } else {
+          // Agar description hi nahi hai → sirf points likho
+          pdf.setFont("helvetica", "bold");
+          pdf.setFontSize(11);
+          pdf.text(String(getTotalPoints(point.points)), rightX, yPosition);
+          pdf.setFont("helvetica", "normal");
+        }
 
         // --- Add bottom margin after each point ---
         yPosition += Math.max(lines.length * 1, 4) + 4;
       });
     }
 
-    if (
-      representative?.extras?.highlights?.badgeNum > 0 ||
-      representative?.extras?.highlights?.title ||
-      representative?.extras?.highlights?.session
-    ) {
-      yPosition = checkNewPage(20);
-      const sectionHeight = 50;
+    if (representative?.extras?.highlights) {
+      const sectionHeight = 50; // approx total block height
+      yPosition = checkNewPage(sectionHeight + 20); // ✅ check available space
 
+      // Background block
       pdf.setFillColor(55, 59, 84);
       pdf.rect(margin, yPosition - 5, contentWidth, sectionHeight, "F");
 
+      // Title
       pdf.setTextColor(255, 255, 255);
       pdf.setFontSize(14);
       pdf.setFont("helvetica", "bold");
@@ -435,26 +439,34 @@ export const generatePDF = async (representative, primaryColor) => {
 
       pdf.setFontSize(10);
       pdf.setFont("helvetica", "normal");
-      const highlightText = `${representative?.extras?.highlights?.title} ${representative?.extras?.highlights?.session}.`;
-      const highlightLines = pdf.splitTextToSize(
-        highlightText,
-        contentWidth - 40 // Reduced width to create space for the circle
-      );
-      pdf.text(highlightLines, margin + 10, yPosition + 20); // Adjusted y-position
 
-      pdf.setFillColor(234, 179, 8);
-      pdf.circle(pageWidth - margin - 25, yPosition + 15, 8, "F"); // Moved circle further left
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(12);
-      pdf.setFont("helvetica", "bold");
-      pdf.text(
-        representative?.extras?.highlights?.badgeNum > 0 &&
-          `${representative?.extras?.highlights?.badgeNum}`,
-        pageWidth - margin - 27, // Adjusted x-position
-        yPosition + 17
-      );
+      // ✅ KeyTakeaways + session safe string
+      const keyTakeaways =
+        representative?.extras?.highlights?.keyTakeaways || "";
+      const session = representative?.extras?.highlights?.session || "";
+      const highlightText = `${keyTakeaways}`.trim();
 
-      yPosition += sectionHeight + 10;
+      if (highlightText) {
+        const highlightLines = pdf.splitTextToSize(
+          highlightText,
+          contentWidth - 40 // Reduced width to create space for the circle
+        );
+        pdf.text(highlightLines, margin + 10, yPosition + 20);
+      }
+
+      // ✅ BadgeNum safe
+      const badgeNum = representative?.extras?.highlights?.badgeNum;
+      if (badgeNum && badgeNum > 0) {
+        pdf.setFillColor(234, 179, 8);
+        pdf.circle(pageWidth - margin - 25, yPosition + 15, 8, "F");
+
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(12);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(String(badgeNum), pageWidth - margin - 27, yPosition + 17);
+      }
+
+      yPosition += sectionHeight + 20;
       pdf.setTextColor(0, 0, 0);
     }
 

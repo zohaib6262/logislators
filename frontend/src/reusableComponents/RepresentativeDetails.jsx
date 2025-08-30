@@ -176,7 +176,7 @@ const RepresentativeDetails = ({ id, representative }) => {
                   {
                     <p className="text-white dark:text-gray-300 flex items-center my-1">
                       {representative?.extras?.highlights?.session &&
-                        `${representative?.extras?.highlights?.session} Report Card`}
+                        `${representative?.extras?.highlights?.session} Legislative Report Card`}
                       {representative?.county}
                     </p>
                   }
