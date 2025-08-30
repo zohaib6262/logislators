@@ -59,9 +59,9 @@ export const getTotalPoints = (points) => {
   }
 
   // agar denominator 0 ya 1 ho to sirf total dikhayein
-  if (Number(denominator) <= 1) {
+  if (denominator < 0.1 || !denominator) {
     const total = numerator.toFixed(2);
 
-    return total;
+    return `${total}`;
   }
 };
