@@ -426,25 +426,27 @@ export const generatePDF = async (representative, primaryColor) => {
     if (representative?.extras?.highlights) {
       const sectionHeight = 50; // approx total block height
       yPosition = checkNewPage(sectionHeight + 20); // ✅ check available space
-
-      // Background block
-      pdf.setFillColor(55, 59, 84);
-      pdf.rect(margin, yPosition - 5, contentWidth, sectionHeight, "F");
-
-      // Title
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(14);
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Highlights & Key Takeaways", margin + 10, yPosition + 10);
-
-      pdf.setFontSize(10);
-      pdf.setFont("helvetica", "normal");
-
-      // ✅ KeyTakeaways + session safe string
       const keyTakeaways =
         representative?.extras?.highlights?.keyTakeaways || "";
-      const session = representative?.extras?.highlights?.session || "";
       const highlightText = `${keyTakeaways}`.trim();
+      if (highlightText) {
+        // Background block
+        pdf.setFillColor(55, 59, 84);
+        pdf.rect(margin, yPosition - 5, contentWidth, sectionHeight, "F");
+
+        // Title
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(14);
+        pdf.setFont("helvetica", "bold");
+        pdf.text("Highlights & Key Takeaways", margin + 10, yPosition + 10);
+
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "normal");
+      }
+
+      // ✅ KeyTakeaways + session safe string
+
+      const session = representative?.extras?.highlights?.session || "";
 
       if (highlightText) {
         const highlightLines = pdf.splitTextToSize(
