@@ -22,6 +22,7 @@ import { generatePDF } from "@/utils/generatePDF";
 import { jsPDF } from "jspdf";
 import { Helmet } from "react-helmet-async";
 import { TokenContext } from "@/store/TokenContextProvider";
+import { getTotalPoints } from "@/utils/getTotalScores";
 
 const RepresentativeDetails = ({ id, representative }) => {
   const cardRef = useRef(null);
@@ -311,7 +312,8 @@ const RepresentativeDetails = ({ id, representative }) => {
                   >
                     <div className="font-semibold sm:w-1/2">{point.bills}</div>
                     <p className="sm:w-2/3">
-                      {point.description} <strong>{point.points}</strong>
+                      {point.description}
+                      <strong>{getTotalPoints(point.points)}</strong>
                     </p>
                   </div>
                 ))}

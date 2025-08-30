@@ -780,7 +780,7 @@ const EditRepresentative = () => {
                       Points
                     </label>
                     <input
-                      type="number"
+                      type="text"
                       value={point.points}
                       onChange={(e) =>
                         handleExtraPointChange(index, "points", e.target.value)

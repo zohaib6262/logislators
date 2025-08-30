@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { getTotalPoints } from "./getTotalScores";
 
 const loadImageAsBase64 = async (imageUrl) => {
   try {
@@ -380,7 +381,8 @@ export const generatePDF = async (representative, primaryColor) => {
         pdf.setFontSize(11);
 
         let lines = pdf.splitTextToSize(point.description, contentWidth - 120);
-        lines[lines.length - 1] += " " + point.points + "";
+        const totalPoints = getTotalPoints(point.points);
+        lines[lines.length - 1] += " " + totalPoints + " ";
 
         pdf.text(lines, rightX, yPosition);
 

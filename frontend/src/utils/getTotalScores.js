@@ -13,3 +13,16 @@ export const getTotalScores = (categories) => {
 
   return `${total}/${outOf}`;
 };
+
+export const getTotalPoints = (points) => {
+  if (!points) return "0/0"; // fallback
+
+  // split string by "/"
+  const [numerator, denominator] = points.split("/").map(Number);
+
+  // round to 2 decimals
+  const total = numerator.toFixed(2);
+  const outOf = denominator.toFixed(2);
+
+  return `${total}/${outOf}`;
+};

@@ -142,7 +142,7 @@ const AddRepresentative = () => {
         ...prev.extras,
         extraPoints: [
           ...prev.extras.extraPoints,
-          { bills: "", description: "", points: 0 },
+          { bills: "", description: "", points: "" },
         ],
       },
     }));
@@ -648,7 +648,7 @@ const AddRepresentative = () => {
                       Points
                     </label>
                     <input
-                      type="number"
+                      type="text"
                       value={point.points}
                       onChange={(e) =>
                         handleExtraPointChange(index, "points", e.target.value)
