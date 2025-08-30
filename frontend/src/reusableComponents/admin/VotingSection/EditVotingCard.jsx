@@ -30,7 +30,7 @@ const EditVotingCard = () => {
           type: "success",
           message: "Feature updated successfully",
         });
-        setTimeout(() => navigate("/admin/features"), 1500);
+        setTimeout(() => navigate("/admin/voting-section"), 1500);
       } else {
         setNotification({
           type: "error",
