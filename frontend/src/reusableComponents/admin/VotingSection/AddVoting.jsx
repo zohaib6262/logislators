@@ -14,7 +14,6 @@ const AddVoting = () => {
   const handleSubmit = async (votingCard) => {
     try {
       const result = await createVotingSection(votingCard);
-      console.log("Result from createVotingSection:", result);
       if (result.success) {
         setNotification({
           type: "success",

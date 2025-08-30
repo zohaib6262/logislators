@@ -18,6 +18,7 @@ import { TokenContext } from "@/store/TokenContextProvider";
 import useFetchHomePage from "@/hooks/homePage/useFetchHomePage";
 import { useFeatures } from "@/hooks/Feature/useFeature";
 import { lightenColor } from "@/utils/colorUtils";
+import { useVotingSection } from "@/hooks/VotingSection/useVotingSection";
 
 export const SearchRepresentative = () => {
   const [searchParams] = useSearchParams();
@@ -29,7 +30,7 @@ export const SearchRepresentative = () => {
   const zipCode = (searchParams.get("zipCode") || "").replace(/\+/g, " ");
   const { primaryColor } = useContext(TokenContext);
   const lightPrimary = lightenColor(primaryColor, 60); // 60% lighter
-
+  const { votingSection } = useVotingSection();
   const {
     submitUserContact,
     isLoading: isSubmitLoading,
@@ -40,7 +41,7 @@ export const SearchRepresentative = () => {
   const fullAddress = `${street} ${city}, ${state} ${zipCode}`;
 
   const [selectedRepIds, setSelectedRepIds] = useState([]);
-  const { homeData, features, header } = useOutletContext();
+  const { homeData } = useOutletContext();
   // const {
   //   features,
   //   loading: featuresLoading,
@@ -334,8 +335,8 @@ export const SearchRepresentative = () => {
         </div>
       )}
       <div className="container mx-auto px-4 flex justify-center ">
-        <div className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-8 justify-content-around">
-          {features.map((feature) => (
+        <div className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-8 justify-content-around my-5">
+          {votingSection.map((feature) => (
             <div
               key={feature._id}
               className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"

@@ -15,7 +15,6 @@ const VotingSection = () => {
     deleteVotingSection,
     refreshVotingSection,
   } = useVotingSection();
-
   const { primaryColor } = useContext(TokenContext);
 
   const lighterPrimary = newLightnerColor(primaryColor, 30);
@@ -51,7 +50,7 @@ const VotingSection = () => {
   };
 
   return (
-    <div className="cmin-h-screen bg-white py-8 mt-18">
+    <div className="min-h-screen bg-white py-8 mt-18">
       <div className="max-w-4xl mx-auto px-4">
         {/* Header with title and actions */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -117,7 +116,7 @@ const VotingSection = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {votingSection.map((votingSectionData) => (
               <VotingCard
-                key={votingSection._id}
+                key={votingSectionData._id}
                 votingCard={votingSectionData}
                 onEdit={() =>
                   navigate(`/admin/voting-section/${votingSectionData._id}`)
@@ -131,7 +130,6 @@ const VotingSection = () => {
         {/* Delete Confirmation Modal */}
         {votingCardToDelete && (
           <DeleteConfirmationModalVoting
-            ref={modalRef}
             isOpen={!!votingCardToDelete}
             onClose={() => setVotingCardToDelete(null)}
             onConfirm={handleDeleteConfirm}

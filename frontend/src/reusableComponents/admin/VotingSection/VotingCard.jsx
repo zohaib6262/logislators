@@ -11,14 +11,14 @@ const VotingCard = ({ votingCard, onEdit, onDelete, preview = false }) => {
       {!preview && (
         <div className="flex justify-end space-x-2 mb-2">
           <button
-            onClick={() => onEdit(votingCard)}
+            onClick={onEdit}
             className="p-1.5 text-gray-500 hover:text-blue-600 rounded-full hover:bg-blue-50 transition-colors"
             aria-label="Edit voting card"
           >
             <Pencil size={18} />
           </button>
           <button
-            onClick={() => onDelete(votingCard._id || "")}
+            onClick={() => votingCard._id && onDelete(votingCard._id)}
             className="p-1.5 text-gray-500 hover:text-red-600 rounded-full hover:bg-red-50 transition-colors"
             aria-label="Delete voting card"
           >
@@ -30,7 +30,8 @@ const VotingCard = ({ votingCard, onEdit, onDelete, preview = false }) => {
       {/* Voting card content */}
       <div className={preview ? "" : "mt-2"}>
         <img
-          src={votingCard?.icon}
+          src={votingCard?.icon || "/default-icon.png"}
+          alt={votingCard?.title || "Voting icon"}
           className={`${
             preview ? "mb-4" : "mb-3"
           } flex items-center justify-center ${

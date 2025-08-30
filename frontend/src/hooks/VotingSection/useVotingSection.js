@@ -21,7 +21,8 @@ export function useVotingSection() {
       if (!res.ok) setError("Failed to fetch voting section");
 
       const data = await res.json();
-      setFeatures(data);
+      setVotingSection(data);
+
       setError(null);
     } catch (err) {
       setError({
@@ -54,7 +55,7 @@ export function useVotingSection() {
       if (!res.ok) throw new Error("Failed to create voting section");
 
       const newVotingSection = await res.json();
-      setVotingSection(newVotingSection);
+      setVotingSection((prev) => [...prev, newVotingSection]);
 
       return { success: true, votingSection: newVotingSection };
     } catch (err) {

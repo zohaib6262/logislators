@@ -1,40 +1,39 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-// import { useFeatures, Feature as FeatureType } from "../../hooks/useFeatures";
-import FeatureForm from "./FeatureForm";
-import { useFeatures } from "../../../hooks/Feature/useFeature";
+import VotingForm from "./VotingForm"; // <-- make sure you have this
+import { useVotingSection } from "@/hooks/VotingSection/useVotingSection";
 import { TokenContext } from "@/store/TokenContextProvider";
 import { lightenColor } from "@/utils/colorUtils";
 
 const EditVoting = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { features, updateFeature } = useFeatures();
-  const [feature, setFeature] = useState(null);
+  const { votingSection, updateVotingSection } = useVotingSection();
+  const [votingCard, setVotingCard] = useState(null);
   const [notification, setNotification] = useState(null);
   const { primaryColor } = useContext(TokenContext);
   const lightPrimary = lightenColor(primaryColor, 60); // 60% lighter
+
   useEffect(() => {
-    const currentFeature = features.find((f) => f._id === id);
-
-    if (currentFeature) {
-      setFeature(currentFeature);
+    const currentCard = votingSection.find((f) => f._id === id);
+    if (currentCard) {
+      setVotingCard(currentCard);
     }
-  }, [id, features]);
+  }, [id, votingSection]);
 
-  const handleSubmit = async (updatedFeature) => {
+  const handleSubmit = async (updatedCard) => {
     try {
-      const result = await updateFeature(id, updatedFeature);
+      const result = await updateVotingSection(id, updatedCard);
       if (result.success) {
         setNotification({
           type: "success",
-          message: "Feature updated successfully",
+          message: "Voting card updated successfully",
         });
-        setTimeout(() => navigate("/admin/features"), 1500);
+        setTimeout(() => navigate("/admin/voting-section"), 1500);
       } else {
         setNotification({
           type: "error",
-          message: result.error || "Failed to update feature",
+          message: result.error || "Failed to update voting card",
         });
       }
     } catch (err) {
@@ -46,7 +45,7 @@ const EditVoting = () => {
     }
   };
 
-  if (!feature) {
+  if (!votingCard) {
     return (
       <div className="flex justify-center items-center h-64">
         <div
@@ -72,10 +71,10 @@ const EditVoting = () => {
           </div>
         )}
 
-        <FeatureForm
-          feature={feature}
+        <VotingForm
+          votingCard={votingCard}
           onSubmit={handleSubmit}
-          onCancel={() => navigate("/admin/features")}
+          onCancel={() => navigate("/admin/voting-section")}
         />
       </div>
     </div>
