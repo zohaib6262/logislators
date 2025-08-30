@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Edit, Plus, RefreshCw } from "lucide-react";
 import VotingCard from "./VotingCard";
 import DeleteConfirmationModalVoting from "./DeleteConfirmModalVoting";
-import { useVotingSection } from "../../../hooks/VotingSection/useVotingSection";
 import { TokenContext } from "@/store/TokenContextProvider";
 import { newLightnerColor } from "@/utils/colorUtils";
+import { useVotingSection } from "@/hooks/VotingSection/useVotingSection";
 
 const VotingSection = () => {
   const {
@@ -27,7 +27,7 @@ const VotingSection = () => {
   const handleDeleteConfirm = async () => {
     if (votingCardToDelete) {
       try {
-        const result = await deleteVotingCard(votingCardToDelete);
+        const result = await deleteVotingSection(votingCardToDelete);
         if (result.success) {
           showNotification("success", "Voting card deleted successfully");
           await refreshVotingSection();
@@ -88,6 +88,59 @@ const VotingSection = () => {
           >
             {notification.message}
           </div>
+        )}
+
+        {/* Voting Section Grid */}
+        {loading && votingSection.length === 0 ? (
+          <div className="flex justify-center items-center h-64">
+            <div
+              className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+              style={{ borderColor: primaryColor }}
+            ></div>
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 text-red-800 p-4 rounded-md">{error}</div>
+        ) : votingSection.length === 0 ? (
+          <div className="text-center py-12 bg-gray-50 rounded-lg">
+            <p className="text-gray-600 mb-4">No voting card found.</p>
+            <button
+              onClick={() => navigate("/admin/voting-section/new")}
+              className="px-4 py-2 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
+              }}
+            >
+              Add Your First Feature
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {votingSection.map((votingSectionData) => (
+              <VotingCard
+                key={votingSection._id}
+                votingCard={votingSectionData}
+                onEdit={() =>
+                  navigate(`/admin/voting-section/${votingSectionData._id}`)
+                }
+                onDelete={(id) => setVotingCardToDelete(id)}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {votingCardToDelete && (
+          <DeleteConfirmationModalVoting
+            ref={modalRef}
+            isOpen={!!votingCardToDelete}
+            onClose={() => setVotingCardToDelete(null)}
+            onConfirm={handleDeleteConfirm}
+            isDeleting={loading}
+            featureName={
+              votingSection.find((f) => f._id === votingCardToDelete)?.title ||
+              ""
+            }
+          />
         )}
       </div>
     </div>
