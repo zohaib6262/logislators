@@ -386,17 +386,31 @@ export const generatePDF = async (representative, primaryColor) => {
         let lines = pdf.splitTextToSize(point.description, contentWidth - 120);
         const totalPoints = getTotalPoints(point.points);
 
-        // last line print karo (description normal text)
+        // Description print karo (multi-line)
         pdf.setFont("helvetica", "normal");
         pdf.text(lines, rightX, yPosition);
 
-        // ab points ko alag bold mein print karo
+        // Ab last line ka content aur width nikal lo
+        const lastLine = lines[lines.length - 1];
+        const lastLineWidth = pdf.getTextWidth(lastLine);
+
+        // Line height calculate karo (approx: fontSize * 0.35)
+        const lineHeight = pdf.getFontSize() * 0.35;
+        const lastLineY = yPosition + (lines.length - 1) * lineHeight;
+
+        // Ab points ko usi last line ke end par bold + smaller font me likho
+        const originalFontSize = pdf.getFontSize() + 0.8; // save current size
+
         pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(originalFontSize - 2); // thoda chhota kar diya
         pdf.text(
-          totalPoints,
-          rightX + pdf.getTextWidth(lines.join(" ")) + 5,
-          yPosition
+          `${totalPoints}`,
+          rightX + lastLineWidth + 1, // thoda gap dekar
+          lastLineY + 0.5
         );
+
+        // reset back to normal size
+        pdf.setFontSize(originalFontSize);
 
         // --- Add bottom margin after each point ---
         yPosition += Math.max(lines.length * 1, 4) + 4;
