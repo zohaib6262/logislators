@@ -52,13 +52,16 @@ export const getTotalPoints = (points) => {
   if (!points) return "0";
 
   const [numerator, denominator] = points.split("/").map(Number);
-  const total = numerator.toFixed(2);
-  const outOf = denominator.toFixed(2);
+  if (numerator && denominator) {
+    const total = numerator.toFixed(2);
+    const outOf = denominator.toFixed(2);
+    return `${total}/${outOf}`;
+  }
 
   // agar denominator 0 ya 1 ho to sirf total dikhayein
   if (Number(denominator) <= 1) {
+    const total = numerator.toFixed(2);
+
     return total;
   }
-
-  return `${total}/${outOf}`;
 };
