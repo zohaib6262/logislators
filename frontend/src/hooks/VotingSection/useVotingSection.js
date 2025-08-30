@@ -17,7 +17,7 @@ export function useVotingSection() {
   const fetchVotingSection = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(API_BASE_URL);
+      const res = await fetch(`${API_BASE_URL}/voting-section`);
       if (!res.ok) setError("Failed to fetch voting section");
 
       const data = await res.json();
@@ -42,7 +42,7 @@ export function useVotingSection() {
       if (!token) {
         throw new Error("No authentication token found");
       }
-      const res = await fetch(API_BASE_URL, {
+      const res = await fetch(`${API_BASE_URL}/voting-section`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -73,7 +73,7 @@ export function useVotingSection() {
       if (!token) {
         throw new Error("No authentication token found");
       }
-      const res = await fetch(`${API_BASE_URL}/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/voting-section/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,7 +104,7 @@ export function useVotingSection() {
       if (!token) {
         throw new Error("No authentication token found");
       }
-      const res = await fetch(`${API_BASE_URL}/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/voting-section/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
