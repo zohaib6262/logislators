@@ -362,10 +362,13 @@ export const generatePDF = async (representative, primaryColor) => {
 
       pdf.text(headerText, centerX, yPosition + 6);
 
-      yPosition += 20;
+      yPosition += 10;
 
       // Loop through each point
       representative.extras.extraPoints.forEach((point) => {
+        // --- Add top margin before each point ---
+        yPosition += 8;
+
         // Ensure space before drawing this block
         yPosition = checkNewPage(30);
 
@@ -382,11 +385,22 @@ export const generatePDF = async (representative, primaryColor) => {
 
         let lines = pdf.splitTextToSize(point.description, contentWidth - 120);
         const totalPoints = getTotalPoints(point.points);
-        lines[lines.length - 1] += " " + totalPoints + " ";
 
+        // last line print karo (description normal text)
+        pdf.setFont("helvetica", "normal");
         pdf.text(lines, rightX, yPosition);
 
-        yPosition += Math.max(lines.length * 5, 4);
+        // ab points ko alag bold mein print karo
+        pdf.setFont("helvetica", "bold");
+        pdf.text(
+          totalPoints,
+          rightX + pdf.getTextWidth(lines.join(" ")) + 5,
+          yPosition
+        );
+        pdf.text(lines, rightX, yPosition);
+
+        // --- Add bottom margin after each point ---
+        yPosition += Math.max(lines.length * 1, 4) + 4;
       });
     }
 

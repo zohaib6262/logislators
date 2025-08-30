@@ -40,7 +40,7 @@ export const VotingRecord = ({ categories }) => {
                 <td className="px-6 py-4 text-sm text-gray-500 whitespace-normal break-words">
                   {category.notableBills}
                 </td>
-                <td className="pr-14 py-4 text-sm text-gray-900 whitespace-normal break-words">
+                <td className="pr-8 py-4 text-sm text-gray-900 whitespace-normal break-all max-w-[120px] sm:max-w-none">
                   {category.score}
                 </td>
               </tr>
@@ -54,7 +54,7 @@ export const VotingRecord = ({ categories }) => {
                 >
                   Total
                 </td>
-                <td className="pr-14 py-4 text-sm font-bold text-gray-900">
+                <td className="pr-8 py-4 text-sm font-bold text-gray-900 whitespace-normal break-all max-w-[120px] sm:max-w-none">
                   {totalScore}
                 </td>
               </tr>
