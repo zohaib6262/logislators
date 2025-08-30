@@ -311,7 +311,7 @@ const RepresentativeDetails = ({ id, representative }) => {
                   >
                     <div className="font-semibold sm:w-1/2">{point.bills}</div>
                     <p className="sm:w-2/3">
-                      {point.description} <strong>{point.points}.</strong>
+                      {point.description} <strong>{point.points}</strong>
                     </p>
                   </div>
                 ))}

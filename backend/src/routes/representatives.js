@@ -81,7 +81,11 @@ router.post("/", async (req, res) => {
             console.log(`Skipping duplicate representative: ${rep.id}`);
             continue; // Skip agar already hai
           }
-
+          // Jurisdiction check (skip agar country hai)
+          if (rep?.jurisdiction?.classification === "country") {
+            console.log(`Skipping country-level representative: ${rep.id}`);
+            continue;
+          }
           const newRepresentative = new Representative(rep);
           const savedRep = await newRepresentative.save();
           savedReps.push(savedRep);
