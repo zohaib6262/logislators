@@ -397,7 +397,6 @@ export const generatePDF = async (representative, primaryColor) => {
           rightX + pdf.getTextWidth(lines.join(" ")) + 5,
           yPosition
         );
-        pdf.text(lines, rightX, yPosition);
 
         // --- Add bottom margin after each point ---
         yPosition += Math.max(lines.length * 1, 4) + 4;
