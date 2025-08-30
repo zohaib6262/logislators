@@ -170,12 +170,11 @@ const Feature = () => {
 
         {/* Features Grid */}
         {loading && features.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="flex justify-center items-center h-64">
             <div
-              className="inline-block w-8 h-8 border-4 border-b-transparent border-l-transparent rounded-full animate-spin mb-4"
-              style={{ borderRight: primaryColor, borderLeft: primaryColor }}
+              className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+              style={{ borderColor: primaryColor }}
             ></div>
-            <p className="text-gray-600">Loading features...</p>
           </div>
         ) : error ? (
           <div className="bg-red-50 text-red-800 p-4 rounded-md">{error}</div>

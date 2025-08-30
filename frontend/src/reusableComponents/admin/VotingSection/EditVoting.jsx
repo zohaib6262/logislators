@@ -6,7 +6,7 @@ import { useFeatures } from "../../../hooks/Feature/useFeature";
 import { TokenContext } from "@/store/TokenContextProvider";
 import { lightenColor } from "@/utils/colorUtils";
 
-const EditFeature = () => {
+const EditVoting = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { features, updateFeature } = useFeatures();
@@ -82,4 +82,4 @@ const EditFeature = () => {
   );
 };
 
-export default EditFeature;
+export default EditVoting;

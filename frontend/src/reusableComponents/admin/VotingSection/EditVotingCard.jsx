@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 // import { useFeatures, Feature as FeatureType } from "../../hooks/useFeatures";
-import FeatureForm from "./FeatureForm";
 import { useFeatures } from "../../../hooks/Feature/useFeature";
 import { TokenContext } from "@/store/TokenContextProvider";
 import { lightenColor } from "@/utils/colorUtils";
+import VotingForm from "./VotingForm";
 
-const EditFeature = () => {
+const EditVotingCard = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { features, updateFeature } = useFeatures();
@@ -34,7 +34,7 @@ const EditFeature = () => {
       } else {
         setNotification({
           type: "error",
-          message: result.error || "Failed to update feature",
+          message: result.error || "Failed to update voting card",
         });
       }
     } catch (err) {
@@ -72,14 +72,14 @@ const EditFeature = () => {
           </div>
         )}
 
-        <FeatureForm
+        <VotingForm
           feature={feature}
           onSubmit={handleSubmit}
-          onCancel={() => navigate("/admin/features")}
+          onCancel={() => navigate("/admin/voting-section")}
         />
       </div>
     </div>
   );
 };
 
-export default EditFeature;
+export default EditVotingCard;

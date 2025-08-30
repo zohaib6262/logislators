@@ -33,6 +33,7 @@ const keapConfig = {
 // Routes
 import userContact from "./src/routes/userConatct.js";
 import feature from "./src/routes/feature.js";
+import votingSection from "./src/routes/votingSection.js";
 import homePage from "./src/routes/homePage.js";
 import aboutPage from "./src/routes/aboutPage.js";
 import resourcePage from "./src/routes/manageResourcePage.js";
@@ -47,6 +48,7 @@ import primaryColor from "./src/routes/primaryColor.js";
 app.use("/api/primary", primaryColor);
 app.use("/api/userContact", userContact);
 app.use("/api/features", feature);
+app.use("/api/voting-section", votingSection);
 app.use("/api/home", homePage);
 app.use("/api/about", aboutPage);
 app.use("/api/resource", resourcePage);
@@ -56,7 +58,6 @@ app.use("/api/auth", userRoutes);
 app.use("/api/resources", resources);
 app.use("/api/settings", siteSettings);
 app.use("/api/officials", officialsRoutes);
-app.use("/api/voting-records", votingRecordsRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

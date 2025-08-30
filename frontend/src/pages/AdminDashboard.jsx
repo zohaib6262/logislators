@@ -17,6 +17,7 @@ import {
   FileDiffIcon,
   EditIcon,
   Edit2Icon,
+  Vote,
 } from "lucide-react";
 
 // Admin Components
@@ -45,6 +46,15 @@ const AddFeature = lazy(() =>
 );
 const EditFeature = lazy(() =>
   import("../reusableComponents/admin/Feature/EditFeature")
+);
+const VotingSection = lazy(() =>
+  import("../reusableComponents/admin/VotingSection/VotingSection")
+);
+const AddVoting = lazy(() =>
+  import("../reusableComponents/admin/VotingSection/AddVoting")
+);
+const EditVoting = lazy(() =>
+  import("../reusableComponents/admin/VotingSection/EditVotingCard")
 );
 const ManageAboutPage = lazy(() =>
   import("../reusableComponents/admin/ManageAboutPage")
@@ -121,6 +131,11 @@ const AdminDashboard = () => {
       to: "/admin/features",
       label: "Features",
       icon: <Feather size={20} className="mr-3" />,
+    },
+    {
+      to: "/admin/voting-section",
+      label: "Voting Section",
+      icon: <Vote size={20} className="mr-3" />,
     },
     {
       to: "/admin/home-page",
@@ -433,6 +448,9 @@ const AdminDashboard = () => {
                 <Route path="/features" element={<Feature />} />
                 <Route path="/features/new" element={<AddFeature />} />
                 <Route path="/features/:id" element={<EditFeature />} />
+                <Route path="/voting-section" element={<VotingSection />} />
+                <Route path="/voting-section/new" element={<AddVoting />} />
+                <Route path="/voting-section/:id" element={<EditVoting />} />
 
                 <Route path="/home-page" element={<ManageHomePage />} />
                 <Route path="/aboutus-page" element={<ManageAboutPage />} />

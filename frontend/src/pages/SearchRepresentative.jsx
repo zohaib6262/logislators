@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useContext } from "react";
 import {
   Link,
   useLocation,
+  useOutletContext,
   useParams,
   useSearchParams,
 } from "react-router-dom";
@@ -15,6 +16,8 @@ import useLegislators from "../hooks/lagislators/useLegislators";
 import useUserContactSubmit from "../hooks/userContact/useUserContactSubmit";
 import { TokenContext } from "@/store/TokenContextProvider";
 import useFetchHomePage from "@/hooks/homePage/useFetchHomePage";
+import { useFeatures } from "@/hooks/Feature/useFeature";
+import { lightenColor } from "@/utils/colorUtils";
 
 export const SearchRepresentative = () => {
   const [searchParams] = useSearchParams();
@@ -25,6 +28,8 @@ export const SearchRepresentative = () => {
   const state = (searchParams.get("state") || "Nevada").replace(/\+/g, " ");
   const zipCode = (searchParams.get("zipCode") || "").replace(/\+/g, " ");
   const { primaryColor } = useContext(TokenContext);
+  const lightPrimary = lightenColor(primaryColor, 60); // 60% lighter
+
   const {
     submitUserContact,
     isLoading: isSubmitLoading,
@@ -32,10 +37,16 @@ export const SearchRepresentative = () => {
     setAssemblyDistrict,
     setStateDistrict,
   } = useUserContactSubmit();
-  const { homeData } = useFetchHomePage();
   const fullAddress = `${street} ${city}, ${state} ${zipCode}`;
 
   const [selectedRepIds, setSelectedRepIds] = useState([]);
+  const { homeData, features, header } = useOutletContext();
+  // const {
+  //   features,
+  //   loading: featuresLoading,
+  //   error: featureError,
+  //   refreshFeatures: refetchFeatures,
+  // } = useFeatures();
   const {
     coords,
     people: representatives,
@@ -44,6 +55,7 @@ export const SearchRepresentative = () => {
     error,
     searchByAddress,
   } = useLegislators();
+
   const sliderRef = useRef(null);
   useEffect(() => {
     if (street && city && zipCode) {
@@ -256,35 +268,9 @@ export const SearchRepresentative = () => {
                 ))}
             </div>
           )}
-          {homeData?.howLegislatorsScored && (
-            <div
-              className="border-l-4 p-6 my-10 mx-2 rounded-r-lg"
-              style={{
-                backgroundColor: `${primaryColor}20`,
-                borderColor: primaryColor,
-              }}
-            >
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                How Legislators Are Scored?
-              </h3>
-              <p className="text-gray-700 mb-4">
-                {homeData.howLegislatorsScored}
-              </p>
-              {homeData?.howLegislatorsScoredLink && (
-                <a
-                  href={homeData.howLegislatorsScoredLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  Learn More
-                </a>
-              )}
-            </div>
-          )}
+
           {/* Additional Representatives Carousel */}
-          {representatives.length > 0 && (
+          {/* {representatives.length > 0 && (
             <div className="mb-12 relative">
               <h2 className="text-xl font-bold text-gray-800 mb-6">
                 View More Representatives
@@ -303,7 +289,7 @@ export const SearchRepresentative = () => {
                 </Slider>
               </div>
             </div>
-          )}
+          )} */}
         </div>
       ) : (
         <div className="max-w-3xl mx-auto px-4 py-8">
@@ -318,6 +304,60 @@ export const SearchRepresentative = () => {
           </div>
         </div>
       )}
+      {homeData?.howLegislatorsScored && (
+        <div className="container mx-auto px-4 flex justify-center ">
+          <div
+            className="border-l-4 p-6 rounded-r-lg container mx-auto px-4 my-10"
+            style={{
+              backgroundColor: `${primaryColor}20`,
+              borderColor: primaryColor,
+            }}
+          >
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              How Legislators Are Scored?
+            </h3>
+            <p className="text-gray-700 mb-4">
+              {homeData.howLegislatorsScored}
+            </p>
+            {homeData?.howLegislatorsScoredLink && (
+              <a
+                href={homeData.howLegislatorsScoredLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
+                style={{ backgroundColor: primaryColor }}
+              >
+                Learn More
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+      <div className="container mx-auto px-4 flex justify-center ">
+        <div className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-8 justify-content-around">
+          {features.map((feature) => (
+            <div
+              key={feature._id}
+              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+            >
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
+                style={{ backgroundColor: lightPrimary }}
+              >
+                <img
+                  src={feature?.icon}
+                  alt="Feature Icon"
+                  className="w-6 h-6"
+                />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                {feature?.title || ""}
+              </h3>
+              <p className="text-gray-600">{feature?.description || ""}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
