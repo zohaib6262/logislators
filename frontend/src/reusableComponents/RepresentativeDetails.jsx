@@ -157,12 +157,12 @@ const RepresentativeDetails = ({ id, representative }) => {
                 </div>
 
                 <div className="text-center sm:text-left">
-                  <p className="text-white opacity-90 text-xl sm:text-2xl dark:text-gray-300 flex items-center justify-center sm:justify-start gap-2 text-center sm:text-left">
+                  <p className="text-white opacity-90 text-xl sm:mb-3 sm:text-2xl dark:text-gray-300 flex items-center justify-center sm:justify-start gap-2 text-center sm:text-left">
                     <Building2 size={20} className="shrink-0" />
                     {representative.current_role.title}
                   </p>
 
-                  <h1 className="text-2xl sm:text-3xl font-bold text-white">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-white my-2">
                     {representative.name.toUpperCase()}
                   </h1>
 
@@ -321,30 +321,30 @@ const RepresentativeDetails = ({ id, representative }) => {
             )}
 
             {/* Highlights */}
-            {!representative?.extras?.highlights.title ||
-              !representative?.extras?.highlights.badgeNum > 0 ||
-              !representative?.extras?.highlights?.session || (
-                <div className="bg-[#373B54] text-white rounded-xl px-6 py-4 shadow-md">
-                  <h2 className="text-center text-lg font-semibold text-white uppercase border-b border-white pb-2 mb-4">
-                    Highlights & Key Takeaways
-                  </h2>
-                  <div className="flex flex-row flex-nowrap gap-4 items-start">
-                    <div className="w-3/4">
-                      {representative?.extras?.highlights.title && (
-                        <p>
-                          {`${representative?.extras?.highlights.title}`}
+            {representative?.extras?.highlights.keyTakeaways && (
+              // !representative?.extras?.highlights.badgeNum > 0 ||
+              // !representative?.extras?.highlights?.session || (
+              <div className="bg-[#373B54] text-white rounded-xl px-6 py-4 shadow-md">
+                <h2 className="text-center text-lg font-semibold text-white uppercase border-b border-white pb-2 mb-4">
+                  Highlights & Key Takeaways
+                </h2>
+                <div className="flex flex-row flex-nowrap gap-4 items-start">
+                  <div>
+                    {representative?.extras?.highlights.keyTakeaways && (
+                      <p>
+                        {/* {`${representative?.extras?.highlights.title}`} */}
 
-                          {` ${representative?.extras?.highlights?.session}`}
-                        </p>
-                      )}
-                    </div>
-                    <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-xl font-bold">
+                        {`${representative?.extras?.highlights?.keyTakeaways}`}
+                      </p>
+                    )}
+                  </div>
+                  {/* <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-xl font-bold">
                       {representative?.extras?.highlights?.badgeNum > 0 &&
                         representative?.extras?.highlights?.badgeNum}
-                    </div>
-                  </div>
+                    </div> */}
                 </div>
-              )}
+              </div>
+            )}
           </div>
         </div>
 
