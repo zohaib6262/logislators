@@ -1,27 +1,34 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/User.js";
 import { generateToken } from "../utils/generateToken.js";
+import dotenv from "dotenv";
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
 // @access  Public
 export const authUser = asyncHandler(async (req, res) => {
   const { email, password, name } = req.body;
-
-  const user = await User.findOne({ email });
-
-  if (user && (await user.matchPassword(password))) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      token: generateToken(user._id),
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Email and password are required",
     });
-  } else {
-    res.status(401);
-    throw new Error("Invalid email or password");
   }
+  if (
+    email.trim() === process.env.ADMIN_EMAIL.trim() &&
+    password.trim() === process.env.ADMIN_PASSWORD.trim()
+  ) {
+    return res.json({
+      _id: Math.random().toString(),
+      email: process.env.ADMIN_EMAIL.trim(),
+      isAdmin: true,
+      token: generateToken(process.env.ADMIN_EMAIL.trim()),
+    });
+  }
+  return res.status(401).json({
+    success: false,
+    message: "Invalid email or password",
+  });
 });
 
 // @desc    Register a new user
