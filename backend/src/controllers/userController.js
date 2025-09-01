@@ -19,10 +19,14 @@ export const authUser = asyncHandler(async (req, res) => {
     password.trim() === process.env.ADMIN_PASSWORD.trim()
   ) {
     return res.json({
-      _id: Math.random().toString(),
+      _id: "admin",
       email: process.env.ADMIN_EMAIL.trim(),
       isAdmin: true,
-      token: generateToken(process.env.ADMIN_EMAIL.trim()),
+      token: generateToken({
+        id: "admin",
+        email: process.env.ADMIN_EMAIL.trim(),
+        isAdmin: true,
+      }),
     });
   }
   return res.status(401).json({
