@@ -24,7 +24,6 @@ export const authUser = asyncHandler(async (req, res) => {
       isAdmin: true,
       token: generateToken({
         id: "admin",
-        email: process.env.ADMIN_EMAIL.trim(),
         isAdmin: true,
       }),
     });

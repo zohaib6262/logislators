@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
 import User from "../models/User.js";
 
+// Protect Middleware
 export const protect = asyncHandler(async (req, res, next) => {
   let token;
 
@@ -13,15 +14,15 @@ export const protect = asyncHandler(async (req, res, next) => {
       token = req.headers.authorization.split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      if (decoded.id === "admin") {
-        // admin directly from token
+      if (decoded.isAdmin) {
+        // Directly assign admin user
         req.user = {
           _id: "admin",
-          email: decoded.email,
+          email: process.env.ADMIN_EMAIL.trim(),
           isAdmin: true,
         };
       } else {
-        // normal DB user
+        // Normal DB user
         req.user = await User.findById(decoded.id).select("-password");
       }
 
@@ -38,6 +39,7 @@ export const protect = asyncHandler(async (req, res, next) => {
   }
 });
 
+// Admin Middleware
 export const admin = (req, res, next) => {
   if (req.user && req.user.isAdmin) {
     next();
