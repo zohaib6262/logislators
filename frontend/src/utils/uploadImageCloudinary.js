@@ -4,7 +4,7 @@ export const uploadImageToCloudinary = async (file) => {
   data.append("upload_preset", "my_upload_preset");
 
   const res = await fetch(
-    "https://api.cloudinary.com/v1_1/dlb6fup90/image/upload",
+    "https://api.cloudinary.com/v1_1/dy910ughf/image/upload",
     {
       method: "POST",
       body: data,
