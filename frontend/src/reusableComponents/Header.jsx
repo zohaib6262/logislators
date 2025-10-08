@@ -93,6 +93,13 @@ const Header = () => {
                 Resources
               </Link>
             )}
+            <Link
+              to="/nevada-legislators"
+              className={getLinkClass("/nevada-legislators")}
+              style={getLinkStyle("/nevada-legislators")}
+            >
+              Legislators
+            </Link>
 
             {/* Optional Login Button */}
             {/* 

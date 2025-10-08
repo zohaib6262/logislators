@@ -44,7 +44,7 @@ import userRoutes from "./src/routes/userRoutes.js";
 import resources from "./src/routes/resources.js";
 import siteSettings from "./src/routes/siteSettings.js";
 import primaryColor from "./src/routes/primaryColor.js";
-
+import legislatorsRoutes from "./src/routes/legislators.js";
 app.use("/api/primary", primaryColor);
 app.use("/api/userContact", userContact);
 app.use("/api/features", feature);
@@ -52,6 +52,7 @@ app.use("/api/voting-section", votingSection);
 app.use("/api/home", homePage);
 app.use("/api/about", aboutPage);
 app.use("/api/resource", resourcePage);
+app.use("/api/legislators", legislatorsRoutes);
 app.use("/api/categories", category);
 app.use("/api/representatives", representativesRoutes);
 app.use("/api/auth", userRoutes);

@@ -7,6 +7,7 @@ import withSuspense from "./utils/withSuspense";
 const HomePage = lazy(() => import("./pages/HomePage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const ResourcesPage = lazy(() => import("./pages/ResourcesPage"));
+const Legislators = lazy(() => import("./pages/Legislators"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
@@ -35,6 +36,10 @@ function App() {
           />
           <Route path="about" element={withSuspense(AboutPage)} />
           <Route path="resources" element={withSuspense(ResourcesPage)} />
+          <Route
+            path="nevada-legislators"
+            element={withSuspense(Legislators)}
+          />
           <Route
             path="*"
             element={withSuspense(() => (
