@@ -19,6 +19,7 @@ router.get("/", async (req, res) => {
       const defaultSettings = new SiteSetting({
         enableAboutus: true,
         enableResources: true,
+        enableLegislators: true,
         siteName: "Nevada Rep Finder",
         siteDescription:
           "Helping Nevada residents connect with their elected officials and access important resources",

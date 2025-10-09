@@ -91,6 +91,43 @@ const GeneralSettings = ({ settings, onChange }) => {
             />
           </Switch>
         </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <label
+              htmlFor="enableLegislators"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Enable Legislators Page
+            </label>
+            <p className="text-xs text-gray-500">
+              Toggle to show/hide the Legislators page
+            </p>
+          </div>
+          <Switch
+            checked={settings?.enableLegislators || false}
+            onChange={(checked) => {
+              const syntheticEvent = {
+                target: {
+                  name: "enableLegislators",
+                  value: checked,
+                },
+              };
+              onChange(syntheticEvent);
+            }}
+            style={{
+              backgroundColor: settings?.enableLegislators && primaryColor,
+            }}
+            className={`${
+              !settings?.enableLegislators && "bg-gray-200"
+            } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2`}
+          >
+            <span
+              className={`${
+                settings?.enableLegislators ? "translate-x-6" : "translate-x-1"
+              } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+            />
+          </Switch>
+        </div>
 
         {/* Rest of your existing fields */}
         <PrimaryColor settings={settings} />

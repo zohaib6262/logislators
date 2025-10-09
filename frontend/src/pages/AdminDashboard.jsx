@@ -18,6 +18,7 @@ import {
   EditIcon,
   Edit2Icon,
   Vote,
+  LayoutPanelTop,
 } from "lucide-react";
 
 // Admin Components
@@ -68,6 +69,7 @@ const ManageResourcePage = lazy(() =>
 const NotFoundPage = lazy(() => import("./NotFoundPage"));
 import { TokenContext } from "@/store/TokenContextProvider";
 import LoadingScreen from "@/reusableComponents/LoadingScreen";
+import ManageLegislatorPage from "@/reusableComponents/admin/ManageLegislatorPage/ManageLegislatorPage";
 
 // Utility function to lighten colors
 const lightenColor = (color, percent) => {
@@ -151,6 +153,11 @@ const AdminDashboard = () => {
       to: "/admin/resource-page",
       label: "Manage Resource Page",
       icon: <Edit2Icon size={20} className="mr-3" />,
+    },
+    {
+      to: "/admin/legislator-header",
+      label: "Manage Legislator Header",
+      icon: <LayoutPanelTop size={20} className="mr-3" />,
     },
     {
       to: "/admin/settings",
@@ -455,6 +462,10 @@ const AdminDashboard = () => {
                 <Route path="/home-page" element={<ManageHomePage />} />
                 <Route path="/aboutus-page" element={<ManageAboutPage />} />
                 <Route path="/resource-page" element={<ManageResourcePage />} />
+                <Route
+                  path="/legislator-header"
+                  element={<ManageLegislatorPage />}
+                />
 
                 <Route path="/settings" element={<SiteSettings />} />
 

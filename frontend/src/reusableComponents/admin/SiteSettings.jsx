@@ -49,6 +49,7 @@ export default function SiteSettings() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("Submitting settings:", settings);
     saveSettings(settings);
   };
   const handleFileUpload = (logoUrl) => {
@@ -61,7 +62,7 @@ export default function SiteSettings() {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6 py-10">
       <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">
-        Site Settings{" "}
+        Site Settings
       </h1>
       {loading && (
         <div

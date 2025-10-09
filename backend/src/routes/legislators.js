@@ -4,6 +4,7 @@
 
 import express from "express";
 import Legislator from "../models/Legislators.js";
+import LegislatorsHeaderPage from "../models/LegislatorsHeaderPage.js";
 
 const router = express.Router();
 

@@ -4,6 +4,7 @@ import { legislatorAPI } from "../services/api";
 import LegislatorTable from "../reusableComponents/LegislatorTable";
 import toast from "react-hot-toast";
 import { TokenContext } from "@/store/TokenContextProvider";
+import { useFetchLegislatorPage } from "@/hooks/manageLegislatorsHeaderPage/manageLegislatorsHeaderPage";
 
 export default function LegislatorsPage() {
   const [legislators, setLegislators] = useState([]);
@@ -19,6 +20,7 @@ export default function LegislatorsPage() {
     maxScore: "",
   });
   const { primaryColor } = useContext(TokenContext);
+  const { legislatorData, isLoading } = useFetchLegislatorPage();
 
   useEffect(() => {
     fetchLegislators();
@@ -164,7 +166,7 @@ export default function LegislatorsPage() {
     <div className="min-h-screen bg-gray-50">
       {/* {isLoading && <LoadingSpinner />} */}
 
-      {
+      {legislatorData?.enableLegislatorsHeader && (
         <div
           className="pt-24 pb-16"
           style={{
@@ -174,19 +176,18 @@ export default function LegislatorsPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center text-white">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                Nevada Legislators
+                {legislatorData?.title || ""}
               </h1>
               <p className="text-xl opacity-90 mb-8">
-                Comprehensive voting records and policy positions for Nevada's
-                state legislators{" "}
+                {legislatorData?.description || ""}
               </p>
             </div>
           </div>
         </div>
-      }
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6 mt-16">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />

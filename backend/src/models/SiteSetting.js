@@ -11,6 +11,7 @@ const siteSettingSchema = new mongoose.Schema(
   {
     enableAboutus: { type: Boolean, default: true },
     enableResources: { type: Boolean, default: true },
+    enableLegislators: { type: Boolean, default: true },
     siteName: { type: String },
     siteDescription: { type: String },
     logoUrl: { type: String, default: "" },

@@ -6,6 +6,7 @@ import { TokenContext } from "@/store/TokenContextProvider";
 
 const Footer = () => {
   const { settings, setSettings, loading, error } = useGetSiteSettings();
+  console.log("Settings in Footer:", settings);
   const { primaryColor } = useContext(TokenContext);
   return (
     <footer className="text-white" style={{ backgroundColor: primaryColor }}>
@@ -111,6 +112,16 @@ const Footer = () => {
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     Resources
+                  </Link>
+                </li>
+              )}
+              {settings?.enableLegislators && (
+                <li>
+                  <Link
+                    to="/nevada-legislators"
+                    className="text-gray-300 hover:text-white transition-colors"
+                  >
+                    Nevada Legislators
                   </Link>
                 </li>
               )}
