@@ -19,6 +19,7 @@ import {
   Edit2Icon,
   Vote,
   LayoutPanelTop,
+  UserCog,
 } from "lucide-react";
 
 // Admin Components
@@ -70,6 +71,8 @@ const NotFoundPage = lazy(() => import("./NotFoundPage"));
 import { TokenContext } from "@/store/TokenContextProvider";
 import LoadingScreen from "@/reusableComponents/LoadingScreen";
 import ManageLegislatorPage from "@/reusableComponents/admin/ManageLegislatorPage/ManageLegislatorPage";
+import ManageLegislators from "@/reusableComponents/admin/ManageLegislatorPage/ManageLegislators";
+import LegislatorForm from "@/reusableComponents/admin/ManageLegislatorPage/LegislatorForm";
 
 // Utility function to lighten colors
 const lightenColor = (color, percent) => {
@@ -124,6 +127,12 @@ const AdminDashboard = () => {
       label: "Representatives",
       icon: <Users size={20} className="mr-3" />,
     },
+    {
+      to: "/admin/manage-legislators",
+      label: "Manage Legislators",
+      icon: <UserCog size={20} className="mr-3" />,
+    },
+
     {
       to: "/admin/resources",
       label: "Resources",
@@ -441,6 +450,14 @@ const AdminDashboard = () => {
                 />
 
                 <Route path="/representatives" element={<OfficialsManager />} />
+                <Route
+                  path="/manage-legislators"
+                  element={<ManageLegislators />}
+                />
+                <Route
+                  path="/manage-legislators/:id"
+                  element={<LegislatorForm />}
+                />
                 <Route
                   path="/representatives/:id"
                   element={<EditRepresentative />}

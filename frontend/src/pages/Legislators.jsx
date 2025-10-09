@@ -193,7 +193,7 @@ export default function LegislatorsPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search by name or district..."
+                placeholder="Search by name"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
@@ -203,10 +203,12 @@ export default function LegislatorsPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowFilters(!showFilters)}
+                style={{
+                  borderColor: showFilters && primaryColor,
+                  color: showFilters && primaryColor,
+                }}
                 className={`flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors ${
-                  showFilters
-                    ? "bg-blue-50 border-blue-500 text-blue-700"
-                    : "border-gray-300 hover:bg-gray-50"
+                  !showFilters && "border-gray-300 hover:bg-gray-50"
                 }`}
               >
                 <Filter className="w-5 h-5" />
@@ -242,11 +244,13 @@ export default function LegislatorsPage() {
                     onChange={(e) =>
                       setFilters({ ...filters, party: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    style={{ outlineColor: primaryColor }}
                   >
                     <option value="">All Parties</option>
                     <option value="D">Democrat</option>
                     <option value="R">Republican</option>
+                    <option value="I">Independent</option>
                   </select>
                 </div>
                 <div>
@@ -258,58 +262,13 @@ export default function LegislatorsPage() {
                     onChange={(e) =>
                       setFilters({ ...filters, chamber: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    style={{ outlineColor: primaryColor }}
                   >
                     <option value="">All Chambers</option>
                     <option value="Assembly">Assembly</option>
                     <option value="Senate">Senate</option>
                   </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Recommendation
-                  </label>
-                  <select
-                    value={filters.recommendation}
-                    onChange={(e) =>
-                      setFilters({ ...filters, recommendation: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                  >
-                    <option value="">All Recommendations</option>
-                    <option value="Support1">Support1</option>
-                    <option value="Support2">Support2</option>
-                    <option value="Oppose1">Oppose1</option>
-                    <option value="Oppose2">Oppose2</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Min Score
-                  </label>
-                  <input
-                    type="number"
-                    value={filters.minScore}
-                    onChange={(e) =>
-                      setFilters({ ...filters, minScore: e.target.value })
-                    }
-                    placeholder="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Max Score
-                  </label>
-                  <input
-                    type="number"
-                    value={filters.maxScore}
-                    onChange={(e) =>
-                      setFilters({ ...filters, maxScore: e.target.value })
-                    }
-                    placeholder="100"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                  />
                 </div>
               </div>
               <div className="flex justify-end">
