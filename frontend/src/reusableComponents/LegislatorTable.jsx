@@ -293,7 +293,12 @@ import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 
 const columnHelper = createColumnHelper();
 
-export default function LegislatorTable({ legislators }) {
+export default function LegislatorTable({
+  legislators,
+  selectedCategory,
+  selectedParty,
+  selectedChamber,
+}) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
 
@@ -318,17 +323,28 @@ export default function LegislatorTable({ legislators }) {
     return match ? match.score : "-";
   };
 
-  const allBillNumbers = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          legislators.flatMap(
-            (leg) => leg.bills?.map((bill) => bill.billNumber) || []
-          )
+  // Get all bill numbers and filter by category if selected
+  const allBillNumbers = useMemo(() => {
+    const allBills = Array.from(
+      new Set(
+        legislators.flatMap(
+          (leg) => leg.bills?.map((bill) => bill.billNumber) || []
         )
-      ),
-    [legislators]
-  );
+      )
+    );
+
+    // If no category selected, show all bills
+    if (!selectedCategory) return allBills;
+
+    // Filter bills by selected category
+    const firstLeg = legislators[0];
+    if (!firstLeg?.bills) return allBills;
+
+    return allBills.filter((billNum) => {
+      const bill = firstLeg.bills.find((b) => b.billNumber === billNum);
+      return bill?.category?.toLowerCase() === selectedCategory.toLowerCase();
+    });
+  }, [legislators, selectedCategory]);
 
   const columns = useMemo(() => {
     const baseColumns = [
@@ -475,9 +491,143 @@ export default function LegislatorTable({ legislators }) {
       weighting: sample?.weighting || "",
     };
   };
+  let headerHtml;
+  let footerHtml;
+  if (selectedCategory && selectedChamber && selectedParty) {
+    footerHtml = ` • Filtered by ${selectedCategory} category bills and ${selectedChamber} members and ${
+      selectedParty === "D"
+        ? "Democrat party members"
+        : selectedParty === "R"
+        ? "Republican party members"
+        : "Independent party members"
+    }`;
+    headerHtml = (
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-sm text-blue-700 font-medium">
+          📌 Showing only
+          <span className="font-bold">{` ${
+            selectedCategory ? `${selectedCategory} category bills` : ""
+          }  ${
+            selectedChamber ? `and ${selectedChamber} chamber members` : ""
+          } ${selectedParty === "D" ? `and Democrat party members` : ""} ${
+            selectedParty === "R" ? `and Republican party members` : ""
+          }
+          ${selectedParty === "I" ? `and Independent party ` : ""}`}</span>{" "}
+        </p>
+      </div>
+    );
+  } else if (selectedCategory && selectedChamber) {
+    footerHtml = ` • Filtered by ${selectedCategory} category bills and ${selectedChamber} members"
+    }`;
+    headerHtml = (
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-sm text-blue-700 font-medium">
+          📌 Showing only
+          <span className="font-bold">{` ${
+            selectedCategory ? `${selectedCategory} category bills` : ""
+          }  ${
+            selectedChamber ? `and ${selectedChamber} chamber members` : ""
+          }`}</span>
+        </p>
+      </div>
+    );
+  } else if (selectedCategory && selectedParty) {
+    footerHtml = ` • Filtered by ${selectedCategory} category bills ${
+      selectedParty === "D"
+        ? "Democrat party members"
+        : selectedParty === "R"
+        ? "Republican party members"
+        : "Independent party members"
+    }`;
+    headerHtml = (
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-sm text-blue-700 font-medium">
+          📌 Showing only
+          <span className="font-bold">{` ${
+            selectedCategory ? `${selectedCategory} category bills` : ""
+          }  ${selectedParty === "D" ? `and Democrat party members` : ""} ${
+            selectedParty === "R" ? `and Republican party members` : ""
+          }
+          ${
+            selectedParty === "I" ? `and Independent party members` : ""
+          }`}</span>{" "}
+        </p>
+      </div>
+    );
+  } else if (selectedChamber && selectedParty) {
+    footerHtml = ` • Filtered by ${selectedChamber} members and ${
+      selectedParty === "D"
+        ? "Democrat party members"
+        : selectedParty === "R"
+        ? "Republican party members"
+        : "Independent party members"
+    }`;
+    headerHtml = (
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-sm text-blue-700 font-medium">
+          📌 Showing only
+          <span className="font-bold">{`${
+            selectedChamber ? ` ${selectedChamber} chamber members` : ""
+          } ${selectedParty === "D" ? `and Democrat party members` : ""} ${
+            selectedParty === "R" ? `and Republican party members` : ""
+          }
+          ${
+            selectedParty === "I" ? `and Independent party members` : ""
+          }`}</span>{" "}
+        </p>
+      </div>
+    );
+  } else if (selectedCategory && !selectedChamber && !selectedParty) {
+    footerHtml = ` • Filtered by ${selectedCategory} category bills`;
+    headerHtml = (
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-sm text-blue-700 font-medium">
+          📌 Showing only
+          <span className="font-bold">{` ${
+            selectedCategory ? `${selectedCategory} category bills` : ""
+          } `}</span>
+        </p>
+      </div>
+    );
+  } else if (!selectedCategory && selectedChamber && !selectedParty) {
+    footerHtml = ` • Filtered by ${selectedChamber} members`;
+    headerHtml = (
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-sm text-blue-700 font-medium">
+          📌 Showing only
+          <span className="font-bold">{` ${
+            selectedChamber ? ` ${selectedChamber} chamber members` : ""
+          }`}</span>
+        </p>
+      </div>
+    );
+  } else if (!selectedCategory && !selectedChamber && selectedParty) {
+    footerHtml = ` • Filtered by ${
+      selectedParty === "D"
+        ? "Democrat party members"
+        : selectedParty === "R"
+        ? "Republican party members"
+        : "Independent party members"
+    }`;
+    headerHtml = (
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-sm text-blue-700 font-medium">
+          📌 Showing only
+          <span className="font-bold">{` ${
+            selectedParty === "D" ? `Democrat party members` : ""
+          } ${selectedParty === "R" ? `Republican party members` : ""}
+          ${
+            selectedParty === "I" ? `Independent party members` : ""
+          }`}</span>{" "}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
+      {headerHtml && headerHtml}
+
       <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -691,8 +841,9 @@ export default function LegislatorTable({ legislators }) {
       </div>
 
       <div className="mt-4 text-sm text-gray-600">
-        Showing {table.getRowModel().rows.length} of {legislators.length}{" "}
-        legislators
+        {`Showing ${table.getRowModel().rows.length} of ${legislators.length}
+         legislators`}
+        {footerHtml && footerHtml}
       </div>
     </div>
   );

@@ -1,5 +1,13 @@
 import { useState, useEffect, useContext } from "react";
-import { Search, Filter, Download, RefreshCw, Loader2 } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Download,
+  RefreshCw,
+  Loader2,
+  ChevronRight,
+  ChevronLeft,
+} from "lucide-react";
 import { legislatorAPI } from "../services/api";
 import LegislatorTable from "../reusableComponents/LegislatorTable";
 import toast from "react-hot-toast";
@@ -15,6 +23,7 @@ export default function LegislatorsPage() {
   const [filters, setFilters] = useState({
     party: "",
     chamber: "",
+    category: "",
     recommendation: "",
     minScore: "",
     maxScore: "",
@@ -40,6 +49,7 @@ export default function LegislatorsPage() {
     return (
       filters.party ||
       filters.chamber ||
+      filters.category ||
       filters.recommendation ||
       filters.minScore ||
       filters.maxScore
@@ -93,6 +103,7 @@ export default function LegislatorsPage() {
       const filterParams = {};
       if (filters.party) filterParams.party = filters.party;
       if (filters.chamber) filterParams.chamber = filters.chamber;
+      if (filters.category) filterParams.category = filters.category;
       if (filters.recommendation)
         filterParams.recommendation = filters.recommendation;
       if (filters.minScore) filterParams.minScore = Number(filters.minScore);
@@ -110,6 +121,7 @@ export default function LegislatorsPage() {
     setFilters({
       party: "",
       chamber: "",
+      category: "",
       recommendation: "",
       minScore: "",
       maxScore: "",
@@ -118,22 +130,11 @@ export default function LegislatorsPage() {
   };
 
   const exportToCSV = () => {
-    const headers = [
-      "Name",
-      "Party",
-      "Chamber",
-      "District",
-      "Recommendation",
-      "Score",
-      "Points",
-    ];
+    const headers = ["Name", "Party", "Chamber", "Points"];
     const csvData = filteredLegislators.map((leg) => [
       leg.name,
       leg.party,
       leg.chamber,
-      leg.district,
-      leg.recommendation,
-      leg.score,
       leg.points,
     ]);
 
@@ -162,10 +163,9 @@ export default function LegislatorsPage() {
       Loading about us page...
     </div>
   );
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* {isLoading && <LoadingSpinner />} */}
-
       {legislatorData?.enableLegislatorsHeader && (
         <div
           className="pt-24 pb-16"
@@ -221,14 +221,14 @@ export default function LegislatorsPage() {
                 <RefreshCw className="w-5 h-5" />
                 Refresh
               </button>
-              <button
+              {/* <button
                 onClick={exportToCSV}
                 className={`flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors`}
                 style={{ background: primaryColor }}
               >
                 <Download className="w-5 h-5" />
                 Export CSV
-              </button>
+              </button> */}
             </div>
           </div>
 
@@ -268,6 +268,29 @@ export default function LegislatorsPage() {
                     <option value="">All Chambers</option>
                     <option value="Assembly">Assembly</option>
                     <option value="Senate">Senate</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Category
+                  </label>
+                  <select
+                    value={filters.category}
+                    onChange={(e) =>
+                      setFilters({ ...filters, category: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    style={{ outlineColor: primaryColor }}
+                  >
+                    <option value="">All Categories</option>
+                    <option value="Fiscal">Fiscal</option>
+                    <option value="Education">Education</option>
+                    <option value="Labor">Labor</option>
+                    <option value="Elections">Elections</option>
+                    <option value="Good Governance">Good Governance</option>
+                    <option value="Business">Business</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Housing">Housing</option>
                   </select>
                 </div>
               </div>
@@ -318,7 +341,19 @@ export default function LegislatorsPage() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <LegislatorTable legislators={filteredLegislators} />
+            <div className="mb-4 flex items-center gap-2 text-sm text-gray-600 bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <ChevronLeft className="w-4 h-4 animate-pulse" />
+              <span className="font-medium">
+                Scroll horizontally to view all columns
+              </span>
+              <ChevronRight className="w-4 h-4 animate-pulse" />
+            </div>
+            <LegislatorTable
+              legislators={filteredLegislators}
+              selectedCategory={filters.category}
+              selectedParty={filters.party}
+              selectedChamber={filters.chamber}
+            />
           </div>
         )}
       </div>

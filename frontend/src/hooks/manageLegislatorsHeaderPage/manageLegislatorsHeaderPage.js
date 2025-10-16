@@ -11,7 +11,6 @@ export function useFetchLegislatorPage() {
     setError(null);
     try {
       const response = await axios.get(`${BASE_URL}/legislator/header`);
-      console.log(" Fetched legislator page data:", response.data);
       setLegislatorData(response.data);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch resource page");
