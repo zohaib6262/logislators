@@ -98,7 +98,7 @@ const Header = () => {
               className={getLinkClass("/nevada-legislators")}
               style={getLinkStyle("/nevada-legislators")}
             >
-              Legislators
+              Voting Records
             </Link>
 
             {/* Optional Login Button */}
