@@ -93,13 +93,15 @@ const Header = () => {
                 Resources
               </Link>
             )}
-            <Link
-              to="/nevada-legislators"
-              className={getLinkClass("/nevada-legislators")}
-              style={getLinkStyle("/nevada-legislators")}
-            >
-              Voting Records
-            </Link>
+            {settings?.enableLegislators && (
+              <Link
+                to="/nevada-legislators"
+                className={getLinkClass("/nevada-legislators")}
+                style={getLinkStyle("/nevada-legislators")}
+              >
+                Voting Records
+              </Link>
+            )}
 
             {/* Optional Login Button */}
             {/* 
@@ -156,14 +158,13 @@ const Header = () => {
                 </Link>
               )}
               {settings?.enableLegislators && (
-                <li>
-                  <Link
-                    to="/nevada-legislators"
-                    className="text-gray-300 hover:text-white transition-colors"
-                  >
-                    Voting Records
-                  </Link>
-                </li>
+                <Link
+                  to="/nevada-legislators"
+                  className={getLinkClass("/nevada-legislators")}
+                  style={getLinkStyle("/nevada-legislators")}
+                >
+                  Voting Records
+                </Link>
               )}
             </div>
           </nav>
