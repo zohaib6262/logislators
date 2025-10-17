@@ -36,10 +36,7 @@ function App() {
           />
           <Route path="about" element={withSuspense(AboutPage)} />
           <Route path="resources" element={withSuspense(ResourcesPage)} />
-          <Route
-            path="nevada-legislators"
-            element={withSuspense(Legislators)}
-          />
+          <Route path="voting-records" element={withSuspense(Legislators)} />
           <Route
             path="*"
             element={withSuspense(() => (

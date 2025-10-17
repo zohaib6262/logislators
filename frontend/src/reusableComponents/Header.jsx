@@ -95,9 +95,9 @@ const Header = () => {
             )}
             {settings?.enableLegislators && (
               <Link
-                to="/nevada-legislators"
-                className={getLinkClass("/nevada-legislators")}
-                style={getLinkStyle("/nevada-legislators")}
+                to="/voting-records"
+                className={getLinkClass("/voting-records")}
+                style={getLinkStyle("/voting-records")}
               >
                 Voting Records
               </Link>
@@ -159,9 +159,10 @@ const Header = () => {
               )}
               {settings?.enableLegislators && (
                 <Link
-                  to="/nevada-legislators"
-                  className={getLinkClass("/nevada-legislators")}
-                  style={getLinkStyle("/nevada-legislators")}
+                  to="/voting-records"
+                  className={getMobileLinkClass()}
+                  style={getMobileLinkStyle("/voting-records")}
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   Voting Records
                 </Link>
