@@ -117,7 +117,7 @@ const Footer = () => {
               {settings?.enableLegislators && (
                 <li>
                   <Link
-                    to="/nevada-legislators"
+                    to="/voting-records"
                     className="text-gray-300 hover:text-white transition-colors"
                   >
                     Voting Records
