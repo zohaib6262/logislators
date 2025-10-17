@@ -155,6 +155,16 @@ const Header = () => {
                   Resources
                 </Link>
               )}
+              {settings?.enableLegislators && (
+                <li>
+                  <Link
+                    to="/nevada-legislators"
+                    className="text-gray-300 hover:text-white transition-colors"
+                  >
+                    Voting Records
+                  </Link>
+                </li>
+              )}
             </div>
           </nav>
         )}

@@ -120,7 +120,7 @@ const Footer = () => {
                     to="/nevada-legislators"
                     className="text-gray-300 hover:text-white transition-colors"
                   >
-                    Nevada Legislators
+                    Voting Records
                   </Link>
                 </li>
               )}
