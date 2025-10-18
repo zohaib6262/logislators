@@ -128,8 +128,8 @@ const AdminDashboard = () => {
       icon: <Users size={20} className="mr-3" />,
     },
     {
-      to: "/admin/manage-legislators",
-      label: "Manage Legislators",
+      to: "/admin/manage-voting-records",
+      label: "Manage Voting Records",
       icon: <UserCog size={20} className="mr-3" />,
     },
 
@@ -164,8 +164,8 @@ const AdminDashboard = () => {
       icon: <Edit2Icon size={20} className="mr-3" />,
     },
     {
-      to: "/admin/legislator-header",
-      label: "Manage Legislator Header",
+      to: "/admin/voting-records-header",
+      label: "Manage Voting Records Header",
       icon: <LayoutPanelTop size={20} className="mr-3" />,
     },
     {
@@ -451,11 +451,11 @@ const AdminDashboard = () => {
 
                 <Route path="/representatives" element={<OfficialsManager />} />
                 <Route
-                  path="/manage-legislators"
+                  path="/manage-voting-records"
                   element={<ManageLegislators />}
                 />
                 <Route
-                  path="/manage-legislators/:id"
+                  path="/manage-voting-records/:id"
                   element={<LegislatorForm />}
                 />
                 <Route
@@ -480,7 +480,7 @@ const AdminDashboard = () => {
                 <Route path="/aboutus-page" element={<ManageAboutPage />} />
                 <Route path="/resource-page" element={<ManageResourcePage />} />
                 <Route
-                  path="/legislator-header"
+                  path="/voting-records-header"
                   element={<ManageLegislatorPage />}
                 />
 

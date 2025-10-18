@@ -1,14 +1,14 @@
-
 import mongoose from "mongoose";
 
 // Each bill entry
 const BillSchema = new mongoose.Schema(
   {
-    billNumber: { type: String, required: true }, 
+    billNumber: { type: String, required: true },
     value: { type: String, default: "" },
     recommendation: { type: String, default: "" },
     category: { type: String, default: "" },
     weighting: { type: Number, default: 0 },
+    billSummary: { type: String, default: "" },
   },
   { _id: false }
 );

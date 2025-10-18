@@ -1,410 +1,3 @@
-// import { useState, useEffect } from "react";
-// import { X, Plus, Trash2 } from "lucide-react";
-
-// const LegislatorForm = ({ legislator, onClose, onSave }) => {
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     party: "D",
-//     chamber: "Assembly",
-//     points: 0,
-//     points_possible: 0,
-//     score_percentage: 0,
-//     score_with_bonus: 0,
-//     key_highlights: "",
-//     categoryScores: [],
-//     bills: [],
-//   });
-//   const [saving, setSaving] = useState(false);
-
-//   useEffect(() => {
-//     if (legislator) {
-//       setFormData(legislator);
-//     }
-//   }, [legislator]);
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setSaving(true);
-//     try {
-//       await onSave(formData);
-//       onClose();
-//     } catch (error) {
-//       console.error("Error saving legislator:", error);
-//     } finally {
-//       setSaving(false);
-//     }
-//   };
-
-//   const handleCategoryScoreChange = (index, field, value) => {
-//     const updatedScores = [...(formData.categoryScores || [])];
-//     updatedScores[index] = { ...updatedScores[index], [field]: value };
-//     setFormData({ ...formData, categoryScores: updatedScores });
-//   };
-
-//   const addCategoryScore = () => {
-//     setFormData({
-//       ...formData,
-//       categoryScores: [
-//         ...(formData.categoryScores || []),
-//         { category: "", score: 0 },
-//       ],
-//     });
-//   };
-
-//   const removeCategoryScore = (index) => {
-//     const updatedScores = (formData.categoryScores || []).filter(
-//       (_, i) => i !== index
-//     );
-//     setFormData({ ...formData, categoryScores: updatedScores });
-//   };
-
-//   const handleBillChange = (index, field, value) => {
-//     const updatedBills = [...(formData.bills || [])];
-//     updatedBills[index] = { ...updatedBills[index], [field]: value };
-//     setFormData({ ...formData, bills: updatedBills });
-//   };
-
-//   const addBill = () => {
-//     setFormData({
-//       ...formData,
-//       bills: [
-//         ...(formData.bills || []),
-//         {
-//           billNumber: "",
-//           value: "",
-//           recommendation: "",
-//           category: "",
-//           weighting: 0,
-//         },
-//       ],
-//     });
-//   };
-
-//   const removeBill = (index) => {
-//     const updatedBills = (formData.bills || []).filter((_, i) => i !== index);
-//     setFormData({ ...formData, bills: updatedBills });
-//   };
-
-//   return (
-//     <div className="fixed inset-0 z-50 overflow-y-auto">
-//       <div className="flex min-h-screen items-center justify-center p-4">
-//         <div
-//           className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-//           onClick={onClose}
-//         ></div>
-
-//         <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-//           <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
-//             <h2 className="text-2xl font-bold text-gray-900">
-//               {legislator ? "Edit Legislator" : "Add New Legislator"}
-//             </h2>
-//             <button
-//               onClick={onClose}
-//               className="text-gray-400 hover:text-gray-600 transition-colors"
-//             >
-//               <X className="w-6 h-6" />
-//             </button>
-//           </div>
-
-//           <form onSubmit={handleSubmit} className="p-6">
-//             <div className="space-y-6">
-//               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-2">
-//                     Name *
-//                   </label>
-//                   <input
-//                     type="text"
-//                     required
-//                     value={formData.name}
-//                     onChange={(e) =>
-//                       setFormData({ ...formData, name: e.target.value })
-//                     }
-//                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-//                   />
-//                 </div>
-
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-2">
-//                     Party *
-//                   </label>
-//                   <select
-//                     required
-//                     value={formData.party}
-//                     onChange={(e) =>
-//                       setFormData({ ...formData, party: e.target.value })
-//                     }
-//                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-//                   >
-//                     <option value="D">Democrat (D)</option>
-//                     <option value="R">Republican (R)</option>
-//                     <option value="I">Independent (I)</option>
-//                   </select>
-//                 </div>
-
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-2">
-//                     Chamber *
-//                   </label>
-//                   <select
-//                     required
-//                     value={formData.chamber}
-//                     onChange={(e) =>
-//                       setFormData({ ...formData, chamber: e.target.value })
-//                     }
-//                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-//                   >
-//                     <option value="Assembly">Assembly</option>
-//                     <option value="Senate">Senate</option>
-//                   </select>
-//                 </div>
-
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-2">
-//                     Points
-//                   </label>
-//                   <input
-//                     type="number"
-//                     value={formData.points || 0}
-//                     onChange={(e) =>
-//                       setFormData({
-//                         ...formData,
-//                         points: Number(e.target.value),
-//                       })
-//                     }
-//                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-//                   />
-//                 </div>
-
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-2">
-//                     Points Possible
-//                   </label>
-//                   <input
-//                     type="number"
-//                     value={formData.points_possible || 0}
-//                     onChange={(e) =>
-//                       setFormData({
-//                         ...formData,
-//                         points_possible: Number(e.target.value),
-//                       })
-//                     }
-//                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-//                   />
-//                 </div>
-
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-2">
-//                     Score Percentage
-//                   </label>
-//                   <input
-//                     type="number"
-//                     step="0.01"
-//                     value={formData.score_percentage || 0}
-//                     onChange={(e) =>
-//                       setFormData({
-//                         ...formData,
-//                         score_percentage: Number(e.target.value),
-//                       })
-//                     }
-//                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-//                   />
-//                 </div>
-//               </div>
-
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Key Highlights
-//                 </label>
-//                 <textarea
-//                   rows={4}
-//                   value={formData.key_highlights || ""}
-//                   onChange={(e) =>
-//                     setFormData({ ...formData, key_highlights: e.target.value })
-//                   }
-//                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-//                 />
-//               </div>
-
-//               {/* Category Scores */}
-//               <div>
-//                 <div className="flex items-center justify-between mb-3">
-//                   <label className="block text-sm font-medium text-gray-700">
-//                     Category Scores
-//                   </label>
-//                   <button
-//                     type="button"
-//                     onClick={addCategoryScore}
-//                     className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
-//                   >
-//                     <Plus className="w-4 h-4" />
-//                     Add Category
-//                   </button>
-//                 </div>
-//                 <div className="space-y-2">
-//                   {(formData.categoryScores || []).map(
-//                     (categoryScore, index) => (
-//                       <div key={index} className="flex gap-2">
-//                         <input
-//                           type="text"
-//                           placeholder="Category"
-//                           value={categoryScore.category}
-//                           onChange={(e) =>
-//                             handleCategoryScoreChange(
-//                               index,
-//                               "category",
-//                               e.target.value
-//                             )
-//                           }
-//                           className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-//                         />
-//                         <input
-//                           type="number"
-//                           step="0.01"
-//                           placeholder="Score"
-//                           value={categoryScore.score}
-//                           onChange={(e) =>
-//                             handleCategoryScoreChange(
-//                               index,
-//                               "score",
-//                               Number(e.target.value)
-//                             )
-//                           }
-//                           className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-//                         />
-//                         <button
-//                           type="button"
-//                           onClick={() => removeCategoryScore(index)}
-//                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-//                         >
-//                           <Trash2 className="w-4 h-4" />
-//                         </button>
-//                       </div>
-//                     )
-//                   )}
-//                 </div>
-//               </div>
-
-//               {/* Bills */}
-//               <div>
-//                 <div className="flex items-center justify-between mb-3">
-//                   <label className="block text-sm font-medium text-gray-700">
-//                     Bills
-//                   </label>
-//                   <button
-//                     type="button"
-//                     onClick={addBill}
-//                     className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
-//                   >
-//                     <Plus className="w-4 h-4" />
-//                     Add Bill
-//                   </button>
-//                 </div>
-//                 <div className="space-y-3">
-//                   {(formData.bills || []).map((bill, index) => (
-//                     <div
-//                       key={index}
-//                       className="p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-2"
-//                     >
-//                       <div className="flex gap-2">
-//                         <input
-//                           type="text"
-//                           placeholder="Bill Number"
-//                           value={bill.billNumber}
-//                           onChange={(e) =>
-//                             handleBillChange(
-//                               index,
-//                               "billNumber",
-//                               e.target.value
-//                             )
-//                           }
-//                           className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
-//                         />
-//                         <input
-//                           type="text"
-//                           placeholder="Value (Y/N/A)"
-//                           value={bill.value}
-//                           onChange={(e) =>
-//                             handleBillChange(index, "value", e.target.value)
-//                           }
-//                           className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
-//                         />
-//                         <button
-//                           type="button"
-//                           onClick={() => removeBill(index)}
-//                           className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-//                         >
-//                           <Trash2 className="w-4 h-4" />
-//                         </button>
-//                       </div>
-//                       <div className="grid grid-cols-3 gap-2">
-//                         <input
-//                           type="text"
-//                           placeholder="Recommendation"
-//                           value={bill.recommendation}
-//                           onChange={(e) =>
-//                             handleBillChange(
-//                               index,
-//                               "recommendation",
-//                               e.target.value
-//                             )
-//                           }
-//                           className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
-//                         />
-//                         <input
-//                           type="text"
-//                           placeholder="Category"
-//                           value={bill.category}
-//                           onChange={(e) =>
-//                             handleBillChange(index, "category", e.target.value)
-//                           }
-//                           className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
-//                         />
-//                         <input
-//                           type="number"
-//                           placeholder="Weighting"
-//                           value={bill.weighting}
-//                           onChange={(e) =>
-//                             handleBillChange(
-//                               index,
-//                               "weighting",
-//                               Number(e.target.value)
-//                             )
-//                           }
-//                           className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
-//                         />
-//                       </div>
-//                     </div>
-//                   ))}
-//                 </div>
-//               </div>
-//             </div>
-
-//             <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200">
-//               <button
-//                 type="button"
-//                 onClick={onClose}
-//                 disabled={saving}
-//                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-//               >
-//                 Cancel
-//               </button>
-//               <button
-//                 type="submit"
-//                 disabled={saving}
-//                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-//               >
-//                 {saving ? "Saving..." : legislator ? "Update" : "Create"}
-//               </button>
-//             </div>
-//           </form>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default LegislatorForm;
 import React, { useContext, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Save, Plus, Trash2 } from "lucide-react";
@@ -539,6 +132,7 @@ const EditLegislator = () => {
           recommendation: "",
           category: "",
           weighting: 0,
+          billSummary: "",
         },
       ],
     }));
@@ -559,7 +153,7 @@ const EditLegislator = () => {
     }
     try {
       await updateLegislator(id, formData);
-      navigate("/admin/manage-legislators");
+      navigate("/admin/manage-voting-records");
     } catch (error) {
       console.error("Error updating legislator:", error);
     }
@@ -586,11 +180,11 @@ const EditLegislator = () => {
             <p className="text-sm text-red-700">{fetchError}</p>
             <div className="mt-4">
               <Link
-                to="/admin/manage-legislators"
+                to="/admin/manage-voting-records"
                 className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500"
               >
                 <ArrowLeft size={16} className="mr-1" />
-                Back to legislators
+                Back to voting records list
               </Link>
             </div>
           </div>
@@ -603,10 +197,10 @@ const EditLegislator = () => {
     <div className="container mx-auto px-4 py-8 mt-10">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">
-          Edit Legislator
+          Edit Voting Record
         </h1>
         <Link
-          to="/admin/manage-legislators"
+          to="/admin/manage-voting-records"
           className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
         >
           <ArrowLeft size={16} className="mr-2" />
@@ -876,8 +470,9 @@ const EditLegislator = () => {
                     <Trash2 size={16} />
                   </button> */}
                 </div>
-                <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                  <div className="sm:col-span-2">
+                <div className="grid grid-cols-1 sm:grid-cols-6 gap-x-4 gap-y-6">
+                  {/* Bill Number */}
+                  <div className="sm:col-span-1">
                     <label className="block text-sm font-medium text-gray-700">
                       Bill Number
                     </label>
@@ -887,9 +482,11 @@ const EditLegislator = () => {
                       onChange={(e) =>
                         handleBillChange(index, "billNumber", e.target.value)
                       }
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none "
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-2 focus:ring-[#003049] focus:border-[#003049] outline-none"
                     />
                   </div>
+
+                  {/* Value */}
                   <div className="sm:col-span-1">
                     <label className="block text-sm font-medium text-gray-700">
                       Value (Y/N/A)
@@ -900,10 +497,12 @@ const EditLegislator = () => {
                       onChange={(e) =>
                         handleBillChange(index, "value", e.target.value)
                       }
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none "
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-2 focus:ring-[#003049] focus:border-[#003049] outline-none"
                     />
                   </div>
-                  <div className="sm:col-span-2">
+
+                  {/* Recommendation */}
+                  <div className="sm:col-span-3">
                     <label className="block text-sm font-medium text-gray-700">
                       Recommendation
                     </label>
@@ -917,9 +516,11 @@ const EditLegislator = () => {
                           e.target.value
                         )
                       }
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none "
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-2 focus:ring-[#003049] focus:border-[#003049] outline-none"
                     />
                   </div>
+
+                  {/* Category */}
                   <div className="sm:col-span-1">
                     <label className="block text-sm font-medium text-gray-700">
                       Category
@@ -930,7 +531,21 @@ const EditLegislator = () => {
                       onChange={(e) =>
                         handleBillChange(index, "category", e.target.value)
                       }
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none "
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-2 focus:ring-[#003049] focus:border-[#003049] outline-none"
+                    />
+                  </div>
+                  {/* Bill Summary — more width */}
+                  <div className="sm:col-span-3">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Bill Summary
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={bill.billSummary}
+                      onChange={(e) =>
+                        handleBillChange(index, "billSummary", e.target.value)
+                      }
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-2 focus:ring-[#003049] focus:border-[#003049] outline-none resize-y"
                     />
                   </div>
                 </div>

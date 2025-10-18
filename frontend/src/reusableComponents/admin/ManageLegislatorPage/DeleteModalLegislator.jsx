@@ -42,14 +42,14 @@ const DeleteModalLegislator = ({
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
-              Delete Legislator
+              Delete Voting Record
             </h3>
             <p className="text-sm text-gray-600 text-center">
-              Are you sure you want to delete{" "}
+              Are you sure you want to delete
               <span className="font-semibold text-gray-900">
-                {legislatorName}
+                {` ${legislatorName} `}
               </span>
-              ? This action cannot be undone.
+              {` ? This action cannot be undone.`}
             </p>
           </div>
 

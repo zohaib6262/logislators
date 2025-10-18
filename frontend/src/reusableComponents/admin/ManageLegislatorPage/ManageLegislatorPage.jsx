@@ -56,7 +56,7 @@ function ManageLegislatorPage() {
     <div className="min-h-screen bg-white py-8 mt-10">
       <div className="max-w-4xl mx-auto px-4">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Manage Legislator's Page
+          Manage Voting Records Page
         </h1>
         {isLoading && (
           <div
@@ -64,7 +64,7 @@ function ManageLegislatorPage() {
             style={{ color: primaryColor }}
           >
             <Loader2 className="mr-2 animate-spin" />
-            Loading Legislator's Settings
+            Loading Voting Records Settings
           </div>
         )}
         {error && (
@@ -83,10 +83,10 @@ function ManageLegislatorPage() {
                 htmlFor="enableLegislatorsHeader"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Enable Legislators Page Header
+                Enable Voting Records Page Header
               </label>
               <p className="text-xs text-gray-500">
-                Toggle to show/hide the Legislators page header
+                Toggle to show/hide the voting records page header
               </p>
             </div>
             <Switch
