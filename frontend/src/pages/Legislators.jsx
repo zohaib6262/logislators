@@ -110,6 +110,7 @@ export default function LegislatorsPage() {
       if (filters.maxScore) filterParams.maxScore = Number(filters.maxScore);
 
       const response = await legislatorAPI.filter(filterParams);
+      console.log("Response:", response);
       setFilteredLegislators(response.data);
     } catch (error) {
       console.error("Error filtering:", error);
@@ -291,6 +292,26 @@ export default function LegislatorsPage() {
                     <option value="Business">Business</option>
                     <option value="Healthcare">Healthcare</option>
                     <option value="Housing">Housing</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Recommendation
+                  </label>
+                  <select
+                    value={filters.recommendation}
+                    onChange={(e) =>
+                      setFilters({ ...filters, recommendation: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    style={{ outlineColor: primaryColor }}
+                  >
+                    <option value="">All Recommendations</option>
+                    <option value="Oppose 1">Oppose 1</option>
+                    <option value="Oppose 2">Oppose 2</option>
+                    <option value="Support 1">Support 1</option>
+                    <option value="Support 2">Support 2</option>
+                    <option value="Neutral">Neutral</option>
                   </select>
                 </div>
               </div>
