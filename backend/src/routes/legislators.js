@@ -11,27 +11,97 @@ const router = express.Router();
 // ============================================
 // FILTER LEGISLATORS (Move before /:id)
 // ============================================
+// router.get("/filter", async (req, res) => {
+//   try {
+//     const { party, chamber, recommendation, minScore, maxScore, category } =
+//       req.query;
+//     const filter = {};
+
+//     if (party) filter.party = party;
+//     if (chamber) filter.chamber = chamber;
+//     // Fix for recommendation - query within bills array
+//     if (recommendation) filter["bills.recommendation"] = recommendation;
+
+//     if (category) filter["bills.category"] = category;
+
+//     if (minScore || maxScore) {
+//       filter.score_percentage = {};
+//       if (minScore) filter.score_percentage.$gte = Number(minScore);
+//       if (maxScore) filter.score_percentage.$lte = Number(maxScore);
+//     }
+
+//     const legislators = await Legislator.find(filter).sort({
+//       score_percentage: -1,
+//     });
+//     console.log("legislators:", legislators.length);
+
+//     res.status(200).json({
+//       success: true,
+//       count: legislators.length,
+//       data: legislators,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Error filtering legislators",
+//       error: error.message,
+//     });
+//   }
+// });
 router.get("/filter", async (req, res) => {
   try {
     const { party, chamber, recommendation, minScore, maxScore, category } =
       req.query;
 
-    const filter = {};
-
-    if (party) filter.party = party;
-    if (chamber) filter.chamber = chamber;
-    if (recommendation) filter.recommendation = recommendation;
-    if (category) filter["bills.category"] = category;
-
+    const matchStage = {};
+    if (party) matchStage.party = party;
+    if (chamber) matchStage.chamber = chamber;
     if (minScore || maxScore) {
-      filter.score_percentage = {};
-      if (minScore) filter.score_percentage.$gte = Number(minScore);
-      if (maxScore) filter.score_percentage.$lte = Number(maxScore);
+      matchStage.score_percentage = {};
+      if (minScore) matchStage.score_percentage.$gte = Number(minScore);
+      if (maxScore) matchStage.score_percentage.$lte = Number(maxScore);
     }
 
-    const legislators = await Legislator.find(filter).sort({
-      score_percentage: -1,
-    });
+    // Build bills filter
+    const billsFilter = {};
+    if (recommendation) billsFilter.recommendation = recommendation;
+    if (category) billsFilter.category = category;
+
+    const pipeline = [{ $match: matchStage }];
+
+    // Only add bills filter if we have category or recommendation
+    if (Object.keys(billsFilter).length > 0) {
+      pipeline.push(
+        // First, ensure legislator has at least one matching bill
+        {
+          $match: {
+            bills: {
+              $elemMatch: billsFilter,
+            },
+          },
+        },
+        // Then filter the bills array to only include matching bills
+        {
+          $addFields: {
+            bills: {
+              $filter: {
+                input: "$bills",
+                as: "bill",
+                cond: {
+                  $and: Object.entries(billsFilter).map(([key, value]) => ({
+                    $eq: [`$$bill.${key}`, value],
+                  })),
+                },
+              },
+            },
+          },
+        }
+      );
+    }
+
+    pipeline.push({ $sort: { score_percentage: -1 } });
+
+    const legislators = await Legislator.aggregate(pipeline);
 
     res.status(200).json({
       success: true,
@@ -46,7 +116,6 @@ router.get("/filter", async (req, res) => {
     });
   }
 });
-
 // ============================================
 // GET STATISTICS (Move before /:id)
 // ============================================

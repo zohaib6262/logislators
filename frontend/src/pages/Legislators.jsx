@@ -110,7 +110,6 @@ export default function LegislatorsPage() {
       if (filters.maxScore) filterParams.maxScore = Number(filters.maxScore);
 
       const response = await legislatorAPI.filter(filterParams);
-      console.log("Response:", response);
       setFilteredLegislators(response.data);
     } catch (error) {
       console.error("Error filtering:", error);
@@ -311,7 +310,6 @@ export default function LegislatorsPage() {
                     <option value="Oppose 2">Oppose 2</option>
                     <option value="Support 1">Support 1</option>
                     <option value="Support 2">Support 2</option>
-                    <option value="Neutral">Neutral</option>
                   </select>
                 </div>
               </div>
