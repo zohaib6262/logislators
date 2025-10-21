@@ -1,13 +1,36 @@
 import { Edit, ExternalLink, Star, StarOff, Trash } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import useDeleteResource from "../hooks/useDeleteResource";
 import ConfirmModal from "./ConfirmModal";
+import { TokenContext } from "@/store/TokenContextProvider";
 
 const ResourceCard = ({ resource, refetch }) => {
   const [showModal, setShowModal] = useState(false);
   const { deleteResource, deleting, error } = useDeleteResource(refetch);
+  const { primaryColor } = useContext(TokenContext);
+  // Utility function to lighten a hex color
+  const lightenColor = (color, percent) => {
+    const num = parseInt(color.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = ((num >> 8) & 0x00ff) + amt;
+    const B = (num & 0x0000ff) + amt;
+    return (
+      "#" +
+      (
+        0x1000000 +
+        (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+        (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+        (B < 255 ? (B < 1 ? 0 : B) : 255)
+      )
+        .toString(16)
+        .slice(1)
+    );
+  };
 
+  const lightShade = lightenColor(primaryColor, 70); // soft pastel background
+  const veryLightShade = lightenColor(primaryColor, 85); // faint background
   const handleDelete = async () => {
     if (!resource._id) {
       return;
@@ -40,24 +63,24 @@ const ResourceCard = ({ resource, refetch }) => {
               >
                 {resource.category}
               </span>
-
+              {resource.isFeatured && (
+                <span
+                  className="ml-2 inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full shadow-sm"
+                  style={{
+                    background: lightenColor(primaryColor, 20),
+                    color: "#fff",
+                  }}
+                >
+                  <Star className="w-3 h-3 mr-1 fill-current" />
+                  Featured
+                </span>
+              )}
               <h3 className="text-xl font-bold text-gray-800 mt-2">
                 {resource.title}
               </h3>
             </div>
 
             <div className="flex space-x-2">
-              {/* <button
-                      onClick={() => toggleFeatured(resource._id, resource.isFeatured)}
-                      className={`p-2 rounded-lg transition-colors ${
-                        resource.isFeatured
-                          ? 'bg-orange-100 text-orange-600 hover:bg-orange-200'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                      title={resource.isFeatured ? 'Remove from featured' : 'Set as featured'}
-                    >
-                      {resource.isFeatured ? <StarOff className="w-5 h-5" /> : <Star className="w-5 h-5" />}
-                    </button> */}
               <Link
                 to={`/admin/resources/${resource._id}`}
                 className="text-blue-600 hover:text-blue-800"
