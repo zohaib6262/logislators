@@ -5,6 +5,7 @@ import useAddResource from "../../hooks/useAddResource";
 import useGetCategories from "../../hooks/categories/useGetCategories";
 import { TokenContext } from "@/store/TokenContextProvider";
 import { newLightnerColor } from "@/utils/colorUtils";
+import useGetResources from "@/hooks/useGetRecources";
 
 const AddResource = () => {
   const [resource, setResource] = useState({
@@ -13,14 +14,35 @@ const AddResource = () => {
     url: "",
     category: "",
     customFields: [],
+    isFeatured: false,
   });
-
+  const { resources } = useGetResources();
   const { addResource, loading, error } = useAddResource();
   const { categories: allCategories, loading: categoriesLoading } =
     useGetCategories();
   const { primaryColor } = useContext(TokenContext);
   const lighterPrimary = newLightnerColor(primaryColor, 30);
+  const lightenColor = (color, percent) => {
+    const num = parseInt(color.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = ((num >> 8) & 0x00ff) + amt;
+    const B = (num & 0x0000ff) + amt;
+    return (
+      "#" +
+      (
+        0x1000000 +
+        (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+        (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+        (B < 255 ? (B < 1 ? 0 : B) : 255)
+      )
+        .toString(16)
+        .slice(1)
+    );
+  };
 
+  const lightShade = lightenColor(primaryColor, 50); // soft pastel background
+  const veryLightShade = lightenColor(primaryColor, 85); // faint background
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -47,6 +69,7 @@ const AddResource = () => {
       customFields: prev.customFields.filter((_, i) => i !== index),
     }));
   };
+  const alreadyFeatured = resources?.some((res) => res.isFeatured);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -155,7 +178,7 @@ const AddResource = () => {
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Select a category</option>
-              {allCategories.map((category) => (
+              {allCategories?.map((category) => (
                 <option key={category._id} value={category.name}>
                   {category.name}
                 </option>
@@ -215,7 +238,32 @@ const AddResource = () => {
               </div>
             ))}
           </div>
-
+          {!alreadyFeatured && (
+            <div
+              className="flex items-center gap-3 p-4 rounded-lg mt-6"
+              style={{ background: lightShade }}
+            >
+              <input
+                type="checkbox"
+                id="featured"
+                checked={resource.isFeatured || false}
+                onChange={(e) =>
+                  setResource((prev) => ({
+                    ...prev,
+                    isFeatured: e.target.checked,
+                  }))
+                }
+                className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
+              />
+              <label
+                htmlFor="featured"
+                className="text-sm font-medium text-gray-900"
+              >
+                Set as Featured Resource (only one resource can be featured at a
+                time)
+              </label>
+            </div>
+          )}
           {/* Submit Button */}
           <div className="flex justify-end pt-6 border-t border-gray-200">
             <button
