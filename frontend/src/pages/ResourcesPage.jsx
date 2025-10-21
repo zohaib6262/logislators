@@ -18,10 +18,42 @@ const ResourcesPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const { primaryColor } = useContext(TokenContext);
+  // Utility function to lighten a hex color
+  const lightenColor = (color, percent) => {
+    const num = parseInt(color.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = ((num >> 8) & 0x00ff) + amt;
+    const B = (num & 0x0000ff) + amt;
+    return (
+      "#" +
+      (
+        0x1000000 +
+        (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+        (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+        (B < 255 ? (B < 1 ? 0 : B) : 255)
+      )
+        .toString(16)
+        .slice(1)
+    );
+  };
+
+  const lightShade = lightenColor(primaryColor, 70); // soft pastel background
+  const veryLightShade = lightenColor(primaryColor, 85); // faint background
 
   const filterCategoryName = totalCategories.map((category) => category.name);
   const categories = ["All", ...filterCategoryName];
 
+  const featuredResource = resources.filter((item) => item.isFeatured);
+  console.log("Featured Resource:", featuredResource);
+  const categoryColor =
+    featuredResource.category === "Government"
+      ? "bg-blue-100 text-blue-800"
+      : featuredResource.category === "Voting"
+      ? "bg-green-100 text-green-800"
+      : featuredResource.category === "Education"
+      ? "bg-purple-100 text-purple-800"
+      : "bg-yellow-100 text-yellow-800";
   const filteredResources = resources.filter((resource) => {
     const matchesSearch =
       resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -55,6 +87,59 @@ const ResourcesPage = () => {
 
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
+          <div className="py-8">
+            {featuredResource.length > 0 && (
+              <div
+                className="bg-gradient-to-r from-orange-50 to-red-50 border-2 rounded-xl p-8 shadow-lg"
+                style={{
+                  borderColor: primaryColor,
+                }}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className="text-white p-3 rounded-lg"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    <FileText className="w-8 h-8" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span
+                        className="text-white text-xs font-semibold px-3 py-1.5 rounded-full uppercase tracking-wider"
+                        style={{ backgroundColor: primaryColor, color: "#fff" }}
+                      >
+                        Featured Resource
+                      </span>
+                      <span
+                        className={`text-xs font-semibold px-3 py-1.5 rounded-full ${categoryColor}`}
+                      >
+                        {featuredResource[0].category}
+                      </span>
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                      {featuredResource[0].title}
+                    </h2>
+                    <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+                      {featuredResource[0].description}
+                    </p>
+                    <a
+                      href={featuredResource[0].url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-white font-semibold px-6 py-2 rounded-lg transition-colors"
+                      style={{
+                        backgroundColor: primaryColor,
+                        color: "white",
+                      }}
+                    >
+                      Visit Resource
+                      <ExternalLink className="w-5 h-5" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
           {/* Search and Filter */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

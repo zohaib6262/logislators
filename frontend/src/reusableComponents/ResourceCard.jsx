@@ -1,4 +1,4 @@
-import { Edit, ExternalLink, Trash } from "lucide-react";
+import { Edit, ExternalLink, Star, StarOff, Trash } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import useDeleteResource from "../hooks/useDeleteResource";
@@ -47,6 +47,17 @@ const ResourceCard = ({ resource, refetch }) => {
             </div>
 
             <div className="flex space-x-2">
+              {/* <button
+                      onClick={() => toggleFeatured(resource._id, resource.isFeatured)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        resource.isFeatured
+                          ? 'bg-orange-100 text-orange-600 hover:bg-orange-200'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                      title={resource.isFeatured ? 'Remove from featured' : 'Set as featured'}
+                    >
+                      {resource.isFeatured ? <StarOff className="w-5 h-5" /> : <Star className="w-5 h-5" />}
+                    </button> */}
               <Link
                 to={`/admin/resources/${resource._id}`}
                 className="text-blue-600 hover:text-blue-800"

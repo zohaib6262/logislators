@@ -19,6 +19,7 @@ export default function LegislatorTable({
   selectedCategory,
   selectedParty,
   selectedChamber,
+  selectedRecommendation,
 }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
@@ -218,137 +219,37 @@ export default function LegislatorTable({
     };
   };
 
-  let headerHtml;
-  let footerHtml;
-  if (selectedCategory && selectedChamber && selectedParty) {
-    footerHtml = ` • Filtered by ${selectedCategory} category bills and ${selectedChamber} members and ${
-      selectedParty === "D"
-        ? "Democrat party members"
-        : selectedParty === "R"
-        ? "Republican party members"
-        : "Independent party members"
-    }`;
-    headerHtml = (
-      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-700 font-medium">
-          📌 Showing only
-          <span className="font-bold">{` ${
-            selectedCategory ? `${selectedCategory} category bills` : ""
-          }  ${
-            selectedChamber ? `and ${selectedChamber} chamber members` : ""
-          } ${selectedParty === "D" ? `and Democrat party members` : ""} ${
-            selectedParty === "R" ? `and Republican party members` : ""
-          }
-          ${selectedParty === "I" ? `and Independent party ` : ""}`}</span>{" "}
-        </p>
-      </div>
-    );
-  } else if (selectedCategory && selectedChamber) {
-    footerHtml = ` • Filtered by ${selectedCategory} category bills and ${selectedChamber} members`;
-    headerHtml = (
-      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-700 font-medium">
-          📌 Showing only
-          <span className="font-bold">{` ${
-            selectedCategory ? `${selectedCategory} category bills` : ""
-          }  ${
-            selectedChamber ? `and ${selectedChamber} chamber members` : ""
-          }`}</span>
-        </p>
-      </div>
-    );
-  } else if (selectedCategory && selectedParty) {
-    footerHtml = ` • Filtered by ${selectedCategory} category bills and ${
-      selectedParty === "D"
-        ? "Democrat party members"
-        : selectedParty === "R"
-        ? "Republican party members"
-        : "Independent party members"
-    }`;
-    headerHtml = (
-      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-700 font-medium">
-          📌 Showing only
-          <span className="font-bold">{` ${
-            selectedCategory ? `${selectedCategory} category bills` : ""
-          }  ${selectedParty === "D" ? `and Democrat party members` : ""} ${
-            selectedParty === "R" ? `and Republican party members` : ""
-          }
-          ${
-            selectedParty === "I" ? `and Independent party members` : ""
-          }`}</span>{" "}
-        </p>
-      </div>
-    );
-  } else if (selectedChamber && selectedParty) {
-    footerHtml = ` • Filtered by ${selectedChamber} members and ${
-      selectedParty === "D"
-        ? "Democrat party members"
-        : selectedParty === "R"
-        ? "Republican party members"
-        : "Independent party members"
-    }`;
-    headerHtml = (
-      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-700 font-medium">
-          📌 Showing only
-          <span className="font-bold">{`${
-            selectedChamber ? ` ${selectedChamber} chamber members` : ""
-          } ${selectedParty === "D" ? `and Democrat party members` : ""} ${
-            selectedParty === "R" ? `and Republican party members` : ""
-          }
-          ${
-            selectedParty === "I" ? `and Independent party members` : ""
-          }`}</span>{" "}
-        </p>
-      </div>
-    );
-  } else if (selectedCategory && !selectedChamber && !selectedParty) {
-    footerHtml = ` • Filtered by ${selectedCategory} category bills`;
-    headerHtml = (
-      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-700 font-medium">
-          📌 Showing only
-          <span className="font-bold">{` ${
-            selectedCategory ? `${selectedCategory} category bills` : ""
-          } `}</span>
-        </p>
-      </div>
-    );
-  } else if (!selectedCategory && selectedChamber && !selectedParty) {
-    footerHtml = ` • Filtered by ${selectedChamber} members`;
-    headerHtml = (
-      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-700 font-medium">
-          📌 Showing only
-          <span className="font-bold">{` ${
-            selectedChamber ? ` ${selectedChamber} chamber members` : ""
-          }`}</span>
-        </p>
-      </div>
-    );
-  } else if (!selectedCategory && !selectedChamber && selectedParty) {
-    footerHtml = ` • Filtered by ${
-      selectedParty === "D"
-        ? "Democrat party members"
-        : selectedParty === "R"
-        ? "Republican party members"
-        : "Independent party members"
-    }`;
-    headerHtml = (
-      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-700 font-medium">
-          📌 Showing only
-          <span className="font-bold">{` ${
-            selectedParty === "D" ? `Democrat party members` : ""
-          } ${selectedParty === "R" ? `Republican party members` : ""}
-          ${
-            selectedParty === "I" ? `Independent party members` : ""
-          }`}</span>{" "}
-        </p>
-      </div>
-    );
-  }
+  const summary = useMemo(() => {
+    const parts = [];
+    if (selectedCategory) parts.push(`${selectedCategory} category bills`);
+    if (selectedChamber) parts.push(`${selectedChamber} members`);
+    if (selectedParty) {
+      const partyName =
+        selectedParty === "D"
+          ? "Democrat"
+          : selectedParty === "R"
+          ? "Republican"
+          : "Independent";
+      parts.push(`${partyName} party members`);
+    }
+    if (selectedRecommendation)
+      parts.push(`${selectedRecommendation} recommendation`);
+    return parts.join(" and ");
+  }, [
+    selectedCategory,
+    selectedChamber,
+    selectedParty,
+    selectedRecommendation,
+  ]);
+
+  const headerHtml = summary && (
+    <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+      <p className="text-sm text-blue-700 font-medium">
+        📌 Showing only <span className="font-bold">{summary}</span>
+      </p>
+    </div>
+  );
+  const footerHtml = summary && ` • Filtered by ${summary}`;
 
   return (
     <div className="w-full">

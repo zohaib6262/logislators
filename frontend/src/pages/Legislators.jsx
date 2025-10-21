@@ -372,6 +372,7 @@ export default function LegislatorsPage() {
               selectedCategory={filters.category}
               selectedParty={filters.party}
               selectedChamber={filters.chamber}
+              selectedRecommendation={filters.recommendation}
             />
           </div>
         )}

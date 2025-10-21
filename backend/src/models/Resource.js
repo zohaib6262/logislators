@@ -7,6 +7,10 @@ const ResourceSchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  isFeature: {
+    type: Boolean,
+    default: false,
+  },
   url: {
     type: String,
   },

@@ -32,7 +32,8 @@ router.get("/:id", protect, async (req, res) => {
 // Create a new resource
 router.post("/", protect, async (req, res) => {
   try {
-    const { title, description, url, category, customFields } = req.body;
+    const { title, description, url, category, customFields, isFeature } =
+      req.body;
 
     if (!title || !description || !url || !category) {
       return res.status(400).json({ error: "All fields are required" });
@@ -44,6 +45,7 @@ router.post("/", protect, async (req, res) => {
       url,
       category,
       customFields,
+      isFeature,
     });
 
     const savedResource = await newResource.save();

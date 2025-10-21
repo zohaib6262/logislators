@@ -6,12 +6,35 @@ import useEditResource from "../hooks/useEditResource";
 import useGetCategories from "../hooks/categories/useGetCategories";
 import { lightenColor } from "@/utils/colorUtils";
 import { TokenContext } from "@/store/TokenContextProvider";
+import useGetResources from "@/hooks/useGetRecources";
 
 const EditResource = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { primaryColor } = useContext(TokenContext);
+  const { resources } = useGetResources();
+  // Utility function to lighten a hex color
+  const lightenColor = (color, percent) => {
+    const num = parseInt(color.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = ((num >> 8) & 0x00ff) + amt;
+    const B = (num & 0x0000ff) + amt;
+    return (
+      "#" +
+      (
+        0x1000000 +
+        (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+        (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+        (B < 255 ? (B < 1 ? 0 : B) : 255)
+      )
+        .toString(16)
+        .slice(1)
+    );
+  };
 
+  const lightShade = lightenColor(primaryColor, 50); // soft pastel background
+  const veryLightShade = lightenColor(primaryColor, 85); // faint background
   const { resource, loading, fetchDataError } = useGetResource(id);
   const { updateResource, updateDataError } = useEditResource();
   const { categories: allCategories } = useGetCategories();
@@ -22,9 +45,13 @@ const EditResource = () => {
     category: "",
     url: "",
     customFields: [],
+    isFeatured: false,
   });
   const [submitting, setSubmitting] = useState(false);
-
+  // ✅ Check if another resource is already featured
+  const alreadyFeatured = resources?.some(
+    (res) => res.isFeatured && res._id !== id
+  );
   const lighterPrimary = lightenColor(primaryColor, 60);
   useEffect(() => {
     if (resource) {
@@ -34,6 +61,7 @@ const EditResource = () => {
         category: resource.category || "",
         url: resource.url || "",
         customFields: resource.customFields || [],
+        isFeatured: resource.isFeatured || false,
       });
     }
   }, [resource]);
@@ -91,8 +119,11 @@ const EditResource = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+        <div
+          className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 "
+          style={{ borderColor: primaryColor }}
+        ></div>
       </div>
     );
   }
@@ -264,19 +295,60 @@ const EditResource = () => {
                     className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
-                <div className="col-span-2">
-                  <button
-                    type="button"
-                    disabled={submitting}
-                    onClick={() => handleRemoveCustomField(index)}
-                    className="w-full inline-flex justify-center items-center text-red-600 hover:text-red-800"
+                <div
+                  className="flex items-center gap-3 p-4 rounded-lg"
+                  style={{ background }}
+                >
+                  <input
+                    type="checkbox"
+                    id="featured"
+                    checked={formData.is_featured}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        is_featured: e.target.checked,
+                      })
+                    }
+                    className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
+                  />
+                  <label
+                    htmlFor="featured"
+                    className="text-sm font-medium text-gray-900"
                   >
-                    <Trash2 size={16} />
-                  </button>
+                    Set as Featured Resource (only one resource can be featured
+                    at a time)
+                  </label>
                 </div>
               </div>
             ))}
           </div>
+          {/* ✅ Show checkbox only if NO other resource is featured */}
+          {!alreadyFeatured && (
+            <div
+              className="flex items-center gap-3 p-4 rounded-lg mt-6"
+              style={{ background: lightShade }}
+            >
+              <input
+                type="checkbox"
+                id="featured"
+                checked={formData.isFeatured || false}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    isFeatured: e.target.checked,
+                  }))
+                }
+                className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
+              />
+              <label
+                htmlFor="featured"
+                className="text-sm font-medium text-gray-900"
+              >
+                Set as Featured Resource (only one resource can be featured at a
+                time)
+              </label>
+            </div>
+          )}
 
           {/* Error Message */}
           {error && (
