@@ -32,7 +32,7 @@ router.get("/:id", protect, async (req, res) => {
 // Create a new resource
 router.post("/", protect, async (req, res) => {
   try {
-    const { title, description, url, category, customFields, isFeature } =
+    const { title, description, url, category, customFields, isFeatured } =
       req.body;
 
     if (!title || !description || !url || !category) {
@@ -45,7 +45,7 @@ router.post("/", protect, async (req, res) => {
       url,
       category,
       customFields,
-      isFeature,
+      isFeatured,
     });
 
     const savedResource = await newResource.save();

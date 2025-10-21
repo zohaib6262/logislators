@@ -107,7 +107,6 @@ const EditResource = () => {
       if (!formData.title.trim() || !formData.category) {
         throw new Error("Title and category are required");
       }
-
       await updateResource(id, formData);
       navigate("/admin/resources");
     } catch (error) {
@@ -302,12 +301,9 @@ const EditResource = () => {
                   <input
                     type="checkbox"
                     id="featured"
-                    checked={formData.is_featured}
+                    checked={formData.isFeatured}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        is_featured: e.target.checked,
-                      })
+                      setFormData({ ...formData, isFeatured: e.target.checked })
                     }
                     className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
                   />
