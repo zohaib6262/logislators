@@ -13,9 +13,21 @@ export default function useResetPassword() {
     setSuccess(false);
 
     try {
-      const { data } = await axios.post(`${BASE_URL}/auth/reset-password`, {
-        newPassword,
-      });
+      const token = localStorage.getItem("token");
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ Send token in header
+        },
+      };
+      const { data } = await axios.post(
+        `${BASE_URL}/auth/reset-password`,
+        {
+          newPassword,
+        },
+        config
+      );
 
       if (data.success) {
         setSuccess(true);
