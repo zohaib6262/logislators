@@ -20,6 +20,7 @@ import {
   Vote,
   LayoutPanelTop,
   UserCog,
+  KeyRound,
 } from "lucide-react";
 
 // Admin Components
@@ -73,6 +74,7 @@ import LoadingScreen from "@/reusableComponents/LoadingScreen";
 import ManageLegislatorPage from "@/reusableComponents/admin/ManageLegislatorPage/ManageLegislatorPage";
 import ManageLegislators from "@/reusableComponents/admin/ManageLegislatorPage/ManageLegislators";
 import LegislatorForm from "@/reusableComponents/admin/ManageLegislatorPage/LegislatorForm";
+import ResetPassword from "@/reusableComponents/admin/ResetPassword/ResetPassword";
 
 // Utility function to lighten colors
 const lightenColor = (color, percent) => {
@@ -172,6 +174,11 @@ const AdminDashboard = () => {
       to: "/admin/settings",
       label: "Site Settings",
       icon: <Settings size={20} className="mr-3" />,
+    },
+    {
+      to: "/admin/reset-password",
+      label: "Reset Password",
+      icon: <KeyRound size={20} className="mr-3" />,
     },
   ];
 
@@ -485,7 +492,7 @@ const AdminDashboard = () => {
                 />
 
                 <Route path="/settings" element={<SiteSettings />} />
-
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route
                   path="*"
                   element={
