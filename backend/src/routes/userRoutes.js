@@ -34,22 +34,24 @@ router.post(
     }
 
     // Verify current password
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) {
+    // const isMatch = await bcrypt.compare(currentPassword, user.password);
+    console.log("Is match", isMatch);
+    if (currentPassword.trim() !== user.password.trim()) {
       return res
         .status(401)
         .json({ success: false, message: "Current password is incorrect" });
     }
 
     // Check new password is different
-    if (currentPassword === newPassword) {
+    if (currentPassword.trim() === newPassword.trim()) {
       return res
         .status(400)
         .json({ success: false, message: "New password must be different" });
     }
 
     // Hash new password and save
-    user.password = await bcrypt.hash(newPassword, 10);
+    // user.password = await bcrypt.hash(newPassword, 10);
+    user.password = newPassword;
     await user.save();
 
     res.json({ success: true, message: "Password updated successfully" });

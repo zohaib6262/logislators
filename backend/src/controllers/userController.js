@@ -28,8 +28,8 @@ export const authUser = asyncHandler(async (req, res) => {
   }
 
   // Compare password
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
+  // const isMatch = await bcrypt.compare(password, user.password);
+  if (password.trim() !== user.password.trim()) {
     return res.status(401).json({
       success: false,
       message: "Invalid email or password",
