@@ -35,7 +35,7 @@ router.post(
 
     // Verify current password
     // const isMatch = await bcrypt.compare(currentPassword, user.password);
-    console.log("Is match", isMatch);
+
     if (currentPassword.trim() !== user.password.trim()) {
       return res
         .status(401)
