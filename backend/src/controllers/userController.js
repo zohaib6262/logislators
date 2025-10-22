@@ -2,11 +2,11 @@ import asyncHandler from "express-async-handler";
 import User from "../models/User.js";
 import { generateToken } from "../utils/generateToken.js";
 import dotenv from "dotenv";
-import bcrypt from "bcryptjs";
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
 // @access  Public
+import bcrypt from "bcryptjs";
 
 export const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -28,8 +28,8 @@ export const authUser = asyncHandler(async (req, res) => {
   }
 
   // Compare password
-  // const isMatch = await bcrypt.compare(password, user.password);
-  if (password.trim() !== user.password.trim()) {
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
     return res.status(401).json({
       success: false,
       message: "Invalid email or password",
