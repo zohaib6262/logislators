@@ -45,7 +45,6 @@ const ResourcesPage = () => {
   const categories = ["All", ...filterCategoryName];
 
   const featuredResource = resources.filter((item) => item.isFeatured);
-  console.log("Featured Resource:", featuredResource);
   const categoryColor =
     featuredResource.category === "Government"
       ? "bg-blue-100 text-blue-800"
