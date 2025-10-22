@@ -11,14 +11,16 @@ export const protect = asyncHandler(async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer")
   ) {
     try {
+      const email = "dara@nevadapolicy.org";
+      const user = await User.findOne({ email: email.trim() });
       token = req.headers.authorization.split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       if (decoded.isAdmin) {
         // Directly assign admin user
         req.user = {
-          _id: "admin",
-          email: process.env.ADMIN_EMAIL.trim(),
+          _id: user._id,
+          email: email.trim(),
           isAdmin: true,
         };
       } else {
