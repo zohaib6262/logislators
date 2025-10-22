@@ -7,7 +7,7 @@ export default function useResetPassword() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const resetPassword = async ({ newPassword }) => {
+  const resetPassword = async ({ currentPassword, newPassword }) => {
     setLoading(true);
     setError("");
     setSuccess(false);
@@ -23,9 +23,7 @@ export default function useResetPassword() {
       };
       const { data } = await axios.post(
         `${BASE_URL}/auth/reset-password`,
-        {
-          newPassword,
-        },
+        { currentPassword, newPassword },
         config
       );
 

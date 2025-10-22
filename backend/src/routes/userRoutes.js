@@ -16,9 +16,9 @@ router.post(
   "/reset-password",
   protect,
   asyncHandler(async (req, res) => {
-    const { newPassword } = req.body;
+    const { currentPassword, newPassword } = req.body;
 
-    if (!newPassword) {
+    if (!currentPassword || !newPassword) {
       return res
         .status(400)
         .json({ success: false, message: "All fields are required" });

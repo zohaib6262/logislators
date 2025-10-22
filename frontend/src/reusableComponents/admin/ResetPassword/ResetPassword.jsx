@@ -5,8 +5,10 @@ import { TokenContext } from "@/store/TokenContextProvider";
 import { newLightnerColor } from "@/utils/colorUtils";
 
 export default function ResetPassword() {
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [localError, setLocalError] = useState("");
@@ -18,6 +20,7 @@ export default function ResetPassword() {
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
+        setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
       }, 5000);
@@ -39,7 +42,12 @@ export default function ResetPassword() {
       return;
     }
 
-    await resetPassword({ newPassword });
+    if (newPassword === currentPassword) {
+      setLocalError("New password must be different from current password");
+      return;
+    }
+
+    await resetPassword({ currentPassword, newPassword });
   };
 
   const inputClasses = "w-full px-4 py-3 border rounded-lg pr-12";
@@ -77,6 +85,26 @@ export default function ResetPassword() {
                 <Check size={18} /> Password updated successfully
               </div>
             )}
+
+            {/* Current Password */}
+            <div className="relative">
+              <input
+                type={showCurrentPassword ? "text" : "password"}
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Current Password"
+                className={inputClasses}
+                style={{ outlineColor: primaryColor }}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                className={toggleButtonClasses}
+              >
+                {showCurrentPassword ? <EyeOff /> : <Eye />}
+              </button>
+            </div>
 
             {/* New Password */}
             <div className="relative">
