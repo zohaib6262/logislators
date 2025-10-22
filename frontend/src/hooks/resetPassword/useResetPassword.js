@@ -13,7 +13,7 @@ export default function useResetPassword() {
     setSuccess(false);
 
     try {
-      const { data } = await axios.post(`${BASE_URL}/reset-password`, {
+      const { data } = await axios.post(`${BASE_URL}/auth/reset-password`, {
         newPassword,
       });
 
