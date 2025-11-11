@@ -12,6 +12,8 @@ import {
   Clock,
   Loader2,
   AlertCircle,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 import {
   useFetchAdmins,
@@ -52,6 +54,8 @@ export default function UserManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [inviteEmail, setInviteEmail] = useState("");
   const [notification, setNotification] = useState(null);
 
@@ -97,22 +101,35 @@ export default function UserManagement() {
       setInviteEmail("");
       setIsInviteModalOpen(false);
       showNotification("Invitation sent successfully!");
-      refetch(); // Refresh the list
+      refetch();
     } catch (err) {
       showNotification(inviteError || "Failed to send invitation", "error");
     }
   };
 
+  // Open delete modal
+  const openDeleteModal = (user) => {
+    setSelectedUser(user);
+    setIsDeleteModalOpen(true);
+  };
+
+  // Close delete modal
+  const closeDeleteModal = () => {
+    setSelectedUser(null);
+    setIsDeleteModalOpen(false);
+  };
+
   // Delete user
-  const handleDeleteUser = async (id) => {
-    if (window.confirm("Are you sure you want to delete this admin?")) {
-      try {
-        await deleteAdmin(id);
-        showNotification("Admin deleted successfully!");
-        refetch(); // Refresh the list
-      } catch (err) {
-        showNotification(deleteError || "Failed to delete admin", "error");
-      }
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return;
+
+    try {
+      await deleteAdmin(selectedUser._id);
+      showNotification("Admin deleted successfully!");
+      closeDeleteModal();
+      refetch();
+    } catch (err) {
+      showNotification(deleteError || "Failed to delete admin", "error");
     }
   };
 
@@ -121,8 +138,18 @@ export default function UserManagement() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="animate-spin mx-auto mb-4" size={48} />
-          <p className="text-gray-600">Loading admins...</p>
+          <div className="relative">
+            <Loader2
+              className="animate-spin mx-auto mb-4"
+              size={48}
+              style={{ color: primaryColor }}
+            />
+            <div
+              className="absolute inset-0 blur-xl opacity-30"
+              style={{ backgroundColor: primaryColor }}
+            />
+          </div>
+          <p className="text-gray-600 font-medium">Loading admins...</p>
         </div>
       </div>
     );
@@ -133,12 +160,17 @@ export default function UserManagement() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center bg-white p-8 rounded-xl shadow-md max-w-md">
-          <AlertCircle className="text-red-500 mx-auto mb-4" size={48} />
+          <AlertCircle
+            className="mx-auto mb-4"
+            size={48}
+            style={{ color: primaryColor }}
+          />
           <h3 className="text-xl font-bold text-gray-800 mb-2">Error</h3>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={refetch}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            className="px-6 py-2 text-white rounded-lg transition-all hover:shadow-lg"
+            style={{ backgroundColor: primaryColor }}
           >
             Try Again
           </button>
@@ -194,7 +226,10 @@ export default function UserManagement() {
       <div className="container mx-auto px-6 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
+          <div
+            className="bg-white rounded-xl shadow-md p-6 border-l-4 hover:shadow-lg transition-shadow"
+            style={{ borderLeftColor: primaryColor }}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium mb-1">
@@ -204,13 +239,19 @@ export default function UserManagement() {
                   {totalAdmins}
                 </p>
               </div>
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <Users className="text-blue-600" size={28} />
+              <div
+                className="p-3 rounded-lg"
+                style={{ backgroundColor: lighterPrimary }}
+              >
+                <Users style={{ color: primaryColor }} size={28} />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition-shadow">
+          <div
+            className="bg-white rounded-xl shadow-md p-6 border-l-4 hover:shadow-lg transition-shadow"
+            style={{ borderLeftColor: primaryColor }}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium mb-1">
@@ -220,13 +261,19 @@ export default function UserManagement() {
                   {activeAdmins}
                 </p>
               </div>
-              <div className="bg-green-100 p-3 rounded-lg">
-                <UserCheck className="text-green-600" size={28} />
+              <div
+                className="p-3 rounded-lg"
+                style={{ backgroundColor: lighterPrimary }}
+              >
+                <UserCheck style={{ color: primaryColor }} size={28} />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500 hover:shadow-lg transition-shadow">
+          <div
+            className="bg-white rounded-xl shadow-md p-6 border-l-4 hover:shadow-lg transition-shadow"
+            style={{ borderLeftColor: primaryColor }}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium mb-1">
@@ -236,8 +283,11 @@ export default function UserManagement() {
                   {pendingInvites}
                 </p>
               </div>
-              <div className="bg-yellow-100 p-3 rounded-lg">
-                <Clock className="text-yellow-600" size={28} />
+              <div
+                className="p-3 rounded-lg"
+                style={{ backgroundColor: lighterPrimary }}
+              >
+                <Clock style={{ color: primaryColor }} size={28} />
               </div>
             </div>
           </div>
@@ -367,7 +417,7 @@ export default function UserManagement() {
                     <td className="px-6 py-4">
                       {!user.isSuperAdmin && (
                         <button
-                          onClick={() => handleDeleteUser(user._id)}
+                          onClick={() => openDeleteModal(user)}
                           disabled={isDeleting}
                           className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                         >
@@ -398,8 +448,8 @@ export default function UserManagement() {
 
       {/* Invite Modal */}
       {isInviteModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all animate-scaleIn">
             <div
               className="px-6 py-5 rounded-t-2xl"
               style={{
@@ -418,7 +468,7 @@ export default function UserManagement() {
                   disabled={isInviting}
                   className="text-white hover:bg-white/20 rounded-full p-1 transition-colors disabled:opacity-50"
                 >
-                  <span className="text-2xl font-bold">×</span>
+                  <X size={24} />
                 </button>
               </div>
             </div>
@@ -482,6 +532,106 @@ export default function UserManagement() {
                     </>
                   ) : (
                     "Send Invite"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all animate-scaleIn">
+            <div
+              className="px-6 py-5 rounded-t-2xl"
+              style={{
+                background: `linear-gradient(135deg, ${lighterPrimary}, ${primaryColor})`,
+              }}
+            >
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="text-white" size={28} />
+                  <h3 className="text-2xl font-bold text-white">
+                    Confirm Deletion
+                  </h3>
+                </div>
+                <button
+                  onClick={closeDeleteModal}
+                  disabled={isDeleting}
+                  className="text-white hover:bg-white/20 rounded-full p-1 transition-colors disabled:opacity-50"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {deleteError && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center gap-2">
+                  <AlertCircle size={20} />
+                  <span className="text-sm">{deleteError}</span>
+                </div>
+              )}
+
+              <div className="mb-6">
+                <p className="text-gray-700 text-base mb-4">
+                  Are you sure you want to delete this admin?
+                </p>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-center gap-3">
+                    <Mail className="text-gray-400" size={20} />
+                    <div>
+                      <p className="text-sm text-gray-500 font-medium">Email</p>
+                      <p className="text-gray-900 font-semibold">
+                        {selectedUser.email}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 mt-3">
+                    <Shield className="text-gray-400" size={20} />
+                    <div>
+                      <p className="text-sm text-gray-500 font-medium">Role</p>
+                      <span
+                        className="inline-flex px-2 py-1 text-xs font-semibold rounded-full text-white"
+                        style={{ backgroundColor: primaryColor }}
+                      >
+                        {selectedUser.isSuperAdmin ? "SUPER ADMIN" : "ADMIN"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-500 mt-4">
+                  This action cannot be undone. The admin will lose all access
+                  immediately.
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={closeDeleteModal}
+                  disabled={isDeleting}
+                  className="flex-1 px-6 py-3 border-2 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ borderColor: primaryColor }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteUser}
+                  disabled={isDeleting}
+                  className="flex-1 px-6 py-3 bg-red-500 text-white rounded-lg font-semibold transition-all hover:bg-red-600 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 size={20} />
+                      Delete Admin
+                    </>
                   )}
                 </button>
               </div>
