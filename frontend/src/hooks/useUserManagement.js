@@ -18,7 +18,7 @@ export function useFetchAdmins() {
         throw new Error("No authentication token found");
       }
 
-      const response = await axios.get(`${BASE_URL}/users/admins`, {
+      const response = await axios.get(`${BASE_URL}/auth/admins`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -55,7 +55,7 @@ export function useInviteAdmin() {
       }
 
       const response = await axios.post(
-        `${BASE_URL}/users/invite-admin`,
+        `${BASE_URL}/auth/invite-admin`,
         { email },
         {
           headers: {
@@ -96,14 +96,11 @@ export function useDeleteAdmin() {
         throw new Error("No authentication token found");
       }
 
-      const response = await axios.delete(
-        `${BASE_URL}/users/admin/${adminId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.delete(`${BASE_URL}/auth/admin/${adminId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setDeleteMessage("Admin deleted successfully!");
       return response.data;
@@ -135,7 +132,7 @@ export function useResetPassword() {
       }
 
       const response = await axios.post(
-        `${BASE_URL}/users/reset-password`,
+        `${BASE_URL}/auth/reset-password`,
         { currentPassword, newPassword },
         {
           headers: {
@@ -168,7 +165,7 @@ export function useLogin() {
     setIsLoggingIn(true);
     setLoginError(null);
     try {
-      const response = await axios.post(`${BASE_URL}/users/login`, {
+      const response = await axios.post(`${BASE_URL}/auth/login`, {
         email,
         password,
       });
