@@ -36,6 +36,9 @@ const SiteSettings = lazy(() =>
 const EditRepresentative = lazy(() =>
   import("../reusableComponents/admin/EditRepresentative")
 );
+const UserManagement = lazy(() =>
+  import("../reusableComponents/admin/UserManagement/UserManagement")
+);
 const AddRepresentative = lazy(() =>
   import("../reusableComponents/admin/AddRepresentative")
 );
@@ -47,6 +50,7 @@ const Feature = lazy(() => import("../reusableComponents/admin/Feature"));
 const AddFeature = lazy(() =>
   import("../reusableComponents/admin/Feature/AddFeature")
 );
+
 const EditFeature = lazy(() =>
   import("../reusableComponents/admin/Feature/EditFeature")
 );
@@ -125,10 +129,16 @@ const AdminDashboard = () => {
 
   const navLinks = [
     {
+      to: "/admin/user-management",
+      label: "User Management",
+      icon: <Users size={20} className="mr-3" />,
+    },
+    {
       to: "/admin/representatives",
       label: "Representatives",
       icon: <Users size={20} className="mr-3" />,
     },
+
     {
       to: "/admin/manage-voting-records",
       label: "Manage Voting Records",
@@ -457,6 +467,7 @@ const AdminDashboard = () => {
                 />
 
                 <Route path="/representatives" element={<OfficialsManager />} />
+                <Route path="/user-management" element={<UserManagement />} />
                 <Route
                   path="/manage-voting-records"
                   element={<ManageLegislators />}

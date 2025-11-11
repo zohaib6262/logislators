@@ -56,8 +56,8 @@ export default function ResetPassword() {
     "absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700";
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-10">
-      <div className="w-full max-w-lg">
+    <div className="max-w-4xl mx-auto p-6 space-y-6 py-10">
+      <div className="p-6 rounded-lg">
         {/* Card */}
         <div className="bg-white shadow-lg rounded-xl overflow-hidden">
           {/* Header */}
@@ -170,8 +170,6 @@ export default function ResetPassword() {
             <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
               <li>Use a strong, unique password</li>
               <li>Mix uppercase, lowercase letters, numbers & symbols</li>
-              <li>Avoid using personal information</li>
-              <li>Change your password regularly</li>
             </ul>
           </div>
         </div>
