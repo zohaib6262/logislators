@@ -226,10 +226,7 @@ export default function UserManagement() {
       <div className="container mx-auto px-6 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div
-            className="bg-white rounded-xl shadow-md p-6 border-l-4 hover:shadow-lg transition-shadow"
-            style={{ borderLeftColor: primaryColor }}
-          >
+          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium mb-1">
@@ -239,19 +236,13 @@ export default function UserManagement() {
                   {totalAdmins}
                 </p>
               </div>
-              <div
-                className="p-3 rounded-lg"
-                style={{ backgroundColor: lighterPrimary }}
-              >
-                <Users style={{ color: primaryColor }} size={28} />
+              <div className="bg-blue-100 p-3 rounded-lg">
+                <Users className="text-blue-600" size={28} />
               </div>
             </div>
           </div>
 
-          <div
-            className="bg-white rounded-xl shadow-md p-6 border-l-4 hover:shadow-lg transition-shadow"
-            style={{ borderLeftColor: primaryColor }}
-          >
+          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium mb-1">
@@ -261,19 +252,13 @@ export default function UserManagement() {
                   {activeAdmins}
                 </p>
               </div>
-              <div
-                className="p-3 rounded-lg"
-                style={{ backgroundColor: lighterPrimary }}
-              >
-                <UserCheck style={{ color: primaryColor }} size={28} />
+              <div className="bg-green-100 p-3 rounded-lg">
+                <UserCheck className="text-green-600" size={28} />
               </div>
             </div>
           </div>
 
-          <div
-            className="bg-white rounded-xl shadow-md p-6 border-l-4 hover:shadow-lg transition-shadow"
-            style={{ borderLeftColor: primaryColor }}
-          >
+          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium mb-1">
@@ -283,11 +268,8 @@ export default function UserManagement() {
                   {pendingInvites}
                 </p>
               </div>
-              <div
-                className="p-3 rounded-lg"
-                style={{ backgroundColor: lighterPrimary }}
-              >
-                <Clock style={{ color: primaryColor }} size={28} />
+              <div className="bg-yellow-100 p-3 rounded-lg">
+                <Clock className="text-yellow-600" size={28} />
               </div>
             </div>
           </div>
@@ -417,7 +399,7 @@ export default function UserManagement() {
                     <td className="px-6 py-4">
                       {!user.isSuperAdmin && (
                         <button
-                          onClick={() => openDeleteModal(user)}
+                          onClick={() => handleDeleteUser(user._id)}
                           disabled={isDeleting}
                           className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                         >
