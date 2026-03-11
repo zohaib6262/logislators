@@ -296,3 +296,99 @@ export const sendAdminInviteEmail = async (email, password, inviterName) => {
     return { success: false, error: error.message };
   }
 };
+
+// School submission emails (reuse transporter and style)
+const emailWrapper = (title, contentHtml) => `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;padding:24px;line-height:1.6;">
+  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+    <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:28px 24px;text-align:center;">
+      <h1 style="color:#fff;font-size:22px;font-weight:700;margin:0;">${title}</h1>
+    </div>
+    <div style="padding:28px 24px;color:#334155;">
+      ${contentHtml}
+    </div>
+    <div style="background:#f8fafc;padding:20px 24px;text-align:center;border-top:1px solid #e2e8f0;">
+      <p style="color:#64748b;font-size:13px;margin:0;">Nevada Rep Finder – School Finder</p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+export const sendSchoolSubmissionConfirmation = async (contactEmail, contactName, schoolName) => {
+  const greeting = contactName ? `Hello ${contactName},` : "Hello,";
+  const content = `
+    <p style="font-size:16px;color:#1e293b;margin:0 0 16px;">${greeting}</p>
+    <p style="font-size:15px;color:#475569;margin:0 0 12px;">Thanks for submitting your school information.</p>
+    <p style="font-size:15px;color:#475569;margin:0 0 12px;">Our team will review and approve or edit it before it appears live in the directory.</p>
+    <p style="font-size:15px;color:#475569;margin:0 0 8px;"><strong>School:</strong> ${schoolName || "Your school"}</p>
+    <p style="font-size:14px;color:#64748b;margin:16px 0 0;">You will receive another email once your submission has been reviewed.</p>
+  `;
+  const html = emailWrapper("We received your school submission", content);
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: contactEmail,
+      subject: "We received your school submission",
+      html,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("School submission confirmation email error:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const sendSchoolSubmissionApproved = async (contactEmail, contactName, schoolName) => {
+  const greeting = contactName ? `Hello ${contactName},` : "Hello,";
+  const content = `
+    <p style="font-size:16px;color:#1e293b;margin:0 0 16px;">${greeting}</p>
+    <p style="font-size:15px;color:#475569;margin:0 0 12px;">Your school submission has been approved.</p>
+    <p style="font-size:15px;color:#475569;margin:0 0 12px;">It is now live and available in our school directory.</p>
+    <p style="font-size:15px;color:#475569;margin:0 0 8px;"><strong>School:</strong> ${schoolName || "Your school"}</p>
+    <p style="font-size:14px;color:#64748b;margin:16px 0 0;">Thank you for contributing to our directory.</p>
+  `;
+  const html = emailWrapper("Your school submission has been approved", content);
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: contactEmail,
+      subject: "Your school submission has been approved",
+      html,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("School submission approved email error:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+/** Optional: call when submission is rejected. Easy to wire in PATCH when status → rejected. */
+export const sendSchoolSubmissionRejected = async (contactEmail, contactName, schoolName, adminNotes = "") => {
+  const greeting = contactName ? `Hello ${contactName},` : "Hello,";
+  const notesLine = adminNotes
+    ? `<p style="font-size:14px;color:#64748b;margin:12px 0 0;"><strong>Note from our team:</strong> ${adminNotes}</p>`
+    : "";
+  const content = `
+    <p style="font-size:16px;color:#1e293b;margin:0 0 16px;">${greeting}</p>
+    <p style="font-size:15px;color:#475569;margin:0 0 12px;">After review, we are unable to approve your school submission at this time.</p>
+    <p style="font-size:15px;color:#475569;margin:0 0 8px;"><strong>School:</strong> ${schoolName || "Your school"}</p>
+    ${notesLine}
+    <p style="font-size:14px;color:#64748b;margin:16px 0 0;">If you have questions, please reply to this email.</p>
+  `;
+  const html = emailWrapper("School submission update", content);
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: contactEmail,
+      subject: "School submission update",
+      html,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("School submission rejected email error:", error);
+    return { success: false, error: error.message };
+  }
+};

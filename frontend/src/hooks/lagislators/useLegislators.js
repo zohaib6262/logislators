@@ -24,7 +24,7 @@ const useLegislators = () => {
   };
 
   const fetchPeoplePage = async (lat, lng, page = 1, per_page = 10) => {
-    const url = `https://v3.openstates.org/people.geo?lat=${lat}&lng=${lng}&apikey=39137ffb-f88f-4430-9854-f1c682821d87&page=${page}&per_page=${per_page}`;
+    const url = `https://v3.openstates.org/people.geo?lat=${lat}&lng=${lng}&apikey=d84b6801-600b-4ae6-a49f-c65574f39f43&page=${page}&per_page=${per_page}`;
     const response = await fetch(url);
     const data = await response.json();
     return data;

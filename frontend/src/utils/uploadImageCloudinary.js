@@ -14,3 +14,21 @@ export const uploadImageToCloudinary = async (file) => {
   const json = await res.json();
   return json.secure_url;
 };
+
+/** Video upload using project's Cloudinary account (same preset if configured for video). */
+export const uploadVideoToCloudinary = async (file) => {
+  const data = new FormData();
+  data.append("file", file);
+  data.append("upload_preset", "my_upload_presets");
+
+  const res = await fetch(
+    "https://api.cloudinary.com/v1_1/dy910ughf/video/upload",
+    {
+      method: "POST",
+      body: data,
+    }
+  );
+
+  const json = await res.json();
+  return json.secure_url;
+};

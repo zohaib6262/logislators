@@ -4,8 +4,14 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed:admin": "node src/seeders/adminSeeder.js"
+    "seed:admin": "node src/seeders/adminSeeder.js",
+    "seed:zips": "node src/seeders/seedZipCentroids.js",
+    "seed:zips:csv": "node src/seeders/seedZipCentroidsFromCityZipCsv.js",
+    "seed:schools": "node src/seeders/seedSchools.js",
+    "seed:schools:nces": "node src/seeders/seedSchoolsFromNcesPublicCsv.js"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +22,7 @@
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
+    "csv-parser": "^3.0.0",
     "dotenv": "^16.4.1",
     "express": "^5.1.0",
     "express-async-handler": "^1.2.0",

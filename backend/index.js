@@ -10,8 +10,14 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-// Middleware
-app.use(cors());
+// Middleware – allow frontend origins (Vite dev + optional production)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  process.env.FRONTEND_URL,
+  process.env.CLIENT_URL,
+].filter(Boolean);
+app.use(cors({ origin: allowedOrigins.length ? allowedOrigins : true }));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
@@ -46,6 +52,10 @@ import siteSettings from "./src/routes/siteSettings.js";
 import primaryColor from "./src/routes/primaryColor.js";
 import legislatorsRoutes from "./src/routes/legislators.js";
 import manageLegislatorHeader from "./src/routes/manageLegislatorsHeader.js";
+import adminSchoolFinderFeeds from "./src/routes/adminSchoolFinderFeeds.js";
+import userSchoolFinder from "./src/routes/userSchoolFinder.js";
+import schoolSubmissions from "./src/routes/schoolSubmissions.js";
+import adminSchoolSubmissions from "./src/routes/adminSchoolSubmissions.js";
 app.use("/api/primary", primaryColor);
 app.use("/api/userContact", userContact);
 app.use("/api/features", feature);
@@ -62,7 +72,17 @@ app.use("/api/resources", resources);
 app.use("/api/settings", siteSettings);
 app.use("/api/officials", officialsRoutes);
 app.use("/api/voting-records", votingRecordsRoutes);
+app.use("/api/adminSchoolFinderFeeds", adminSchoolFinderFeeds);
+app.use("/api/userSchoolFinder", userSchoolFinder);
+// Lowercase aliases to avoid path/case mismatch
+app.use("/api/schoolSubmissions", schoolSubmissions);
+app.use("/api/adminSchoolSubmissions", adminSchoolSubmissions);
+app.use("/api/adminschoolfinderfeeds", adminSchoolFinderFeeds);
+app.use("/api/userschoolfinder", userSchoolFinder);
 
 app.listen(PORT, () => {
+  // After deploying code changes, restart this process (e.g. pm2 restart / docker restart)
+  // so /api/userSchoolFinder and /api/userSchoolFinder/search are active (else 404).
   console.log(`Server running on port ${PORT}`);
+  console.log(`School finder: GET http://localhost:${PORT}/api/userSchoolFinder/health`);
 });

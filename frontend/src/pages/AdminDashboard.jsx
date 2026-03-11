@@ -21,6 +21,7 @@ import {
   LayoutPanelTop,
   UserCog,
   KeyRound,
+  School,
 } from "lucide-react";
 
 // Admin Components
@@ -73,6 +74,12 @@ const ManageResourcePage = lazy(() =>
   import("@/reusableComponents/admin/ManageResourcePage")
 );
 const NotFoundPage = lazy(() => import("./NotFoundPage"));
+const SchoolSubmissionsPage = lazy(() =>
+  import("../reusableComponents/admin/SchoolFinder/SchoolSubmissionsPage")
+);
+const AdminSchoolsPage = lazy(() =>
+  import("../reusableComponents/admin/SchoolFinder/AdminSchoolsPage")
+);
 import { TokenContext } from "@/store/TokenContextProvider";
 import LoadingScreen from "@/reusableComponents/LoadingScreen";
 import ManageLegislatorPage from "@/reusableComponents/admin/ManageLegislatorPage/ManageLegislatorPage";
@@ -184,6 +191,16 @@ const AdminDashboard = () => {
       to: "/admin/settings",
       label: "Site Settings",
       icon: <Settings size={20} className="mr-3" />,
+    },
+    {
+      to: "/admin/school-finder/submissions",
+      label: "School Submissions",
+      icon: <School size={20} className="mr-3" />,
+    },
+    {
+      to: "/admin/school-finder/schools",
+      label: "Schools",
+      icon: <School size={20} className="mr-3" />,
     },
     {
       to: "/admin/reset-password",
@@ -503,6 +520,8 @@ const AdminDashboard = () => {
                 />
 
                 <Route path="/settings" element={<SiteSettings />} />
+                <Route path="/school-finder/submissions" element={<SchoolSubmissionsPage />} />
+                <Route path="/school-finder/schools" element={<AdminSchoolsPage />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route
                   path="*"
