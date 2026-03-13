@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { useNavigate, useOutletContext, Link } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { TokenContext } from "@/store/TokenContextProvider";
 import { lightenColor } from "@/utils/colorUtils";
 import Label from "@/UI/Label";
@@ -211,16 +211,6 @@ const SchoolFinder = () => {
                     <Button type="submit" className="w-full sm:w-auto py-3 text-md">
                       Find My School
                     </Button>
-                    <Link
-                      to="/add-school"
-                      className="inline-flex items-center justify-center w-full sm:w-auto py-3 px-4 text-md font-semibold rounded-lg border-2 transition-colors"
-                      style={{
-                        borderColor: primaryColor,
-                        color: primaryColor,
-                      }}
-                    >
-                      Add Your School
-                    </Link>
                   </div>
                 </form>
               </div>

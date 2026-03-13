@@ -25,7 +25,7 @@ const DeleteConfirmModalVoting = forwardRef(
             <div className="flex items-center">
               <AlertTriangle size={20} className="text-red-500 mr-2" />
               <h3 className="text-lg font-semibold text-gray-800">
-                Delete Voting Card
+                Delete Card
               </h3>
             </div>
             <button

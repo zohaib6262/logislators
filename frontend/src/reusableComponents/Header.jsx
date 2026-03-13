@@ -102,6 +102,13 @@ const Header = () => {
                 Voting Records
               </Link>
             )}
+            <Link
+              to="/add-school"
+              className={getLinkClass("/add-school")}
+              style={getLinkStyle("/add-school")}
+            >
+              Add Your School
+            </Link>
 
             {/* Optional Login Button */}
             {/* 
@@ -167,6 +174,14 @@ const Header = () => {
                   Voting Records
                 </Link>
               )}
+              <Link
+                to="/add-school"
+                className={getMobileLinkClass()}
+                style={getMobileLinkStyle("/add-school")}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Add Your School
+              </Link>
             </div>
           </nav>
         )}

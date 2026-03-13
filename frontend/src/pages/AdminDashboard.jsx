@@ -19,7 +19,6 @@ import {
   Edit2Icon,
   Vote,
   LayoutPanelTop,
-  UserCog,
   KeyRound,
   School,
 } from "lucide-react";
@@ -141,18 +140,6 @@ const AdminDashboard = () => {
       icon: <Users size={20} className="mr-3" />,
     },
     {
-      to: "/admin/representatives",
-      label: "Representatives",
-      icon: <Users size={20} className="mr-3" />,
-    },
-
-    {
-      to: "/admin/manage-voting-records",
-      label: "Manage Voting Records",
-      icon: <UserCog size={20} className="mr-3" />,
-    },
-
-    {
       to: "/admin/resources",
       label: "Resources",
       icon: <FileText size={20} className="mr-3" />,
@@ -164,7 +151,7 @@ const AdminDashboard = () => {
     },
     {
       to: "/admin/voting-section",
-      label: "Voting Section",
+      label: "School Search Section",
       icon: <Vote size={20} className="mr-3" />,
     },
     {
@@ -184,7 +171,7 @@ const AdminDashboard = () => {
     },
     {
       to: "/admin/voting-records-header",
-      label: "Manage Voting Records Header",
+      label: "Manage School Search Header",
       icon: <LayoutPanelTop size={20} className="mr-3" />,
     },
     {
@@ -410,15 +397,6 @@ const AdminDashboard = () => {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
                         <DashboardCard
-                          to="/admin/representatives"
-                          icon={
-                            <Users size={28} className="text-blue-700 mr-4" />
-                          }
-                          title="Representatives"
-                          description="Manage official information and enhancements."
-                          className="bg-blue-50"
-                        />
-                        <DashboardCard
                           to="/admin/resources"
                           icon={
                             <FileText
@@ -427,7 +405,7 @@ const AdminDashboard = () => {
                             />
                           }
                           title="Resources"
-                          description="Add and edit resources for elected officials."
+                          description="Add and edit resources for the site."
                           className="bg-emerald-50"
                         />
                         <DashboardCard

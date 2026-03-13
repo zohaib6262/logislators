@@ -145,12 +145,10 @@ const ManageLegislators = () => {
       >
         <div className="container mx-auto px-6">
           <h1 className="text-4xl font-extrabold text-white text-center tracking-wide">
-            Admin Voting Records Dashboard
+            Manage School Search Content
           </h1>
           <p className="text-lg text-gray-300 text-center mt-3 max-w-2xl mx-auto">
-            Manage all Voting Records in the system
-            {/* Add, edit, or delete
-            legislator records as needed. */}
+            Manage school search content and headers.
           </p>
         </div>
       </div>

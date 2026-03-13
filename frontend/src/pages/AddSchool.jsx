@@ -6,7 +6,7 @@ import { TokenContext } from "@/store/TokenContextProvider";
 import Label from "@/UI/Label";
 import Input from "@/UI/Input";
 import Button from "@/UI/Button";
-import { uploadImageToCloudinary, uploadVideoToCloudinary } from "@/utils/uploadImageCloudinary";
+import { uploadImageToCloudinary } from "@/utils/uploadImageCloudinary";
 
 const SCHOOL_TYPES = [
   { value: "public", label: "Public" },
@@ -17,9 +17,7 @@ const SCHOOL_TYPES = [
 ];
 
 const LOGO_MAX_SIZE_MB = 5;
-const VIDEO_MAX_SIZE_MB = 100;
 const LOGO_MAX_BYTES = LOGO_MAX_SIZE_MB * 1024 * 1024;
-const VIDEO_MAX_BYTES = VIDEO_MAX_SIZE_MB * 1024 * 1024;
 
 function isValidEmail(str) {
   if (!str || typeof str !== "string") return false;
@@ -65,9 +63,7 @@ export default function AddSchool() {
   const [success, setSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [logoUploading, setLogoUploading] = useState(false);
-  const [videoUploading, setVideoUploading] = useState(false);
   const logoInputRef = useRef(null);
-  const videoInputRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -100,38 +96,9 @@ export default function AddSchool() {
     }
   };
 
-  const handleVideoFile = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("video/")) {
-      setErrors((prev) => ({ ...prev, videoUrl: "Please select a video file (e.g. MP4, WebM)." }));
-      return;
-    }
-    if (file.size > VIDEO_MAX_BYTES) {
-      setErrors((prev) => ({ ...prev, videoUrl: `Video must be under ${VIDEO_MAX_SIZE_MB} MB.` }));
-      return;
-    }
-    setErrors((prev) => ({ ...prev, videoUrl: null }));
-    setVideoUploading(true);
-    try {
-      const url = await uploadVideoToCloudinary(file);
-      setFormData((prev) => ({ ...prev, videoUrl: url }));
-    } catch (err) {
-      setErrors((prev) => ({ ...prev, videoUrl: "Video upload failed. Please try again." }));
-    } finally {
-      setVideoUploading(false);
-      if (videoInputRef.current) videoInputRef.current.value = "";
-    }
-  };
-
   const clearLogo = () => {
     setFormData((prev) => ({ ...prev, logoUrl: "" }));
     if (logoInputRef.current) logoInputRef.current.value = "";
-  };
-
-  const clearVideo = () => {
-    setFormData((prev) => ({ ...prev, videoUrl: "" }));
-    if (videoInputRef.current) videoInputRef.current.value = "";
   };
 
   const validate = () => {
@@ -158,6 +125,9 @@ export default function AddSchool() {
       e.schoolType = "Select a valid school type.";
     }
     if (s(formData.website) && !isValidUrl(formData.website)) e.website = "Invalid URL format.";
+    if (s(formData.videoUrl) && !isValidUrl(formData.videoUrl)) {
+      e.videoUrl = "Please enter a valid video URL (e.g. YouTube, Vimeo).";
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -584,48 +554,17 @@ export default function AddSchool() {
             </div>
 
             <div>
-              <Label>Video Upload</Label>
-              <p className="text-xs text-gray-500 mb-2">Video file (e.g. MP4, WebM). Max {VIDEO_MAX_SIZE_MB} MB.</p>
-              <input
-                ref={videoInputRef}
-                type="file"
-                accept="video/*"
-                onChange={handleVideoFile}
-                disabled={videoUploading}
-                className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:cursor-pointer file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 disabled:opacity-50"
+              <Label htmlFor="videoUrl">Video Link</Label>
+              <p className="text-xs text-gray-500 mb-2">Paste a YouTube, Vimeo, or other video URL.</p>
+              <Input
+                id="videoUrl"
+                name="videoUrl"
+                type="url"
+                placeholder="https://www.youtube.com/watch?v=..."
+                value={formData.videoUrl}
+                onChange={handleChange}
+                className="w-full"
               />
-              {videoUploading && (
-                <div className="mt-3 flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
-                  <Loader2 className="h-5 w-5 animate-spin text-gray-500 shrink-0" />
-                  <span className="text-sm font-medium text-gray-600">Uploading video…</span>
-                </div>
-              )}
-              {formData.videoUrl && !videoUploading && (
-                <div className="mt-3 flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white">
-                    <span className="text-2xl" aria-hidden>🎬</span>
-                  </div>
-                  <div className="flex flex-1 flex-wrap items-center gap-3">
-                    <p className="text-sm font-medium text-gray-700">Video added</p>
-                    <a
-                      href={formData.videoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50"
-                    >
-                      Open link
-                    </a>
-                    <button
-                      type="button"
-                      onClick={clearVideo}
-                      className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
-                    >
-                      <X className="h-4 w-4" />
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              )}
               {errors.videoUrl && <p className="text-red-600 text-sm mt-1">{errors.videoUrl}</p>}
             </div>
 

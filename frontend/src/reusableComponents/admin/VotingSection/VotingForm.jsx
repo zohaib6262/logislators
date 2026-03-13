@@ -144,7 +144,7 @@ const VotingForm = ({ votingCard, onSubmit, onCancel }) => {
     >
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-800">
-          {id ? "Edit Voting Card" : "Add New Voting Card"}
+          {id ? "Edit Card" : "Add New Card"}
         </h2>
         <Link
           to="/admin/voting-section"
@@ -201,7 +201,7 @@ const VotingForm = ({ votingCard, onSubmit, onCancel }) => {
                 ? "border-red-300 focus:ring-red-200"
                 : "border-gray-300 focus:ring-blue-200 focus:border-blue-400"
             }`}
-            placeholder="Voting card description"
+            placeholder="Card description"
           />
           {touched.description && errors.description && (
             <p className="mt-1 text-sm text-red-500">{errors.description}</p>
@@ -292,7 +292,7 @@ const VotingForm = ({ votingCard, onSubmit, onCancel }) => {
             background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
           }}
         >
-          {id ? "Update Voting Card" : "Add Voting Card"}
+          {id ? "Update Card" : "Add Card"}
         </button>
       </div>
     </form>

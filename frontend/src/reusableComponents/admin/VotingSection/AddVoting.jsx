@@ -17,13 +17,13 @@ const AddVoting = () => {
       if (result.success) {
         setNotification({
           type: "success",
-          message: "Voting card created successfully",
+          message: "Card created successfully",
         });
         setTimeout(() => navigate("/admin/voting-section"), 1500);
       } else {
         setNotification({
           type: "error",
-          message: result.error || "Failed to create voting card",
+          message: result.error || "Failed to create card",
         });
       }
     } catch (err) {

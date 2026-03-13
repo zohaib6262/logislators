@@ -28,12 +28,12 @@ const VotingSection = () => {
       try {
         const result = await deleteVotingSection(votingCardToDelete);
         if (result.success) {
-          showNotification("success", "Voting card deleted successfully");
+          showNotification("success", "Card deleted successfully");
           await refreshVotingSection();
         } else {
           showNotification(
             "error",
-            result.error || "Failed to delete voting card"
+            result.error || "Failed to delete card"
           );
         }
       } catch (err) {
@@ -56,11 +56,11 @@ const VotingSection = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">
-              Manage Voting Section
+              Manage School Search Section
             </h1>
 
             <p className="text-gray-600">
-              Manage the voting section cards that appear on your website's
+              Manage the school search section cards that appear on your website.
             </p>
           </div>
           <div className="flex space-x-3 mt-4 md:mt-0">
@@ -72,7 +72,7 @@ const VotingSection = () => {
               }}
             >
               <Plus size={18} className="mr-2" />
-              Add New Voting Card
+              Add New Card
             </button>
           </div>
         </div>
@@ -89,7 +89,7 @@ const VotingSection = () => {
           </div>
         )}
 
-        {/* Voting Section Grid */}
+        {/* School Search Section Grid */}
         {loading && votingSection.length === 0 ? (
           <div className="flex justify-center items-center h-64">
             <div
@@ -101,7 +101,7 @@ const VotingSection = () => {
           <div className="bg-red-50 text-red-800 p-4 rounded-md">{error}</div>
         ) : votingSection.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <p className="text-gray-600 mb-4">No voting card found.</p>
+            <p className="text-gray-600 mb-4">No cards yet.</p>
             <button
               onClick={() => navigate("/admin/voting-section/new")}
               className="px-4 py-2 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -109,7 +109,7 @@ const VotingSection = () => {
                 background: `linear-gradient(to right, ${lighterPrimary}, ${primaryColor})`,
               }}
             >
-              Add Your First Feature
+              Add Your First Card
             </button>
           </div>
         ) : (

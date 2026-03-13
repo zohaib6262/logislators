@@ -486,6 +486,9 @@ function EditSchoolModal({ school, onClose, onSave, primaryColor, lighterPrimary
           {fieldList.map(([key, label]) => (
             <div key={key}>
               <label className="block text-sm font-semibold text-gray-700 mb-1">{label}</label>
+              {key === "videoUrl" && (
+                <p className="text-xs text-gray-500 mb-1">YouTube, Vimeo, or other video link.</p>
+              )}
               {key === "schoolType" ? (
                 <select
                   value={form[key]}
@@ -500,7 +503,7 @@ function EditSchoolModal({ school, onClose, onSave, primaryColor, lighterPrimary
                 </select>
               ) : (
                 <input
-                  type="text"
+                  type={key === "videoUrl" ? "url" : "text"}
                   value={form[key]}
                   onChange={(e) => setForm((p) => ({ ...p, [key]: e.target.value }))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"

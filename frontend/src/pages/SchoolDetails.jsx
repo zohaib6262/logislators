@@ -46,52 +46,51 @@ export default function SchoolDetails() {
   const backQuery = searchParams.toString();
   const backToResults = backQuery ? `/schools?${backQuery}` : "/schools";
 
+  const backLink = (
+    <div className="bg-white border-b border-gray-200 px-4 py-4">
+      <div className="max-w-4xl mx-auto">
+        <Link
+          to={backToResults}
+          className="inline-flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
+          style={{ color: primaryColor }}
+        >
+          <ArrowLeft className="w-5 h-5 shrink-0" />
+          <span>Back to results</span>
+        </Link>
+      </div>
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-24">
-        <div
-          className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
-          style={{ borderColor: primaryColor }}
-        />
+      <div className="min-h-screen bg-gray-50 pb-8 pt-16">
+        {backLink}
+        <div className="flex items-center justify-center py-24">
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+            style={{ borderColor: primaryColor }}
+          />
+        </div>
       </div>
     );
   }
 
   if (error || !school) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-24">
+      <div className="min-h-screen bg-gray-50 pb-8 pt-16">
+        {backLink}
         <div className="max-w-2xl mx-auto px-4 py-8">
           <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
             <p className="text-red-700 font-medium">{error || "School not found."}</p>
           </div>
-          <Link
-            to={backToResults}
-            className="inline-flex items-center gap-2 mt-6 font-medium px-4 py-2 rounded-lg transition-colors"
-            style={{ color: primaryColor }}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to results
-          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
-      {/* Top bar with back link */}
-      <div className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="max-w-4xl mx-auto">
-          <Link
-            to={backToResults}
-            className="inline-flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
-            style={{ color: primaryColor }}
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Back to results
-          </Link>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50 pb-8 pt-16">
+      {backLink}
 
       <div className="max-w-4xl mx-auto px-4 pt-6">
         <SchoolFinderDetail

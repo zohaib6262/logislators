@@ -27,13 +27,13 @@ const EditVotingCard = () => {
       if (result.success) {
         setNotification({
           type: "success",
-          message: "Voting card updated successfully",
+          message: "Card updated successfully",
         });
         setTimeout(() => navigate("/admin/voting-section"), 1500);
       } else {
         setNotification({
           type: "error",
-          message: result.error || "Failed to update voting card",
+          message: result.error || "Failed to update card",
         });
       }
     } catch (err) {
