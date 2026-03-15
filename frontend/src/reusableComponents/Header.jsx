@@ -90,16 +90,7 @@ const Header = () => {
                 className={getLinkClass("/resources")}
                 style={getLinkStyle("/resources")}
               >
-                Resources
-              </Link>
-            )}
-            {settings?.enableLegislators && (
-              <Link
-                to="/voting-records"
-                className={getLinkClass("/voting-records")}
-                style={getLinkStyle("/voting-records")}
-              >
-                Voting Records
+                School Resources
               </Link>
             )}
             <Link
@@ -161,17 +152,7 @@ const Header = () => {
                   style={getMobileLinkStyle("/resources")}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Resources
-                </Link>
-              )}
-              {settings?.enableLegislators && (
-                <Link
-                  to="/voting-records"
-                  className={getMobileLinkClass()}
-                  style={getMobileLinkStyle("/voting-records")}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Voting Records
+                  School Resources
                 </Link>
               )}
               <Link

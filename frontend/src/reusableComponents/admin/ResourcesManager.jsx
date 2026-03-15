@@ -89,8 +89,9 @@ const ResourcesManager = () => {
             Admin Resource Dashboard
           </h1>
           <p className="text-lg text-gray-300 text-center mt-3 max-w-2xl mx-auto">
-            Manage, edit, and maintain Nevada's civic resources including
-            government, voting, and education tools.
+            Manage, edit, and publish school-related resources that help
+            families discover schools, understand admissions, compare options,
+            and prepare for enrollment.
           </p>
         </div>
       </div>
@@ -108,7 +109,7 @@ const ResourcesManager = () => {
               }}
             >
               <Plus className="mr-2 h-4 w-4" />
-              Add New Resource
+              Create Resource
             </Link>
             <button
               onClick={() => setIsModalOpen(true)}
@@ -131,7 +132,7 @@ const ResourcesManager = () => {
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search resources..."
+                  placeholder="Search school resources..."
                   className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -166,7 +167,7 @@ const ResourcesManager = () => {
               style={{ color: primaryColor }}
             >
               <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-              <span>Loading resources...</span>
+              <span>Loading school resources...</span>
             </div>
           )}
 
@@ -180,7 +181,10 @@ const ResourcesManager = () => {
           {!resources ||
             (resources.length === 0 && (
               <div className="col-span-2 bg-white rounded-lg shadow-md p-8 text-center">
-                <p className="text-gray-600">No resources found.</p>
+                <p className="text-gray-600">
+                  No resources found yet. Add school-related resources to
+                  support families and school discovery users.
+                </p>
               </div>
             ))}
 
@@ -198,7 +202,7 @@ const ResourcesManager = () => {
               ) : resources.length > 0 ? (
                 <div className="col-span-2 bg-white rounded-lg shadow-md p-8 text-center">
                   <p className="text-gray-600">
-                    No resources found matching your search. Try adjusting your
+                    No school resources match your search. Try adjusting your
                     filters.
                   </p>
                 </div>
@@ -225,7 +229,7 @@ const ResourcesManager = () => {
               {/* Header */}
               <div className="flex justify-between items-center pb-4 border-b">
                 <h3 className="text-lg font-medium leading-6 text-gray-900">
-                  {editingCategory ? "Edit Category" : "Add New Category"}
+                  {editingCategory ? "Edit Resource Category" : "Add Resource Category"}
                 </h3>
                 <button
                   onClick={() => setIsModalOpen(false)}
@@ -238,14 +242,14 @@ const ResourcesManager = () => {
               {/* Body */}
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category Name
+                  Resource Category Name
                 </label>
                 <input
                   type="text"
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter category name"
+                  placeholder="e.g. Admissions, Financial Aid"
                 />
               </div>
 
@@ -264,7 +268,7 @@ const ResourcesManager = () => {
               {/* Categories List */}
               <div className="mt-8">
                 <h4 className="font-medium text-gray-900 mb-2">
-                  Existing Categories
+                  Existing Resource Categories
                 </h4>
                 <div className="space-y-2">
                   {allCategories.length > 0 ? (
@@ -292,7 +296,7 @@ const ResourcesManager = () => {
                     ))
                   ) : (
                     <p className="text-sm text-gray-500 py-2">
-                      No categories found
+                      No resource categories yet
                     </p>
                   )}
                 </div>
@@ -314,7 +318,7 @@ const ResourcesManager = () => {
               {/* Header */}
               <div className="flex justify-between items-center pb-4 border-b">
                 <h3 className="text-lg font-medium leading-6 text-gray-900">
-                  Confirm Deletion
+                  Delete Resource Category
                 </h3>
                 <button
                   onClick={() => setIsConfirmModalOpen(false)}
@@ -327,8 +331,8 @@ const ResourcesManager = () => {
               {/* Body */}
               <div className="mt-4">
                 <p className="text-gray-700">
-                  Are you sure you want to delete this category? This action
-                  cannot be undone.
+                  Are you sure you want to delete this resource category? This
+                  action cannot be undone.
                 </p>
               </div>
 

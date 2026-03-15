@@ -37,16 +37,18 @@ router.get("/", async (req, res) => {
         enableZipCode: true,
         enableCity: true,
         enableStreetAddress: true,
-        pageTitle: "Find Your Nevada Representatives",
+        pageTitle: "Find Your School",
         pageDescription:
-          "Discover who represents you in government and access resources to stay informed and engaged",
+          "Enter your address to find schools near you and explore school resources.",
         image:
           "https://res.cloudinary.com/dlb6fup90/image/upload/v1752698699/pxfqs1izpu3aqcssxqcb.jpg",
-        imageTitle: "Find Your Voice in Nevada",
-        imageDescription:
-          "Connect with your representatives and make your voice heard in our democracy",
+        imageTitle: "",
+        imageDescription: "",
         changeStreetAddressPlaceholder: "",
         changeCityPlaceholder: "",
+        howLegislatorsScored:
+          "School results are shown based on the location and filters entered by the user, including radius, grades served, school type, and maximum cost. This helps families discover relevant school options in their area, review important details, and make more informed enrollment decisions.",
+        howLegislatorsScoredLink: "/resources",
       });
       await existing.save();
     }

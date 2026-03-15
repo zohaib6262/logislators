@@ -110,17 +110,7 @@ const Footer = () => {
                     to="/resources"
                     className="text-gray-300 hover:text-white transition-colors"
                   >
-                    Resources
-                  </Link>
-                </li>
-              )}
-              {settings?.enableLegislators && (
-                <li>
-                  <Link
-                    to="/voting-records"
-                    className="text-gray-300 hover:text-white transition-colors"
-                  >
-                    Voting Records
+                    School Resources
                   </Link>
                 </li>
               )}
@@ -180,7 +170,7 @@ const Footer = () => {
 
         <div className="mt-8 pt-8 border-t border-white-700 text-center text-white-400">
           <p>
-            &copy; {new Date().getFullYear()} Nevada Rep Finder. All rights
+            &copy; {new Date().getFullYear()} {settings?.siteName || "School Finder"}. All rights
             reserved.
           </p>
         </div>

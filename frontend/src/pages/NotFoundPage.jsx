@@ -43,7 +43,7 @@ const NotFoundPage = ({ to, home, representatives = true }) => {
               className="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <Search size={18} className="mr-2" />
-              Find Representatives
+              Find Schools
             </Link>
           )}
         </div>

@@ -20,10 +20,11 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, deleting }) => {
             transition={{ duration: 0.2 }}
           >
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              Confirm Delete
+              Delete Resource
             </h3>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete this resource?
+              Are you sure you want to delete this resource? This action cannot
+              be undone.
             </p>
             <div className="flex justify-end space-x-3">
               <button

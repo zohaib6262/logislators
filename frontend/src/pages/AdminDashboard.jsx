@@ -141,7 +141,7 @@ const AdminDashboard = () => {
     },
     {
       to: "/admin/resources",
-      label: "Resources",
+      label: "School Resources",
       icon: <FileText size={20} className="mr-3" />,
     },
     {
@@ -166,7 +166,7 @@ const AdminDashboard = () => {
     },
     {
       to: "/admin/resource-page",
-      label: "Manage Resource Page",
+      label: "Manage School Resources Page",
       icon: <Edit2Icon size={20} className="mr-3" />,
     },
     {
@@ -404,8 +404,8 @@ const AdminDashboard = () => {
                               className="text-emerald-700 mr-4"
                             />
                           }
-                          title="Resources"
-                          description="Add and edit resources for the site."
+                          title="School Resources"
+                          description="Manage school-related resources for families and school discovery."
                           className="bg-emerald-50"
                         />
                         <DashboardCard
@@ -440,8 +440,8 @@ const AdminDashboard = () => {
                               className="text-indigo-700 mr-4"
                             />
                           }
-                          title="Resource Page"
-                          description="Edit the content of the Resource page."
+                          title="School Resources Page"
+                          description="Edit the School Resources page header and content."
                           className="bg-indigo-50"
                         />
                         <DashboardCard

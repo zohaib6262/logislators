@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Save, X, Plus, Loader2 } from "lucide-react";
+import { toast } from "react-toastify";
 import useAddResource from "../../hooks/useAddResource";
 import useGetCategories from "../../hooks/categories/useGetCategories";
 import { TokenContext } from "@/store/TokenContextProvider";
@@ -75,6 +76,7 @@ const AddResource = () => {
     e.preventDefault();
     try {
       await addResource(resource);
+      toast.success("Resource created successfully");
       navigate("/admin/resources");
     } catch (err) {
       console.error("Failed to add resource:", err);
@@ -84,13 +86,13 @@ const AddResource = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Add New Resource</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Create Resource</h1>
         <Link
           to="/admin/resources"
           className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Resources
+          Back to School Resources
         </Link>
       </div>
 
@@ -166,7 +168,7 @@ const AddResource = () => {
               htmlFor="category"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Category *
+              Resource Category *
             </label>
             <select
               id="category"
@@ -177,7 +179,7 @@ const AddResource = () => {
               disabled={categoriesLoading}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="">Select a category</option>
+              <option value="">Select a resource category</option>
               {allCategories?.map((category) => (
                 <option key={category._id} value={category.name}>
                   {category.name}
@@ -259,8 +261,8 @@ const AddResource = () => {
                 htmlFor="featured"
                 className="text-sm font-medium text-gray-900"
               >
-                Set as Featured Resource (only one resource can be featured at a
-                time)
+                Set as Featured (show on School Resources page; only one can be
+                featured)
               </label>
             </div>
           )}
@@ -284,7 +286,7 @@ const AddResource = () => {
               ) : (
                 <>
                   <Save className="mr-2 h-4 w-4" />
-                  Save Resource
+                  Create Resource
                 </>
               )}
             </button>

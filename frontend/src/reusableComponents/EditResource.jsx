@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
 import useGetResource from "../hooks/useGetResource";
 import useEditResource from "../hooks/useEditResource";
 import useGetCategories from "../hooks/categories/useGetCategories";
@@ -108,6 +109,7 @@ const EditResource = () => {
         throw new Error("Title and category are required");
       }
       await updateResource(id, formData);
+      toast.success("Resource updated successfully");
       navigate("/admin/resources");
     } catch (error) {
       setError(error.message || "Failed to update resource");
@@ -142,7 +144,7 @@ const EditResource = () => {
                   className="inline-flex items-center text-sm text-blue-600 hover:text-blue-500"
                 >
                   <ArrowLeft size={16} className="mr-1" />
-                  Back to resources
+                  Back to School Resources
                 </Link>
               </div>
             </div>
@@ -161,7 +163,7 @@ const EditResource = () => {
           className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
         >
           <ArrowLeft size={16} className="mr-2" />
-          Back to List
+          Back to School Resources
         </Link>
       </div>
 
@@ -311,8 +313,8 @@ const EditResource = () => {
                     htmlFor="featured"
                     className="text-sm font-medium text-gray-900"
                   >
-                    Set as Featured Resource (only one resource can be featured
-                    at a time)
+                    Set as Featured (show on School Resources page; only one can
+                    be featured)
                   </label>
                 </div>
               </div>
@@ -340,8 +342,8 @@ const EditResource = () => {
                 htmlFor="featured"
                 className="text-sm font-medium text-gray-900"
               >
-                Set as Featured Resource (only one resource can be featured at a
-                time)
+                Set as Featured (show on School Resources page; only one can be
+                featured)
               </label>
             </div>
           )}

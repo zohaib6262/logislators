@@ -1,6 +1,7 @@
 import { Edit, ExternalLink, Star, StarOff, Trash } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useContext, useState } from "react";
+import { toast } from "react-toastify";
 import useDeleteResource from "../hooks/useDeleteResource";
 import ConfirmModal from "./ConfirmModal";
 import { TokenContext } from "@/store/TokenContextProvider";
@@ -38,6 +39,7 @@ const ResourceCard = ({ resource, refetch }) => {
 
     try {
       await deleteResource(resource._id);
+      toast.success("Resource deleted successfully");
       setShowModal(false);
     } catch (err) {
       setError("Failed to delete resource.");
@@ -118,7 +120,7 @@ const ResourceCard = ({ resource, refetch }) => {
               rel="noopener noreferrer"
               className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors"
             >
-              Visit Resource
+              View Resource
               <ExternalLink className="h-4 w-4 ml-1" />
             </a>
           </div>

@@ -420,7 +420,7 @@ function ManageHomePage() {
 
             <div className="mb-8 pb-6 border-b border-t my-5 border-gray-200">
               <FormSection
-                label="How Legislators Are Scored?"
+                label="How Schools Are Selected?"
                 classNameData="mt-4"
               >
                 <textarea
@@ -429,7 +429,7 @@ function ManageHomePage() {
                   rows={6}
                   value={formData.howLegislatorsScored}
                   onChange={handleInputChange}
-                  placeholder="Explain how legislators are scored..."
+                  placeholder="Describe how school results are selected and filtered (e.g. by location, radius, grades, school type, max cost)."
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm"
                 />
               </FormSection>
@@ -440,7 +440,7 @@ function ManageHomePage() {
                   name="howLegislatorsScoredLink"
                   value={formData.howLegislatorsScoredLink}
                   onChange={handleInputChange}
-                  placeholder="Enter URL for Learn More button"
+                  placeholder="e.g. /resources"
                   className="block w-full border border-gray-300 rounded-md py-2 px-3 shadow-sm"
                 />
               </FormSection>

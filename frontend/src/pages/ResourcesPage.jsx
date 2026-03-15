@@ -11,6 +11,40 @@ import { useFetchResourcePage } from "@/hooks/manageResourcePage/useManageResour
 import { TokenContext } from "@/store/TokenContextProvider";
 import useGetCategories from "@/hooks/categories/useGetCategories";
 
+/*
+ * Data sources (public /resources page):
+ * - Hero: resourceData from GET /api/resource (ManageResourcePage). Fallback when missing or isLegacyCivicContent().
+ * - Featured card: first resource with isFeatured from GET /api/resources. Same fallbacks for legacy text.
+ * - List cards: GET /api/resources; title/description/category use fallbacks or getCategoryDisplayName when legacy.
+ * - Categories: GET /api/categories. Site branding: GET /api/settings (Header/Footer).
+ */
+
+/** Detect legacy civic/voting/Nevada wording so we can show school-focused fallbacks instead. */
+function isLegacyCivicContent(str) {
+  if (!str || typeof str !== "string") return true;
+  const s = str.toLowerCase();
+  return (
+    s.includes("nevada") &&
+    (s.includes("voting") ||
+      s.includes("civic") ||
+      s.includes("government") ||
+      s.includes("elected") ||
+      s.includes("representatives") ||
+      s.includes("legislator"))
+  );
+}
+
+/** Display label for resource category (school-focused when legacy category names exist). */
+function getCategoryDisplayName(category) {
+  if (!category) return "";
+  const map = {
+    Voting: "Admissions & Info",
+    Government: "School & Government",
+    Education: "Education",
+  };
+  return map[category] || category;
+}
+
 const ResourcesPage = () => {
   const { resources, loading, error } = useGetResources();
   const { resourceData, isLoading } = useFetchResourcePage();
@@ -45,12 +79,13 @@ const ResourcesPage = () => {
   const categories = ["All", ...filterCategoryName];
 
   const featuredResource = resources.filter((item) => item.isFeatured);
+  const featuredCategory = featuredResource[0]?.category;
   const categoryColor =
-    featuredResource.category === "Government"
+    featuredCategory === "Government"
       ? "bg-blue-100 text-blue-800"
-      : featuredResource.category === "Voting"
+      : featuredCategory === "Voting"
       ? "bg-green-100 text-green-800"
-      : featuredResource.category === "Education"
+      : featuredCategory === "Education"
       ? "bg-purple-100 text-purple-800"
       : "bg-yellow-100 text-yellow-800";
   const filteredResources = resources.filter((resource) => {
@@ -75,10 +110,15 @@ const ResourcesPage = () => {
         >
           <div className="container mx-auto px-4">
             <h1 className="text-3xl md:text-4xl font-bold text-white text-center">
-              {resourceData?.title || ""}
+              {resourceData?.title && !isLegacyCivicContent(resourceData.title)
+                ? resourceData.title
+                : "Resource Page"}
             </h1>
             <p className="text-xl text-blue-100 text-center mt-4 max-w-3xl mx-auto">
-              {resourceData?.description || ""}
+              {resourceData?.description &&
+              !isLegacyCivicContent(resourceData.description)
+                ? resourceData.description
+                : "Explore helpful resources that support families in finding schools, understanding admissions, and preparing for enrollment."}
             </p>
           </div>
         </div>
@@ -107,19 +147,25 @@ const ResourcesPage = () => {
                         className="text-white text-xs font-semibold px-3 py-1.5 rounded-full uppercase tracking-wider"
                         style={{ backgroundColor: primaryColor, color: "#fff" }}
                       >
-                        Featured Resource
+                        Featured School Resource
                       </span>
                       <span
                         className={`text-xs font-semibold px-3 py-1.5 rounded-full ${categoryColor}`}
                       >
-                        {featuredResource[0].category}
+                        {getCategoryDisplayName(featuredResource[0].category)}
                       </span>
                     </div>
                     <h2 className="text-3xl font-bold text-gray-900 mb-3">
-                      {featuredResource[0].title}
+                      {featuredResource[0].title &&
+                      !isLegacyCivicContent(featuredResource[0].title)
+                        ? featuredResource[0].title
+                        : "School Search & Admissions Support"}
                     </h2>
                     <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-                      {featuredResource[0].description}
+                      {featuredResource[0].description &&
+                      !isLegacyCivicContent(featuredResource[0].description)
+                        ? featuredResource[0].description
+                        : "Browse useful school-related guidance designed to help families make informed decisions. Resources may include admissions help, enrollment checklists, tuition and financial aid guidance, required document information, parent support materials, and school comparison tips."}
                     </p>
                     <a
                       href={featuredResource[0].url}
@@ -148,7 +194,7 @@ const ResourcesPage = () => {
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search resources..."
+                    placeholder="Search school resources..."
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 pl-12 focus:outline-none focus:ring-2"
                     style={{
                       borderColor: primaryColor,
@@ -188,7 +234,7 @@ const ResourcesPage = () => {
               style={{ color: primaryColor }}
             >
               <Loader2 className="mr-2 animate-spin" />
-              Loading resources...
+              Loading school resources...
             </div>
           ) : error ? (
             <div className="flex items-center justify-center text-red-600 py-6">
@@ -217,16 +263,22 @@ const ResourcesPage = () => {
                                 : "bg-yellow-100 text-yellow-800"
                             }`}
                           >
-                            {resource.category}
+                            {getCategoryDisplayName(resource.category)}
                           </span>
                           <h3 className="text-xl font-bold text-gray-800 mt-2">
-                            {resource.title}
+                            {resource.title &&
+                            !isLegacyCivicContent(resource.title)
+                              ? resource.title
+                              : "School resource"}
                           </h3>
                         </div>
                         <FileText className="h-6 w-6 text-gray-400" />
                       </div>
                       <p className="text-gray-600 mt-3">
-                        {resource.description}
+                        {resource.description &&
+                        !isLegacyCivicContent(resource.description)
+                          ? resource.description
+                          : "Helpful information for families exploring schools, admissions, and enrollment."}
                       </p>
                       <div className="mt-4 pt-4 border-t border-gray-100">
                         <a
@@ -246,8 +298,8 @@ const ResourcesPage = () => {
               ) : (
                 <div className="col-span-2 bg-white rounded-lg shadow-md p-8 text-center">
                   <p className="text-gray-600">
-                    No resources found matching your search. Try adjusting your
-                    filters.
+                    No school resources found matching your search. Try
+                    adjusting your filters.
                   </p>
                 </div>
               )}
@@ -261,19 +313,20 @@ const ResourcesPage = () => {
               style={{ backgroundColor: `${primaryColor}20` }}
             >
               <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                Suggest a Resource
+                Suggest a School Resource
               </h2>
               <p className="text-gray-700 mb-4">
-                Do you know of a valuable resource that should be included in
-                our directory? Let us know and we'll consider adding it to the
+                Do you know of a valuable school-related resource that could
+                help families find schools, understand admissions, or prepare
+                for enrollment? Let us know and we'll consider adding it to the
                 list.
               </p>
               <a
-                href={`mailto:${resourceData?.email}?subject=Resource%20Suggestion`}
+                href={`mailto:${resourceData?.email}?subject=School%20Resource%20Suggestion`}
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
                 style={{ backgroundColor: primaryColor }}
               >
-                Submit a Resource
+                Submit a Suggestion
               </a>
             </div>
           )}

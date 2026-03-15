@@ -20,16 +20,16 @@ router.get("/", async (req, res) => {
         enableAboutus: true,
         enableResources: true,
         enableLegislators: true,
-        siteName: "Nevada Rep Finder",
+        siteName: "School Finder",
         siteDescription:
-          "Helping Nevada residents connect with their elected officials and access important resources",
+          "Find schools near you and explore resources for admissions, enrollment, and family support.",
         primaryColor: "#000000",
-        footerText: "© 2025 Nevada Rep Finder. All rights reserved.",
+        footerText: "© 2025 School Finder. All rights reserved.",
         logoUrl:
           "https://res.cloudinary.com/dlb6fup90/image/upload/v1749034908/u43kfaj77ryiaqj6orap.png",
 
         // ✅ These must be valid non-empty strings
-        contactEmail: "info@nevadarepfinder.org",
+        contactEmail: "info@schoolfinder.org",
         contactPhone: "(775) 555-0122",
 
         socialLinks: {

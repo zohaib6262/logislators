@@ -46,7 +46,7 @@ export function useUpdateResourcePage() {
           "Content-Type": "application/json",
         },
       });
-      setUpdateMessage("Resource page updated successfully!");
+      setUpdateMessage("School resources page updated successfully.");
       return response.data;
     } catch (err) {
       setUpdateError(

@@ -57,7 +57,7 @@ function ManageResourcePage() {
     <div className="min-h-screen bg-white py-8 mt-10">
       <div className="max-w-4xl mx-auto px-4">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Manage Resource Page
+          Manage School Resources Page
         </h1>
         {isLoading && (
           <div
@@ -65,7 +65,7 @@ function ManageResourcePage() {
             style={{ color: primaryColor }}
           >
             <Loader2 className="mr-2 animate-spin" />
-            Loading Resource Settings
+            Loading school resources page settings…
           </div>
         )}
         {error && (
@@ -84,10 +84,11 @@ function ManageResourcePage() {
                 htmlFor="enableResourceHeader"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Enable Resources Page Header
+                Enable School Resources Page Header
               </label>
               <p className="text-xs text-gray-500">
-                Toggle to show/hide the Resources page header
+                Toggle to show/hide the School Resources page header on the
+                public site
               </p>
             </div>
             <Switch

@@ -453,19 +453,29 @@ export default function SchoolsResults() {
             }}
           >
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              How Legislators Are Scored?
+              How Schools Are Selected?
             </h3>
             <p className="text-gray-700 mb-4">{homeData.howLegislatorsScored}</p>
             {homeData?.howLegislatorsScoredLink && (
-              <a
-                href={homeData.howLegislatorsScoredLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
-                style={{ backgroundColor: primaryColor }}
-              >
-                Learn More
-              </a>
+              homeData.howLegislatorsScoredLink.startsWith("/") ? (
+                <Link
+                  to={homeData.howLegislatorsScoredLink}
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  Learn More
+                </Link>
+              ) : (
+                <a
+                  href={homeData.howLegislatorsScoredLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  Learn More
+                </a>
+              )
             )}
           </div>
         </div>

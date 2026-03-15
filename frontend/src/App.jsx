@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useContext, lazy } from "react";
 import { TokenContext } from "./store/TokenContextProvider";
 import withSuspense from "./utils/withSuspense";
@@ -9,7 +9,6 @@ import withSuspense from "./utils/withSuspense";
 const SchoolFinder = lazy(() => import("./pages/SchoolFinder"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const ResourcesPage = lazy(() => import("./pages/ResourcesPage"));
-const Legislators = lazy(() => import("./pages/Legislators"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
@@ -42,7 +41,9 @@ function App() {
           />
           <Route path="about" element={withSuspense(AboutPage)} />
           <Route path="resources" element={withSuspense(ResourcesPage)} />
-          <Route path="voting-records" element={withSuspense(Legislators)} />
+          <Route path="voting-records" element={<Navigate to="/" replace />} />
+          <Route path="representatives" element={<Navigate to="/" replace />} />
+          <Route path="representative/:id" element={<Navigate to="/" replace />} />
           <Route path="schools" element={withSuspense(SchoolsResults)} />
           <Route path="schools/:id" element={withSuspense(SchoolDetails)} />
           <Route path="add-school" element={withSuspense(AddSchool)} />

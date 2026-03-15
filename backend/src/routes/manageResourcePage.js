@@ -13,8 +13,8 @@ router.get("/", async (req, res) => {
         enableResourceHeader: true,
         title: "Resource Page",
         description:
-          "Explore helpful resources about Nevada government, voting, and civic engagement",
-        email: "eric@nevadapolicy.org",
+          "Explore helpful resources that support families in finding schools, understanding admissions, and preparing for enrollment.",
+        email: "",
       });
       await resourcePage.save();
     }

@@ -112,8 +112,8 @@ const SchoolFinder = () => {
                   Find Your School
                 </h2>
                 <p className="text-gray-600 mb-6">
-                  Enter your Nevada address to discover who represents you and
-                  access resources about your elected officials.
+                  Enter your address to find schools near you and explore school
+                  resources.
                 </p>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
