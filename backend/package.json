@@ -11,7 +11,8 @@
     "seed:zips": "node src/seeders/seedZipCentroids.js",
     "seed:zips:csv": "node src/seeders/seedZipCentroidsFromCityZipCsv.js",
     "seed:schools": "node src/seeders/seedSchools.js",
-    "seed:schools:nces": "node src/seeders/seedSchoolsFromNcesPublicCsv.js"
+    "seed:schools:nces": "node src/seeders/seedSchoolsFromNcesPublicCsv.js",
+    "migrate:sf-collections": "node src/scripts/migrate-to-sf-collections.js"
   },
   "keywords": [],
   "author": "",
