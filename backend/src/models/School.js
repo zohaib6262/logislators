@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// School Finder uses isolated sf_ collections; users remains shared.
 const schoolSchema = new mongoose.Schema(
   {
     ncessch: { type: String, sparse: true, unique: true }, // NCES school ID for upserts
@@ -38,7 +39,7 @@ const schoolSchema = new mongoose.Schema(
       },
     },
   },
-  { timestamps: true }
+  { timestamps: true, collection: "sf_schools" }
 );
 
 schoolSchema.index({ location: "2dsphere" });

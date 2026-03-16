@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 
-const homepageSchema = new mongoose.Schema({
+// School Finder uses isolated sf_ collections; users remains shared.
+const homepageSchema = new mongoose.Schema(
+  {
   enableHomeHeader: { type: Boolean, default: true },
   pageTitle: {
     type: String,
@@ -45,7 +47,9 @@ const homepageSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-});
+  },
+  { collection: "sf_homepages" }
+);
 
 const HomePage = mongoose.model("HomePage", homepageSchema);
 

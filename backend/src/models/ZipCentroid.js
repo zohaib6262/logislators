@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// School Finder uses isolated sf_ collections; users remains shared.
 const zipCentroidSchema = new mongoose.Schema(
   {
     zip: { type: String, required: true, unique: true },
@@ -16,7 +17,7 @@ const zipCentroidSchema = new mongoose.Schema(
       },
     },
   },
-  { timestamps: true }
+  { timestamps: true, collection: "sf_zipcentroids" }
 );
 
 zipCentroidSchema.index({ location: "2dsphere" });

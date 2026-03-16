@@ -1,3 +1,4 @@
+// Writes to sf_zipcentroids via ZipCentroid model (School Finder isolated collection).
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { readFileSync } from "fs";

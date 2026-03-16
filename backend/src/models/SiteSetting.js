@@ -1,6 +1,7 @@
 // models/siteSettings.model.js
 import mongoose from "mongoose";
 
+// School Finder uses isolated sf_ collections; users remains shared.
 const socialLinksSchema = new mongoose.Schema({
   facebook: { type: String, default: "" },
   twitter: { type: String, default: "" },
@@ -21,7 +22,7 @@ const siteSettingSchema = new mongoose.Schema(
     contactPhone: { type: String },
     socialLinks: { type: socialLinksSchema, default: () => ({}) },
   },
-  { timestamps: true }
+  { timestamps: true, collection: "sf_sitesettings" }
 );
 
 export default mongoose.model("SiteSetting", siteSettingSchema);

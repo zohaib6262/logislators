@@ -1,5 +1,5 @@
 /**
- * Seed ZipCentroid collection from a CSV (e.g. cityzipcodes.csv).
+ * Seed ZipCentroid collection from a CSV (writes to sf_zipcentroids via ZipCentroid model).
  * Uses streaming read + bulkWrite; does not change any routes or app flow.
  *
  * Usage:

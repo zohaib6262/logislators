@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// School Finder uses isolated sf_ collections; users remains shared (ref: User).
 const schoolSubmissionSchema = new mongoose.Schema(
   {
     schoolName: { type: String, required: true },
@@ -47,7 +48,7 @@ const schoolSubmissionSchema = new mongoose.Schema(
     reviewedAt: Date,
     approvedSchoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
   },
-  { timestamps: true }
+  { timestamps: true, collection: "sf_schoolsubmissions" }
 );
 
 schoolSubmissionSchema.index({ location: "2dsphere" });

@@ -1,3 +1,4 @@
+// Writes to shared users collection (User model unchanged for School Finder isolation).
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import User from "../models/User.js";

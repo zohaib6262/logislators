@@ -1,5 +1,5 @@
 /**
- * Seed School collection from NCES Public School Locations CSV.
+ * Seed School collection from NCES Public School Locations CSV (writes to sf_schools via School model).
  * Uses streaming CSV parsing + bulkWrite; does not change routes or search logic.
  *
  * Usage:

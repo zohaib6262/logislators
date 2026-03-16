@@ -1,3 +1,4 @@
+// Writes to sf_schools via School model (School Finder isolated collection).
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import School from "../models/School.js";
