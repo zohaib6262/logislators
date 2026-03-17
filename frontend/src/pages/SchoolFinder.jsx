@@ -88,17 +88,18 @@ const SchoolFinder = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center justify-center p-4 text-center">
                   <div className="text-white">
                     <h2 className="text-2xl md:text-3xl font-bold mb-2 md:mb-4">
-                      Nevada State Capitol
+                      Real educational freedom starts with real information.
                     </h2>
                     <p className="text-sm md:text-lg opacity-90 font-semibold mb-2">
-                      Your Voice is Powerful
+                      Start exploring education options near you today.
                     </p>
                     <p className="text-sm md:text-lg opacity-90">
-                      Every law that affects your family, your business, and your
-                      community is shaped by the Nevada Legislature. Whether you
-                      care about education, taxes, healthcare, or government
-                      transparency, your input matters. But the first step is
-                      knowing who to contact.
+                        By simply entering your address, you can explore all
+                        the education options available near you—including 
+                        public schools, charter schools, private schools,
+                        and homeschool co-ops. Instead of searching across 
+                        dozens of websites, you can see what’s available 
+                        within your community in one simple place.
                     </p>
                   </div>
                 </div>
