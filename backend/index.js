@@ -56,6 +56,7 @@ import adminSchoolFinderFeeds from "./src/routes/adminSchoolFinderFeeds.js";
 import userSchoolFinder from "./src/routes/userSchoolFinder.js";
 import schoolSubmissions from "./src/routes/schoolSubmissions.js";
 import adminSchoolSubmissions from "./src/routes/adminSchoolSubmissions.js";
+import homeLead from "./src/routes/homeLead.js";
 app.use("/api/primary", primaryColor);
 app.use("/api/userContact", userContact);
 app.use("/api/features", feature);
@@ -74,6 +75,7 @@ app.use("/api/officials", officialsRoutes);
 app.use("/api/voting-records", votingRecordsRoutes);
 app.use("/api/adminSchoolFinderFeeds", adminSchoolFinderFeeds);
 app.use("/api/userSchoolFinder", userSchoolFinder);
+app.use("/api/homeLead", homeLead);
 // Lowercase aliases to avoid path/case mismatch
 app.use("/api/schoolSubmissions", schoolSubmissions);
 app.use("/api/adminSchoolSubmissions", adminSchoolSubmissions);

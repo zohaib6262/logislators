@@ -5,6 +5,7 @@ import { lightenColor } from "@/utils/colorUtils";
 import Label from "@/UI/Label";
 import Input from "@/UI/Input";
 import Button from "@/UI/Button";
+import BASE_URL from "@/lib/utils";
 
 /**
  * SchoolFinder: Full-page with hero and lead/address form only.
@@ -52,6 +53,31 @@ const SchoolFinder = () => {
       city: formData.city.trim(),
       state: formData.state.trim(),
     };
+
+    // Keap sync for homepage search lead (non-blocking; search UX must not depend on CRM).
+    const keapPayload = {
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
+      email: formData.email.trim(),
+      street: formData.street.trim(),
+      city: formData.city.trim(),
+      state: formData.state.trim(),
+      zipcode: zipCode,
+    };
+    fetch(`${BASE_URL}/homeLead`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(keapPayload),
+    })
+      .then((r) => {
+        if (!r.ok) {
+          console.error("[Keap] Homepage lead sync failed:", r.status);
+        }
+      })
+      .catch((err) => {
+        console.error("[Keap] Homepage lead sync error:", err?.message || err);
+      });
+
     navigate(`/schools?zipCode=${encodeURIComponent(zipCode)}`, { state: leadState });
   };
 
