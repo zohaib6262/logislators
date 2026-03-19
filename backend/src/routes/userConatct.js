@@ -2,6 +2,11 @@ import UserContact from "../models/UserContact.js";
 import express from "express";
 import dotenv from "dotenv";
 import axios from "axios";
+import {
+  createOrUpdateContact,
+  ensureTagExists,
+  applyTagToContact,
+} from "../utils/keapService.js";
 dotenv.config();
 const router = express.Router();
 
@@ -52,86 +57,26 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Enhanced Keap CRM Integration
+// Enhanced Keap CRM Integration (uses shared keapService for contact + tag helpers)
 async function addToKeapCRM(userData) {
   try {
     const accessToken = process.env.KEAP_ACCESS_TOKEN;
-    const DEFAULT_TAG_ID = process.env.KEAP_DEFAULT_TAG_ID;
     console.log("Processing user in Keap:", userData.email);
 
-    // 1. Check if contact exists
-    const checkResponse = await axios.get(
-      `https://api.infusionsoft.com/crm/rest/v1/contacts?email=${userData.email}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    let contactId;
-    let isNewContact = false;
-
-    // Prepare contact data
-    const contactPayload = {
-      email_addresses: [{ email: userData.email, field: "EMAIL1" }],
+    const payload = {
+      email: userData.email,
       given_name: userData.firstName,
       family_name: userData.lastName,
-      addresses: [
-        {
-          line1: userData && userData.street ? userData.street : "",
-          line2: "",
-          locality: userData?.city || "",
-          region: userData?.state || "",
-          postal_code: userData?.zipcode || "",
-          zip_code: userData?.zipcode || "",
-          zip_four: "",
-          country_code: "USA",
-          field: "OTHER",
-        },
-      ],
+      street: userData.street,
+      city: userData.city,
+      state: userData.state,
+      zipcode: userData.zipcode,
     };
-
-    if (checkResponse.data.contacts?.length > 0) {
-      // Update existing contact
-      contactId = checkResponse.data.contacts[0].id;
-      console.log("Updating existing contact:", contactId);
-      await axios.patch(
-        `https://api.infusionsoft.com/crm/rest/v1/contacts/${contactId}`,
-        contactPayload,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    } else {
-      // Create new contact
-      console.log("Creating new contact");
-      const createResponse = await axios.post(
-        "https://api.infusionsoft.com/crm/rest/v1/contacts",
-        contactPayload,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      contactId = createResponse.data.id;
-      isNewContact = true;
-    }
+    const { contactId, isNewContact } = await createOrUpdateContact(accessToken, payload);
 
     // Handle Tags
     console.log("Processing tags for contact:", contactId);
-    const tagResults = await handleContactTags(
-      accessToken,
-      contactId,
-      userData,
-      DEFAULT_TAG_ID
-    );
+    const tagResults = await handleContactTags(accessToken, contactId, userData);
     console.log("Tag Results:", tagResults);
 
     // Get complete contact data with tags
@@ -176,13 +121,8 @@ async function addToKeapCRM(userData) {
   }
 }
 
-// Improved Tag Management
-async function handleContactTags(
-  accessToken,
-  contactId,
-  userData,
-  defaultTagId
-) {
+// Improved Tag Management (uses shared ensureTagExists, applyTagToContact from keapService)
+async function handleContactTags(accessToken, contactId, userData) {
   const results = {
     assemblyTag: null,
     senateTag: null,
@@ -320,127 +260,6 @@ async function handleContactTags(
       error: error.message,
     });
     return results;
-  }
-}
-
-// Tag Creation and Management
-async function ensureTagExists(accessToken, tagName) {
-  try {
-    // Search for existing tag
-    const searchResponse = await axios.get(
-      `https://api.infusionsoft.com/crm/rest/v1/tags?name=${encodeURIComponent(
-        tagName
-      )}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    // Return existing tag if found
-    if (searchResponse.data.tags?.length > 0) {
-      console.log("Found existing tag:", tagName);
-      return searchResponse.data.tags[0];
-    }
-
-    // Create new tag
-    console.log("Creating new tag:", tagName);
-    const createResponse = await axios.post(
-      "https://api.infusionsoft.com/crm/rest/v1/tags",
-      {
-        name: tagName,
-        description: `Tag for ${tagName}`,
-        category: null,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    return createResponse.data;
-  } catch (error) {
-    console.error(`Error ensuring tag exists (${tagName}):`, {
-      message: error.message,
-      response: error.response?.data,
-      stack: error.stack,
-    });
-    throw error;
-  }
-}
-
-// Enhanced Tag Application
-async function applyTagToContact(accessToken, contactId, tagId) {
-  try {
-    console.log(`Applying tag ${tagId} to contact ${contactId}`);
-
-    // First check if tag is already applied
-    const existingTags = await axios.get(
-      `https://api.infusionsoft.com/crm/rest/v1/contacts/${contactId}/tags`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    // Check if tag already exists
-    const tagExists = existingTags.data.tags.some((tag) => tag.id === tagId);
-    if (tagExists) {
-      console.log(`Tag ${tagId} already exists on contact ${contactId}`);
-      return {
-        success: true,
-        alreadyApplied: true,
-      };
-    }
-
-    // Apply the tag using the correct endpoint and method
-    const response = await axios.post(
-      `https://api.infusionsoft.com/crm/rest/v1/contacts/${contactId}/tags`,
-      { tagIds: [tagId] },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    // Verify the tag was applied
-    const verification = await axios.get(
-      `https://api.infusionsoft.com/crm/rest/v1/contacts/${contactId}/tags`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    return {
-      success: true,
-      status: response.status,
-      data: response.data,
-      verifiedTags: verification.data.tags.map((t) => t.id),
-    };
-  } catch (error) {
-    console.error(`Error applying tag ${tagId}:`, {
-      message: error.message,
-      response: error.response?.data,
-      stack: error.stack,
-    });
-
-    throw {
-      tagId,
-      contactId,
-      error: error.message,
-      response: error.response?.data,
-    };
   }
 }
 

@@ -1,10 +1,56 @@
 import express from "express";
 import SchoolSubmission from "../models/SchoolSubmission.js";
 import { sendSchoolSubmissionConfirmation } from "../utils/emailService.js";
+import {
+  createOrUpdateContact,
+  ensureTagExists,
+  applyTagToContact,
+} from "../utils/keapService.js";
 
 const router = express.Router();
 
 const SCHOOL_TYPES = ["public", "private", "charter", "homeschool", "other"];
+
+const EDUCATION_GUIDE_TAG = "Education Guide";
+const PENDING_SCHOOL_SUBMISSION_TAG = "Pending School Submission";
+
+/**
+ * Sync a school submission to Keap: create/update contact and apply Education Guide (+ optional Pending School Submission) tag.
+ * Does not throw; callers should .catch() to log. Used at form submission time, not at approval time.
+ */
+async function syncSchoolSubmissionToKeap(data) {
+  const accessToken = process.env.KEAP_ACCESS_TOKEN;
+  if (!accessToken || !accessToken.trim()) {
+    console.warn("Keap sync skipped: KEAP_ACCESS_TOKEN not set.");
+    return;
+  }
+
+  const nameParts = (data.contactName || "").trim().split(/\s+/);
+  const given_name = nameParts[0] || "";
+  const family_name = nameParts.slice(1).join(" ") || "";
+
+  const payload = {
+    email: data.contactEmail,
+    given_name,
+    family_name,
+    street: data.streetAddress,
+    city: data.city,
+    state: data.state,
+    zipcode: data.zipCode,
+    phone: data.contactPhone || undefined,
+    company: data.schoolName ? `${data.schoolName}${data.schoolType ? ` (${data.schoolType})` : ""}` : undefined,
+  };
+
+  const { contactId } = await createOrUpdateContact(accessToken, payload);
+
+  const tagNames = [EDUCATION_GUIDE_TAG, PENDING_SCHOOL_SUBMISSION_TAG];
+  for (const tagName of tagNames) {
+    const tag = await ensureTagExists(accessToken, tagName);
+    await applyTagToContact(accessToken, contactId, tag.id);
+  }
+
+  console.log("Keap sync OK for school submission:", data.contactEmail, "contactId:", contactId);
+}
 
 function isValidEmail(str) {
   if (!str || typeof str !== "string") return false;
@@ -162,6 +208,21 @@ router.post("/", async (req, res) => {
 
     sendSchoolSubmissionConfirmation(contactEmail, contactName, schoolName).catch((err) =>
       console.error("School submission confirmation email failed:", err)
+    );
+
+    // Sync to Keap immediately (do not block or fail the submission if Keap fails)
+    syncSchoolSubmissionToKeap({
+      contactName,
+      contactEmail,
+      contactPhone,
+      schoolName,
+      schoolType,
+      streetAddress,
+      city,
+      state,
+      zipCode,
+    }).catch((err) =>
+      console.error("Keap sync for school submission failed (submission still saved):", err?.message || err)
     );
 
     res.status(201).json({

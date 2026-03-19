@@ -81,7 +81,7 @@ const Header = () => {
                 className={getLinkClass("/about")}
                 style={getLinkStyle("/about")}
               >
-                About us
+                About Us
               </Link>
             )}
             {settings?.enableResources && (
