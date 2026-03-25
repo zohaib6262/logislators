@@ -21,6 +21,7 @@ import {
   LayoutPanelTop,
   KeyRound,
   School,
+  Upload,
 } from "lucide-react";
 
 // Admin Components
@@ -78,6 +79,9 @@ const SchoolSubmissionsPage = lazy(() =>
 );
 const AdminSchoolsPage = lazy(() =>
   import("../reusableComponents/admin/SchoolFinder/AdminSchoolsPage")
+);
+const DataImportPage = lazy(() =>
+  import("../reusableComponents/admin/SchoolFinder/DataImportPage")
 );
 import { TokenContext } from "@/store/TokenContextProvider";
 import LoadingScreen from "@/reusableComponents/LoadingScreen";
@@ -188,6 +192,11 @@ const AdminDashboard = () => {
       to: "/admin/school-finder/schools",
       label: "Schools",
       icon: <School size={20} className="mr-3" />,
+    },
+    {
+      to: "/admin/data-import",
+      label: "Data import",
+      icon: <Upload size={20} className="mr-3" />,
     },
     {
       to: "/admin/reset-password",
@@ -456,6 +465,18 @@ const AdminDashboard = () => {
                           description="Configure site settings and appearance."
                           className="bg-violet-50"
                         />
+                        <DashboardCard
+                          to="/admin/data-import"
+                          icon={
+                            <Upload
+                              size={28}
+                              className="text-slate-700 mr-4"
+                            />
+                          }
+                          title="Data import"
+                          description="Upload schools or ZIP centroid CSV files (in memory) to refresh search data."
+                          className="bg-slate-50"
+                        />
                       </div>
                     </div>
                   }
@@ -500,6 +521,7 @@ const AdminDashboard = () => {
                 <Route path="/settings" element={<SiteSettings />} />
                 <Route path="/school-finder/submissions" element={<SchoolSubmissionsPage />} />
                 <Route path="/school-finder/schools" element={<AdminSchoolsPage />} />
+                <Route path="/data-import" element={<DataImportPage />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route
                   path="*"

@@ -1,8 +1,25 @@
 import express from "express";
+import multer from "multer";
 import School from "../models/School.js";
 import ZipCentroid from "../models/ZipCentroid.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { adminOnly } from "../middleware/authMiddleware.js";
+import {
+  parseCsvFromBuffer,
+  validateSchoolCsvHeaders,
+  validateZipCsvHeaders,
+  mapSchoolCsvRow,
+  mapZipCsvRow,
+  replaceCollectionDocuments,
+  bumpReasons,
+  appendSchoolDocuments,
+  appendZipDocuments,
+} from "../utils/schoolFinderCsvImport.js";
+
+const uploadCsv = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 },
+});
 
 const router = express.Router();
 
@@ -152,6 +169,337 @@ const BULK_ENRICHMENT_KEYS = [
 
 router.use(protect);
 router.use(adminOnly);
+
+// ---------- Admin CSV import (memory only; feeds sf_schools / sf_zipcentroids) ----------
+
+/**
+ * POST /api/adminSchoolFinderFeeds/import/schools
+ * multipart field name: file — replaces all documents in sf_schools with validated CSV rows.
+ */
+router.post("/import/schools", uploadCsv.single("file"), async (req, res) => {
+  try {
+    if (!req.file?.buffer) {
+      return res.status(400).json({
+        success: false,
+        message: "CSV file is required (multipart field name: file).",
+        collectionAffected: School.collection.name,
+      });
+    }
+
+    const rows = await parseCsvFromBuffer(req.file.buffer);
+    if (rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "CSV contains no data rows.",
+        totalRows: 0,
+        importedCount: 0,
+        skippedCount: 0,
+        skippedReasons: {},
+        collectionAffected: School.collection.name,
+      });
+    }
+
+    const { ok, missing } = validateSchoolCsvHeaders(rows[0]);
+    if (!ok) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing required columns: ${missing.join(", ")}`,
+        totalRows: rows.length,
+        importedCount: 0,
+        skippedCount: rows.length,
+        skippedReasons: { missing_required_columns: rows.length },
+        collectionAffected: School.collection.name,
+      });
+    }
+
+    const skippedReasons = {};
+    const docs = [];
+    for (let i = 0; i < rows.length; i++) {
+      const out = mapSchoolCsvRow(rows[i], i + 2);
+      if (!out.ok) {
+        bumpReasons(skippedReasons, out.reasons);
+        continue;
+      }
+      docs.push(out.doc);
+    }
+
+    const skippedCount = rows.length - docs.length;
+    if (docs.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid rows after validation; existing data was not modified.",
+        totalRows: rows.length,
+        importedCount: 0,
+        skippedCount,
+        skippedReasons,
+        collectionAffected: School.collection.name,
+      });
+    }
+
+    await replaceCollectionDocuments(School, docs, "import/schools");
+
+    res.json({
+      success: true,
+      message: `Replaced school dataset: ${docs.length} school(s) imported, ${skippedCount} row(s) skipped.`,
+      mode: "replace",
+      totalRows: rows.length,
+      importedCount: docs.length,
+      addedCount: docs.length,
+      updatedCount: 0,
+      duplicateCount: 0,
+      skippedCount,
+      skippedReasons,
+      collectionAffected: School.collection.name,
+    });
+  } catch (err) {
+    console.error("adminSchoolFinderFeeds import/schools error:", err);
+    res.status(500).json({
+      success: false,
+      message: err.message || "School CSV import failed.",
+      collectionAffected: School.collection.name,
+    });
+  }
+});
+
+/**
+ * POST /api/adminSchoolFinderFeeds/import/zip-centroids
+ * multipart field name: file — replaces all documents in sf_zipcentroids with validated CSV rows.
+ */
+router.post("/import/zip-centroids", uploadCsv.single("file"), async (req, res) => {
+  try {
+    if (!req.file?.buffer) {
+      return res.status(400).json({
+        success: false,
+        message: "CSV file is required (multipart field name: file).",
+        collectionAffected: ZipCentroid.collection.name,
+      });
+    }
+
+    const rows = await parseCsvFromBuffer(req.file.buffer);
+    if (rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "CSV contains no data rows.",
+        totalRows: 0,
+        importedCount: 0,
+        skippedCount: 0,
+        skippedReasons: {},
+        collectionAffected: ZipCentroid.collection.name,
+      });
+    }
+
+    const { ok, missing } = validateZipCsvHeaders(rows[0]);
+    if (!ok) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing required columns: ${missing.join(", ")}`,
+        totalRows: rows.length,
+        importedCount: 0,
+        skippedCount: rows.length,
+        skippedReasons: { missing_required_columns: rows.length },
+        collectionAffected: ZipCentroid.collection.name,
+      });
+    }
+
+    const skippedReasons = {};
+    const docs = [];
+    const seenZips = new Set();
+    for (let i = 0; i < rows.length; i++) {
+      const out = mapZipCsvRow(rows[i], i + 2, seenZips);
+      if (!out.ok) {
+        bumpReasons(skippedReasons, out.reasons);
+        continue;
+      }
+      docs.push(out.doc);
+    }
+
+    const skippedCount = rows.length - docs.length;
+    if (docs.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid rows after validation; existing data was not modified.",
+        totalRows: rows.length,
+        importedCount: 0,
+        skippedCount,
+        skippedReasons,
+        collectionAffected: ZipCentroid.collection.name,
+      });
+    }
+
+    await replaceCollectionDocuments(ZipCentroid, docs, "import/zip-centroids");
+
+    res.json({
+      success: true,
+      message: `Replaced ZIP centroid dataset: ${docs.length} row(s) imported, ${skippedCount} row(s) skipped.`,
+      mode: "replace",
+      totalRows: rows.length,
+      importedCount: docs.length,
+      addedCount: docs.length,
+      updatedCount: 0,
+      duplicateCount: 0,
+      skippedCount,
+      skippedReasons,
+      collectionAffected: ZipCentroid.collection.name,
+    });
+  } catch (err) {
+    console.error("adminSchoolFinderFeeds import/zip-centroids error:", err);
+    res.status(500).json({
+      success: false,
+      message: err.message || "ZIP CSV import failed.",
+      collectionAffected: ZipCentroid.collection.name,
+    });
+  }
+});
+
+/**
+ * POST /api/adminSchoolFinderFeeds/import/schools/append
+ * multipart field name: file — inserts new schools only; skips duplicates (normalized name+address+city+state+zip).
+ */
+router.post("/import/schools/append", uploadCsv.single("file"), async (req, res) => {
+  try {
+    if (!req.file?.buffer) {
+      return res.status(400).json({
+        success: false,
+        message: "CSV file is required (multipart field name: file).",
+        mode: "append",
+        collectionAffected: School.collection.name,
+      });
+    }
+
+    const rows = await parseCsvFromBuffer(req.file.buffer);
+    if (rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "CSV contains no data rows.",
+        mode: "append",
+        totalRows: 0,
+        addedCount: 0,
+        updatedCount: 0,
+        skippedCount: 0,
+        duplicateCount: 0,
+        skippedReasons: {},
+        collectionAffected: School.collection.name,
+      });
+    }
+
+    const { ok, missing } = validateSchoolCsvHeaders(rows[0]);
+    if (!ok) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing required columns: ${missing.join(", ")}`,
+        mode: "append",
+        totalRows: rows.length,
+        addedCount: 0,
+        updatedCount: 0,
+        skippedCount: rows.length,
+        duplicateCount: 0,
+        skippedReasons: { missing_required_columns: rows.length },
+        collectionAffected: School.collection.name,
+      });
+    }
+
+    const summary = await appendSchoolDocuments(School, rows);
+    if (summary.skippedCount === rows.length) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid rows after validation; existing data was not modified.",
+        mode: "append",
+        ...summary,
+        collectionAffected: School.collection.name,
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Append schools: ${summary.addedCount} added, ${summary.duplicateCount} duplicate(s) skipped, ${summary.skippedCount} row(s) skipped (invalid).`,
+      mode: "append",
+      ...summary,
+      collectionAffected: School.collection.name,
+    });
+  } catch (err) {
+    console.error("adminSchoolFinderFeeds import/schools/append error:", err);
+    res.status(500).json({
+      success: false,
+      message: err.message || "School CSV append failed.",
+      collectionAffected: School.collection.name,
+    });
+  }
+});
+
+/**
+ * POST /api/adminSchoolFinderFeeds/import/zip-centroids/append
+ * multipart field name: file — inserts new ZIP centroids only; skips existing zips and duplicate zips in file.
+ */
+router.post("/import/zip-centroids/append", uploadCsv.single("file"), async (req, res) => {
+  try {
+    if (!req.file?.buffer) {
+      return res.status(400).json({
+        success: false,
+        message: "CSV file is required (multipart field name: file).",
+        mode: "append",
+        collectionAffected: ZipCentroid.collection.name,
+      });
+    }
+
+    const rows = await parseCsvFromBuffer(req.file.buffer);
+    if (rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "CSV contains no data rows.",
+        mode: "append",
+        totalRows: 0,
+        addedCount: 0,
+        updatedCount: 0,
+        skippedCount: 0,
+        duplicateCount: 0,
+        skippedReasons: {},
+        collectionAffected: ZipCentroid.collection.name,
+      });
+    }
+
+    const { ok, missing } = validateZipCsvHeaders(rows[0]);
+    if (!ok) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing required columns: ${missing.join(", ")}`,
+        mode: "append",
+        totalRows: rows.length,
+        addedCount: 0,
+        updatedCount: 0,
+        skippedCount: rows.length,
+        duplicateCount: 0,
+        skippedReasons: { missing_required_columns: rows.length },
+        collectionAffected: ZipCentroid.collection.name,
+      });
+    }
+
+    const summary = await appendZipDocuments(ZipCentroid, rows);
+    if (summary.skippedCount === rows.length) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid rows after validation; existing data was not modified.",
+        mode: "append",
+        ...summary,
+        collectionAffected: ZipCentroid.collection.name,
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Append ZIP centroids: ${summary.addedCount} added, ${summary.duplicateCount} duplicate(s) skipped, ${summary.skippedCount} row(s) skipped (invalid).`,
+      mode: "append",
+      ...summary,
+      collectionAffected: ZipCentroid.collection.name,
+    });
+  } catch (err) {
+    console.error("adminSchoolFinderFeeds import/zip-centroids/append error:", err);
+    res.status(500).json({
+      success: false,
+      message: err.message || "ZIP CSV append failed.",
+      collectionAffected: ZipCentroid.collection.name,
+    });
+  }
+});
 
 // ---------- Schools CRUD ----------
 
