@@ -25,6 +25,10 @@ function parseGradeToNumber(grade) {
  */
 router.get("/search", async (req, res) => {
   try {
+    const DEBUG =
+      process.env.DEBUG_SCHOOL_FINDER === "1" ||
+      process.env.DEBUG_SCHOOL_FINDER === "true";
+
     const zipCodeRaw = (req.query.zipCode ?? req.query.zipcode ?? "").toString().trim();
     const zipCode = zipCodeRaw.replace(/\s+/g, "");
     if (!zipCode) {
@@ -66,10 +70,25 @@ router.get("/search", async (req, res) => {
     const maxDistanceMeters = radiusMiles * MILES_TO_METERS;
 
     const grade = (req.query.grade || "").toString().trim();
-    const schoolType = (req.query.schoolType || "").toString().trim().toLowerCase();
-    const maxCost = req.query.maxCost != null && req.query.maxCost !== ""
-      ? Number(req.query.maxCost)
-      : null;
+    const schoolTypeRaw = (req.query.schoolType ?? req.query.schooltype ?? "").toString();
+    const schoolType = schoolTypeRaw.trim().toLowerCase();
+    const maxCostRaw = (req.query.maxCost ?? req.query.maxcost ?? "").toString().trim();
+    const maxCost =
+      maxCostRaw !== "" && !Number.isNaN(Number(maxCostRaw)) ? Number(maxCostRaw) : null;
+
+    if (DEBUG) {
+      console.log("[userSchoolFinder/search] incoming query:", req.query);
+      console.log("[userSchoolFinder/search] normalized:", {
+        zipCode,
+        radiusMiles,
+        grade,
+        parsedGrade: parseGradeToNumber(grade),
+        schoolTypeRaw,
+        schoolTypeApplied: !!(schoolType && ["public", "private", "charter", "homeschool", "other"].includes(schoolType)),
+        maxCostRaw,
+        maxCostApplied: maxCost,
+      });
+    }
 
     // Pagination params
     const pageRaw = Number(req.query.page) || 1;
@@ -79,14 +98,18 @@ router.get("/search", async (req, res) => {
     const skip = (page - 1) * pageSize;
 
     const matchStage = {};
-    if (schoolType && ["public", "private", "charter", "homeschool", "other"].includes(schoolType)) {
-      matchStage.schoolType = schoolType;
-    }
+    const allowedSchoolTypes = ["public", "private", "charter", "homeschool", "other"];
+    const applySchoolType = !!(schoolType && allowedSchoolTypes.includes(schoolType));
+    if (applySchoolType) matchStage.schoolType = schoolType;
+
     const gradeNum = parseGradeToNumber(grade);
-    if (gradeNum != null) {
-      matchStage.gradesMin = { $lte: gradeNum };
-      matchStage.gradesMax = { $gte: gradeNum };
-    }
+
+    // Grade filtering:
+    // Historically this route used `gradesMin`/`gradesMax`. Some imports only populate
+    // `gradesServed` with values like "11-12", "K-5", "K-12", etc.
+    // We now filter using a robust match that checks whether the selected grade
+    // falls within any served range, with normalization (K => 0, trim, uppercase,
+    // support hyphen ranges and comma-separated/mixed values).
     if (maxCost != null && !Number.isNaN(maxCost)) {
       matchStage.$or = [
         { costValue: { $lte: maxCost } },
@@ -106,6 +129,140 @@ router.get("/search", async (req, res) => {
       ...(Object.keys(matchStage).length ? { query: matchStage } : {}),
     };
 
+    const gradeMatchStage =
+      gradeNum != null
+        ? {
+            // NOTE: Uses MongoDB $function for robust grade range matching against `gradesServed`.
+            // Expected examples (selected -> matches if served contains):
+            // - 12 -> "11-12", "9-12", "K-12"
+            // - 11 -> "11-12", "9-12", "K-12"
+            // - 5  -> "3-5", "K-5", "K-12"
+            // - K  -> "K", "K-5", "K-12"
+            $match: {
+              $expr: {
+                $function: {
+                  lang: "js",
+                  args: [
+                    gradeNum,
+                    { $ifNull: ["$gradesMin", null] },
+                    { $ifNull: ["$gradesMax", null] },
+                    { $ifNull: ["$gradesServed", []] },
+                  ],
+                  body: `
+                    function normalizeGradeToken(t) {
+                      if (t === null || t === undefined) return null;
+                      const raw = String(t).trim().toUpperCase();
+                      if (!raw) return null;
+                      if (raw === "K") return 0;
+                      const n = parseInt(raw, 10);
+                      return Number.isNaN(n) ? null : n;
+                    }
+
+                    function parseRangeToken(token) {
+                      if (!token) return null;
+                      const s = String(token).trim().toUpperCase().replace(/\\s+/g, "");
+                      if (!s) return null;
+
+                      if (s.includes("-")) {
+                        const parts = s.split("-").map(x => x.trim()).filter(Boolean);
+                        if (parts.length < 2) return null;
+                        const a = normalizeGradeToken(parts[0]);
+                        const b = normalizeGradeToken(parts[1]);
+                        if (a === null || b === null) return null;
+                        const lo = Math.min(a, b);
+                        const hi = Math.max(a, b);
+                        return { lo, hi };
+                      }
+
+                      const g = normalizeGradeToken(s);
+                      if (g === null) return null;
+                      return { lo: g, hi: g };
+                    }
+
+                    function selectedInServedRanges(selectedGrade, servedArrOrStr) {
+                      // Some data can be stored inconsistently:
+                      // - Array: ["11-12", "K-5"]
+                      // - String: "11-12, K-5"
+                      // - Single token: "K-11"
+                      // We'll normalize everything into an array of entries.
+                      if (servedArrOrStr === null || servedArrOrStr === undefined) return false;
+                      const servedAsArray = Array.isArray(servedArrOrStr) ? servedArrOrStr : [servedArrOrStr];
+                      for (const entry of servedAsArray) {
+                        if (entry === null || entry === undefined) continue;
+                        const entryStr = String(entry);
+                        // Support comma-separated/mixed values if they exist inside a single array element.
+                        const parts = entryStr.split(/[,;|]/).map(x => x.trim()).filter(Boolean);
+                        for (const part of parts) {
+                          const r = parseRangeToken(part);
+                          if (!r) continue;
+                          if (selectedGrade >= r.lo && selectedGrade <= r.hi) return true;
+                        }
+                      }
+                      return false;
+                    }
+
+                    const selected = Number(arguments[0]);
+                    const docMin = normalizeGradeToken(arguments[1]);
+                    const docMax = normalizeGradeToken(arguments[2]);
+                    const servedArr = arguments[3];
+
+                    if (docMin !== null && docMax !== null) {
+                      const lo = Math.min(docMin, docMax);
+                      const hi = Math.max(docMin, docMax);
+                      if (selected >= lo && selected <= hi) return true;
+                    }
+
+                    return selectedInServedRanges(selected, servedArr);
+                  `,
+                },
+              },
+            },
+          }
+        : null;
+
+    // Debug counts (geo -> grade -> schoolType -> maxCost) without changing the real result pipeline.
+    // Runs only when DEBUG_SCHOOL_FINDER=1 to avoid overhead.
+    if (DEBUG) {
+      const geoNearOnly = {
+        near: geoNear.near,
+        distanceField: geoNear.distanceField,
+        maxDistance: geoNear.maxDistance,
+        spherical: geoNear.spherical,
+      };
+
+      const buildCountPipeline = (queryForGeoNear) => {
+        const geoStage = { ...geoNearOnly };
+        if (queryForGeoNear && Object.keys(queryForGeoNear).length) {
+          geoStage.query = queryForGeoNear;
+        }
+        const stages = [{ $geoNear: geoStage }];
+        if (gradeMatchStage) stages.push(gradeMatchStage);
+        stages.push({ $count: "count" });
+        return stages;
+      };
+
+      // Counts are approximate but match the same logical order as the main pipeline.
+      // afterGeo: distance only (no grade/schoolType/maxCost).
+      const afterGeo = await School.aggregate([{ $geoNear: geoNearOnly }, { $count: "count" }]);
+      // afterGrade: distance + grade (if selected).
+      const afterGrade = await School.aggregate(buildCountPipeline({}));
+
+      const afterSchoolType = await School.aggregate(buildCountPipeline(applySchoolType ? { schoolType } : {}));
+      const afterMaxCost = await School.aggregate(buildCountPipeline(Object.keys(matchStage).length ? matchStage : {}));
+
+      const countAfterGeo = afterGeo[0]?.count ?? 0;
+      const countAfterGrade = afterGrade[0]?.count ?? 0;
+      const countAfterSchoolType = afterSchoolType[0]?.count ?? 0;
+      const countAfterMaxCost = afterMaxCost[0]?.count ?? 0;
+
+      console.log("[userSchoolFinder/search][debug] counts:", {
+        afterGeo: countAfterGeo,
+        afterGrade: countAfterGrade,
+        afterSchoolType: countAfterSchoolType,
+        afterMaxCost: countAfterMaxCost,
+      });
+    }
+
     const pipeline = [
       { $geoNear: geoNear },
       {
@@ -113,6 +270,7 @@ router.get("/search", async (req, res) => {
           distanceMiles: { $divide: ["$distanceMeters", MILES_TO_METERS] },
         },
       },
+      ...(gradeMatchStage ? [gradeMatchStage] : []),
       {
         $facet: {
           results: [
@@ -146,9 +304,7 @@ router.get("/search", async (req, res) => {
               },
             },
           ],
-          total: [
-            { $count: "count" },
-          ],
+          total: [{ $count: "count" }],
         },
       },
     ];
