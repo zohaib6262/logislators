@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import { useSearchParams, Link, useOutletContext } from "react-router-dom";
 import { ArrowLeft, MapPin, ChevronRight } from "lucide-react";
 import BASE_URL from "@/lib/utils";
@@ -6,6 +6,7 @@ import { TokenContext } from "@/store/TokenContextProvider";
 import { lightenColor } from "@/utils/colorUtils";
 import { useVotingSection } from "@/hooks/VotingSection/useVotingSection";
 import SchoolAvatar from "@/reusableComponents/SchoolAvatar";
+import SchoolResultsMap from "@/reusableComponents/schoolFinder/SchoolResultsMap";
 
 const RADIUS_OPTIONS = [1, 5, 10, 25];
 const SCHOOL_TYPE_OPTIONS = [
@@ -54,6 +55,8 @@ export default function SchoolsResults() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchCenter, setSearchCenter] = useState(null);
+  const [highlightedSchoolId, setHighlightedSchoolId] = useState(null);
   const { primaryColor } = useContext(TokenContext);
   const lightPrimary = lightenColor(primaryColor, 60);
   const { votingSection } = useVotingSection();
@@ -82,9 +85,14 @@ export default function SchoolsResults() {
   }, [radiusMiles, grade, schoolType, maxCost]);
 
   useEffect(() => {
+    setHighlightedSchoolId(null);
+  }, [page, zipCode, radiusMiles, grade, schoolType, maxCost]);
+
+  useEffect(() => {
     if (!zipCode) {
       setError("ZIP Code is required for search.");
       setLoading(false);
+      setSearchCenter(null);
       return;
     }
 
@@ -109,6 +117,7 @@ export default function SchoolsResults() {
     const ac = new AbortController();
     setLoading(true);
     setError(null);
+    setSearchCenter(null);
     fetch(searchUrl, { signal: ac.signal })
       .then(async (res) => {
         const text = await res.text();
@@ -139,12 +148,25 @@ export default function SchoolsResults() {
         setSchools(list);
         setTotalCount(total);
         setTotalPages(pages);
+        const sc = data.searchCenter;
+        if (
+          sc &&
+          typeof sc.lat === "number" &&
+          typeof sc.lng === "number" &&
+          !Number.isNaN(sc.lat) &&
+          !Number.isNaN(sc.lng)
+        ) {
+          setSearchCenter({ lat: sc.lat, lng: sc.lng });
+        } else {
+          setSearchCenter(null);
+        }
         if (import.meta.env.DEV) {
           console.log("[SchoolsResults] response", { totalCount: total, page: data.page, pageSize: data.pageSize, totalPages: pages, schoolsCount: list.length });
         }
       })
       .catch((err) => {
         if (err.name === "AbortError") return;
+        setSearchCenter(null);
         setError(err.message || "Failed to load schools");
       })
       .finally(() => {
@@ -202,6 +224,13 @@ export default function SchoolsResults() {
     return p.toString();
   };
 
+  const handleMarkerSelect = useCallback((id) => {
+    setHighlightedSchoolId(id);
+    requestAnimationFrame(() => {
+      document.getElementById(`school-card-${id}`)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 pt-16 relative">
       <div
@@ -236,7 +265,7 @@ export default function SchoolsResults() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         {!zipCode?.trim() ? (
           <div className="bg-red-50 border-l-4 border-red-500 p-4">
             <p className="text-sm text-red-700">ZIP Code is required for search.</p>
@@ -348,19 +377,51 @@ export default function SchoolsResults() {
               <div className="bg-red-50 border-l-4 border-red-500 p-4">
                 <p className="text-sm text-red-700">{error}</p>
               </div>
-            ) : schools.length > 0 ? (
+            ) : (
               <>
-                <ul className="space-y-3">
+                {(searchCenter || schools.length > 0) && (
+                  <div
+                    className={
+                      schools.length > 0
+                        ? "flex flex-col lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start mb-6"
+                        : "mb-6"
+                    }
+                  >
+                    <div
+                      className={
+                        schools.length > 0
+                          ? "order-1 lg:order-2 mb-6 lg:mb-0 lg:sticky lg:top-20 self-start w-full"
+                          : "w-full"
+                      }
+                    >
+                      <SchoolResultsMap
+                        schools={schools}
+                        searchCenter={searchCenter}
+                        getDetailPath={(id) => `/schools/${id}?${resultsQueryString()}`}
+                        primaryColor={primaryColor}
+                        onMarkerSelect={handleMarkerSelect}
+                      />
+                    </div>
+                    {schools.length > 0 ? (
+                      <div className="order-2 lg:order-1 min-w-0">
+                        <ul className="space-y-3">
                   {schools.map((school) => {
                     const addressStr = formatAddressForList(school);
                     const dist =
                       school.distanceMiles != null ? Number(school.distanceMiles).toFixed(1) : null;
                     const highlights = sanitizeHighlights(school.schoolHighlights);
+                    const sid = String(school._id);
+                    const isHighlighted = highlightedSchoolId === sid;
                     return (
-                      <li key={school._id}>
+                      <li key={school._id} id={`school-card-${sid}`}>
                         <Link
                           to={`/schools/${school._id}?${resultsQueryString()}`}
                           className="flex items-center gap-4 bg-white rounded-lg shadow p-4 hover:shadow-lg hover:border-gray-300 border border-gray-100 transition cursor-pointer group"
+                          style={
+                            isHighlighted
+                              ? { boxShadow: `0 0 0 3px ${primaryColor}` }
+                              : undefined
+                          }
                         >
                           <SchoolAvatar school={school} size="sm" />
                           <div className="flex-1 min-w-0">
@@ -398,46 +459,51 @@ export default function SchoolsResults() {
                       </li>
                     );
                   })}
-                </ul>
-                {totalPages > 1 && totalCount > 0 && (
-                  <div className="flex items-center justify-between mt-4">
-                    <button
-                      type="button"
-                      onClick={() => handlePageChange(page - 1)}
-                      disabled={page <= 1}
-                      className={`px-3 py-1 rounded border text-sm ${
-                        page <= 1
-                          ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                          : "text-gray-700 border-gray-300 hover:bg-gray-50"
-                      }`}
-                    >
-                      Previous
-                    </button>
-                    <span className="text-sm text-gray-600">
-                      Page {Math.min(page, totalPages || 1)} of {totalPages || 1}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handlePageChange(page + 1)}
-                      disabled={page >= (totalPages || 1)}
-                      className={`px-3 py-1 rounded border text-sm ${
-                        page >= (totalPages || 1)
-                          ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                          : "text-gray-700 border-gray-300 hover:bg-gray-50"
-                      }`}
-                    >
-                      Next
-                    </button>
+                        </ul>
+                        {totalPages > 1 && totalCount > 0 && (
+                          <div className="flex items-center justify-between mt-4">
+                            <button
+                              type="button"
+                              onClick={() => handlePageChange(page - 1)}
+                              disabled={page <= 1}
+                              className={`px-3 py-1 rounded border text-sm ${
+                                page <= 1
+                                  ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                                  : "text-gray-700 border-gray-300 hover:bg-gray-50"
+                              }`}
+                            >
+                              Previous
+                            </button>
+                            <span className="text-sm text-gray-600">
+                              Page {Math.min(page, totalPages || 1)} of {totalPages || 1}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handlePageChange(page + 1)}
+                              disabled={page >= (totalPages || 1)}
+                              className={`px-3 py-1 rounded border text-sm ${
+                                page >= (totalPages || 1)
+                                  ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                                  : "text-gray-700 border-gray-300 hover:bg-gray-50"
+                              }`}
+                            >
+                              Next
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ) : null}
+                  </div>
+                )}
+                {schools.length === 0 && (
+                  <div className="bg-white p-6 rounded-lg shadow text-center">
+                    <p className="text-gray-700">No schools found for your search.</p>
+                    <p className="mt-2 text-sm text-gray-500">
+                      Try a larger radius or fewer filters.
+                    </p>
                   </div>
                 )}
               </>
-            ) : (
-              <div className="bg-white p-6 rounded-lg shadow text-center">
-                <p className="text-gray-700">No schools found for your search.</p>
-                <p className="mt-2 text-sm text-gray-500">
-                  Try a larger radius or fewer filters.
-                </p>
-              </div>
             )}
           </>
         )}

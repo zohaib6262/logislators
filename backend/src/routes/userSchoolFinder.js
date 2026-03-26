@@ -46,6 +46,19 @@ router.get("/search", async (req, res) => {
       });
     }
 
+    const [searchLng, searchLat] = centroid.location.coordinates;
+    const searchCenter =
+      typeof searchLat === "number" &&
+      typeof searchLng === "number" &&
+      !Number.isNaN(searchLat) &&
+      !Number.isNaN(searchLng) &&
+      searchLat >= -90 &&
+      searchLat <= 90 &&
+      searchLng >= -180 &&
+      searchLng <= 180
+        ? { lat: searchLat, lng: searchLng }
+        : null;
+
     const radiusMilesRaw = Number(req.query.radiusMiles);
     const radiusMiles = Number.isNaN(radiusMilesRaw) || radiusMilesRaw <= 0
       ? 10
@@ -114,6 +127,7 @@ router.get("/search", async (req, res) => {
                 city: 1,
                 state: 1,
                 zip: 1,
+                location: 1,
                 website: 1,
                 phone: 1,
                 enrollment: 1,
@@ -151,6 +165,7 @@ router.get("/search", async (req, res) => {
       page,
       pageSize,
       totalPages,
+      ...(searchCenter ? { searchCenter } : {}),
     });
   } catch (err) {
     console.error("userSchoolFinder search error:", err);
