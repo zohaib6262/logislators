@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import api from "@/services/api";
 
 const BASE = "adminSchoolFinderFeeds/schools";
@@ -30,24 +30,36 @@ export function useAdminSchool(id) {
   const [school, setSchool] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const requestSeqRef = useRef(0);
 
   const fetchOne = useCallback(async () => {
     if (!id) {
+      requestSeqRef.current += 1;
       setSchool(null);
+      setIsLoading(false);
+      setError(null);
       return;
     }
+    const seq = ++requestSeqRef.current;
+    setSchool(null);
     setIsLoading(true);
     setError(null);
     try {
       const { data } = await api.get(`${BASE}/${id}`);
+      if (seq !== requestSeqRef.current) return;
       setSchool(data.data);
     } catch (err) {
+      if (seq !== requestSeqRef.current) return;
       setError(err.response?.data?.message || "Failed to fetch school");
       setSchool(null);
     } finally {
-      setIsLoading(false);
+      if (seq === requestSeqRef.current) setIsLoading(false);
     }
   }, [id]);
+
+  useEffect(() => {
+    fetchOne();
+  }, [fetchOne]);
 
   return { school, isLoading, error, refetch: fetchOne };
 }

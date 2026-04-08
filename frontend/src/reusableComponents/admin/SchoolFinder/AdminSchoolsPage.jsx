@@ -53,22 +53,14 @@ export default function AdminSchoolsPage() {
   const [notification, setNotification] = useState(null);
 
   const { schools, total, isLoading, error, refetch } = useAdminSchoolsList(1, 100);
-  const { school: viewSchool, refetch: refetchView } = useAdminSchool(viewId);
-  const { school: editSchool, refetch: refetchEdit } = useAdminSchool(editId);
+  const { school: viewSchool } = useAdminSchool(viewId);
+  const { school: editSchool, isLoading: isEditSchoolLoading, error: editSchoolError } = useAdminSchool(editId);
   const { patch, isLoading: isPatching } = usePatchAdminSchool();
   const { deleteSchool, isLoading: isDeleting } = useDeleteAdminSchool();
 
   useEffect(() => {
     refetch();
   }, [refetch]);
-
-  useEffect(() => {
-    if (viewId) refetchView();
-  }, [viewId, refetchView]);
-
-  useEffect(() => {
-    if (editId) refetchEdit();
-  }, [editId, refetchEdit]);
 
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
@@ -245,8 +237,34 @@ export default function AdminSchoolsPage() {
         />
       )}
 
-      {editId && editSchool && (
+      {editId && isEditSchoolLoading && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 text-center">
+            <Loader2 className="animate-spin mx-auto mb-4" size={40} style={{ color: primaryColor }} />
+            <p className="text-gray-600">Loading school…</p>
+          </div>
+        </div>
+      )}
+
+      {editId && !isEditSchoolLoading && editSchoolError && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center">
+            <p className="text-gray-800 mb-4">{editSchoolError}</p>
+            <button
+              type="button"
+              onClick={() => setEditId(null)}
+              className="px-6 py-2 rounded-lg font-semibold text-white"
+              style={{ backgroundColor: primaryColor }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {editId && !isEditSchoolLoading && editSchool && editSchool._id === editId && (
         <EditSchoolModal
+          key={editId}
           school={editSchool}
           onClose={() => setEditId(null)}
           onSave={(updates) => handleEditSave(editId, updates)}
@@ -398,9 +416,9 @@ function ViewSchoolModal({ school, isLoading, onClose, primaryColor, lighterPrim
   );
 }
 
-function EditSchoolModal({ school, onClose, onSave, primaryColor, lighterPrimary, isSaving }) {
+function schoolToForm(school) {
   const loc = school?.location?.coordinates;
-  const [form, setForm] = useState(() => ({
+  return {
     schoolName: school?.schoolName ?? "",
     address: school?.address ?? "",
     city: school?.city ?? "",
@@ -420,7 +438,20 @@ function EditSchoolModal({ school, onClose, onSave, primaryColor, lighterPrimary
     videoUrl: school?.videoUrl ?? "",
     latitude: loc && loc[1] != null ? loc[1] : "",
     longitude: loc && loc[0] != null ? loc[0] : "",
-  }));
+  };
+}
+
+function EditSchoolModal({ school, onClose, onSave, primaryColor, lighterPrimary, isSaving }) {
+  const [form, setForm] = useState(() => schoolToForm(school));
+
+  useEffect(() => {
+    setForm(schoolToForm(school));
+  }, [school]);
+
+  const handleClose = () => {
+    setForm(schoolToForm(null));
+    onClose();
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -478,7 +509,7 @@ function EditSchoolModal({ school, onClose, onSave, primaryColor, lighterPrimary
           style={{ background: `linear-gradient(135deg, ${lighterPrimary}, ${primaryColor})` }}
         >
           <h3 className="text-2xl font-bold text-white">Edit School</h3>
-          <button onClick={onClose} className="text-white hover:bg-white/20 rounded-full p-1">
+          <button type="button" onClick={handleClose} className="text-white hover:bg-white/20 rounded-full p-1">
             <X size={24} />
           </button>
         </div>
@@ -512,7 +543,7 @@ function EditSchoolModal({ school, onClose, onSave, primaryColor, lighterPrimary
             </div>
           ))}
           <div className="flex gap-3 pt-4">
-            <button type="button" onClick={onClose} className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50">
+            <button type="button" onClick={handleClose} className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50">
               Cancel
             </button>
             <button
