@@ -9,14 +9,17 @@ export function useAdminSchoolsList(page = 1, limit = 25) {
   const [totalPages, setTotalPages] = useState(1);
   const [resolvedPage, setResolvedPage] = useState(page);
   const [resolvedLimit, setResolvedLimit] = useState(limit);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState(null);
+  const requestSeqRef = useRef(0);
 
   const fetchList = useCallback(async () => {
-    setIsLoading(true);
+    const seq = ++requestSeqRef.current;
+    setIsFetching(true);
     setError(null);
     try {
       const { data } = await api.get(BASE, { params: { page, limit } });
+      if (seq !== requestSeqRef.current) return;
       const t = data.total ?? 0;
       const lim = data.limit ?? limit;
       const tp = data.totalPages ?? Math.max(1, Math.ceil(t / lim));
@@ -26,9 +29,10 @@ export function useAdminSchoolsList(page = 1, limit = 25) {
       setResolvedPage(data.page ?? page);
       setResolvedLimit(lim);
     } catch (err) {
+      if (seq !== requestSeqRef.current) return;
       setError(err.response?.data?.message || "Failed to fetch schools");
     } finally {
-      setIsLoading(false);
+      if (seq === requestSeqRef.current) setIsFetching(false);
     }
   }, [page, limit]);
 
@@ -36,13 +40,16 @@ export function useAdminSchoolsList(page = 1, limit = 25) {
     fetchList();
   }, [fetchList]);
 
+  const isInitialLoading = isFetching && schools.length === 0;
+
   return {
     schools,
     total,
     totalPages,
     page: resolvedPage,
     limit: resolvedLimit,
-    isLoading,
+    isLoading: isInitialLoading,
+    isFetching,
     error,
     refetch: fetchList,
   };

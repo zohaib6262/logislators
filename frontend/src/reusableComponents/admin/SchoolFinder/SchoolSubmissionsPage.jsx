@@ -1,5 +1,5 @@
 import { TokenContext } from "@/store/TokenContextProvider";
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import {
   Search,
   Eye,
@@ -81,6 +81,7 @@ export default function SchoolSubmissionsPage() {
     limit: activeLimit,
     counts,
     isLoading,
+    isFetching,
     error,
     refetch,
   } = useAdminSchoolSubmissionsList({
@@ -89,6 +90,7 @@ export default function SchoolSubmissionsPage() {
     limit: pageSize,
     search: debouncedSearch,
   });
+  const lastResolvedPageRef = useRef(null);
   const { submission: detailSubmission, isLoading: detailLoading } = useAdminSchoolSubmission(detailId);
   const { patch, isLoading: isPatching } = usePatchAdminSchoolSubmission();
   const { approve, isLoading: isApproving } = useApproveAdminSchoolSubmission();
@@ -103,9 +105,11 @@ export default function SchoolSubmissionsPage() {
   }, [statusFilter, debouncedSearch]);
 
   useEffect(() => {
-    if (isLoading || error) return;
+    if (isFetching || error) return;
+    if (lastResolvedPageRef.current === resolvedPage) return;
+    lastResolvedPageRef.current = resolvedPage;
     if (resolvedPage !== page) setPage(resolvedPage);
-  }, [isLoading, error, resolvedPage, page]);
+  }, [isFetching, error, resolvedPage, page]);
 
   useEffect(() => {
     if (page > totalPages && totalPages >= 1) setPage(totalPages);
@@ -165,7 +169,7 @@ export default function SchoolSubmissionsPage() {
     }
   };
 
-  if (isLoading && list.length === 0) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -319,16 +323,7 @@ export default function SchoolSubmissionsPage() {
             </div>
           )}
 
-          <div className="relative max-w-full overflow-x-auto">
-            {isLoading && list.length > 0 && (
-              <div
-                className="absolute inset-0 bg-white/70 flex items-center justify-center z-10 min-h-[200px]"
-                aria-busy="true"
-                aria-label="Loading submissions"
-              >
-                <Loader2 className="animate-spin" size={40} style={{ color: primaryColor }} />
-              </div>
-            )}
+          <div className="relative max-w-full overflow-x-auto" aria-busy={isFetching && list.length > 0}>
             <table className="w-full table-fixed border-collapse text-xs sm:text-sm">
               <thead className="bg-gray-100">
                 <tr>
@@ -360,7 +355,12 @@ export default function SchoolSubmissionsPage() {
                     Submitted
                   </th>
                   <th className="min-w-0 px-1 py-2 text-right font-semibold text-gray-700 align-top w-[27%] sm:w-[23%] md:w-[17%] lg:w-[15%]">
-                    Actions
+                    <span className="inline-flex items-center gap-1.5 justify-end w-full">
+                      Actions
+                      {isFetching && list.length > 0 ? (
+                        <Loader2 className="animate-spin shrink-0 text-gray-500" size={14} aria-hidden />
+                      ) : null}
+                    </span>
                   </th>
                 </tr>
               </thead>
@@ -469,7 +469,7 @@ export default function SchoolSubmissionsPage() {
                 ))}
               </tbody>
             </table>
-            {!isLoading && list.length === 0 && (
+            {!isFetching && list.length === 0 && (
               <div className="text-center py-12 text-gray-500">
                 <Building2 size={48} className="mx-auto mb-3 opacity-30" />
                 <p className="text-lg font-medium">No submissions found</p>
@@ -503,7 +503,7 @@ export default function SchoolSubmissionsPage() {
                 <div className="flex items-center gap-1 flex-wrap justify-center">
                   <button
                     type="button"
-                    disabled={page <= 1 || isLoading}
+                    disabled={page <= 1 || isFetching}
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
@@ -521,8 +521,8 @@ export default function SchoolSubmissionsPage() {
                         <button
                           key={item}
                           type="button"
-                          disabled={isLoading}
-                          onClick={() => setPage(item)}
+                          disabled={isFetching}
+                          onClick={() => setPage(Number(item))}
                           className={`min-w-[2.25rem] px-2 py-2 rounded-lg text-sm font-semibold border transition-colors disabled:opacity-40 ${
                             item === page
                               ? "text-white border-transparent"
@@ -538,7 +538,7 @@ export default function SchoolSubmissionsPage() {
 
                   <button
                     type="button"
-                    disabled={page >= totalPages || isLoading}
+                    disabled={page >= totalPages || isFetching}
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
@@ -570,7 +570,7 @@ export default function SchoolSubmissionsPage() {
                   />
                   <button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isFetching}
                     className="px-4 py-2 rounded-lg text-sm font-semibold text-white disabled:opacity-40"
                     style={{ backgroundColor: primaryColor }}
                   >

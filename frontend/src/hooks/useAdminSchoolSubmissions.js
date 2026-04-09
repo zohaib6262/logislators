@@ -10,11 +10,13 @@ export function useAdminSchoolSubmissionsList({ status = "", page = 1, limit = 2
   const [resolvedPage, setResolvedPage] = useState(page);
   const [resolvedLimit, setResolvedLimit] = useState(limit);
   const [counts, setCounts] = useState({ pending: 0, approved: 0, rejected: 0 });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState(null);
+  const requestSeqRef = useRef(0);
 
   const fetchList = useCallback(async () => {
-    setIsLoading(true);
+    const seq = ++requestSeqRef.current;
+    setIsFetching(true);
     setError(null);
     try {
       const params = { page, limit };
@@ -22,6 +24,7 @@ export function useAdminSchoolSubmissionsList({ status = "", page = 1, limit = 2
       const q = (search || "").trim();
       if (q) params.q = q;
       const { data } = await api.get(BASE, { params });
+      if (seq !== requestSeqRef.current) return;
       const t = data.total ?? 0;
       const lim = data.limit ?? limit;
       setList(data.data || []);
@@ -31,15 +34,18 @@ export function useAdminSchoolSubmissionsList({ status = "", page = 1, limit = 2
       setResolvedLimit(lim);
       setCounts(data.counts || { pending: 0, approved: 0, rejected: 0 });
     } catch (err) {
+      if (seq !== requestSeqRef.current) return;
       setError(err.response?.data?.message || "Failed to fetch submissions");
     } finally {
-      setIsLoading(false);
+      if (seq === requestSeqRef.current) setIsFetching(false);
     }
   }, [status, page, limit, search]);
 
   useEffect(() => {
     fetchList();
   }, [fetchList]);
+
+  const isInitialLoading = isFetching && list.length === 0;
 
   return {
     list,
@@ -48,7 +54,10 @@ export function useAdminSchoolSubmissionsList({ status = "", page = 1, limit = 2
     page: resolvedPage,
     limit: resolvedLimit,
     counts,
-    isLoading,
+    /** True only for the first load when there is no row data yet (full-page spinner). */
+    isLoading: isInitialLoading,
+    /** True while any list request is in flight (pagination, filters, refetch). */
+    isFetching,
     error,
     refetch: fetchList,
   };

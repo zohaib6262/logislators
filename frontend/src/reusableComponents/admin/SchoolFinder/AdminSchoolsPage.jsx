@@ -1,5 +1,5 @@
 import { TokenContext } from "@/store/TokenContextProvider";
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import {
   Building2,
   Loader2,
@@ -65,18 +65,22 @@ export default function AdminSchoolsPage() {
     page: resolvedPage,
     limit: activeLimit,
     isLoading,
+    isFetching,
     error,
     refetch,
   } = useAdminSchoolsList(page, pageSize);
+  const lastResolvedPageRef = useRef(null);
   const { school: viewSchool } = useAdminSchool(viewId);
   const { school: editSchool, isLoading: isEditSchoolLoading, error: editSchoolError } = useAdminSchool(editId);
   const { patch, isLoading: isPatching } = usePatchAdminSchool();
   const { deleteSchool, isLoading: isDeleting } = useDeleteAdminSchool();
 
   useEffect(() => {
-    if (isLoading || error) return;
+    if (isFetching || error) return;
+    if (lastResolvedPageRef.current === resolvedPage) return;
+    lastResolvedPageRef.current = resolvedPage;
     if (resolvedPage !== page) setPage(resolvedPage);
-  }, [isLoading, error, resolvedPage, page]);
+  }, [isFetching, error, resolvedPage, page]);
 
   useEffect(() => {
     if (page > totalPages && totalPages >= 1) setPage(totalPages);
@@ -113,7 +117,7 @@ export default function AdminSchoolsPage() {
     }
   };
 
-  if (isLoading && schools.length === 0) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -212,16 +216,7 @@ export default function AdminSchoolsPage() {
             </div>
           )}
 
-          <div className="relative max-w-full overflow-x-auto">
-            {isLoading && schools.length > 0 && (
-              <div
-                className="absolute inset-0 bg-white/70 flex items-center justify-center z-10 min-h-[200px]"
-                aria-busy="true"
-                aria-label="Loading schools"
-              >
-                <Loader2 className="animate-spin" size={40} style={{ color: primaryColor }} />
-              </div>
-            )}
+          <div className="relative max-w-full overflow-x-auto" aria-busy={isFetching && schools.length > 0}>
             <table className="w-full table-fixed sm:table-auto">
               <thead className="bg-gray-100">
                 <tr>
@@ -249,8 +244,13 @@ export default function AdminSchoolsPage() {
                   <th className="hidden md:table-cell px-2 py-2 lg:px-4 lg:py-3 text-left text-xs sm:text-sm font-semibold text-gray-700">
                     Updated
                   </th>
-                  <th className="px-1 py-2 lg:px-2 lg:py-3 text-right text-xs sm:text-sm font-semibold text-gray-700 w-[1%] align-top sticky right-0 bg-gray-100 z-[1] shadow-[-8px_0_12px_-8px_rgba(0,0,0,0.12)]">
-                    Actions
+                  <th className="min-w-[10rem] px-1 py-2 text-right text-xs sm:text-sm font-semibold text-gray-700 align-middle whitespace-nowrap sticky right-0 bg-gray-100 z-[1] shadow-[-8px_0_12px_-8px_rgba(0,0,0,0.12)]">
+                    <span className="inline-flex items-center gap-1.5 justify-end w-full">
+                      Actions
+                      {isFetching && schools.length > 0 ? (
+                        <Loader2 className="animate-spin shrink-0 text-gray-500" size={14} aria-hidden />
+                      ) : null}
+                    </span>
                   </th>
                 </tr>
               </thead>
@@ -290,34 +290,34 @@ export default function AdminSchoolsPage() {
                     <td className="hidden md:table-cell px-2 py-2 lg:px-4 lg:py-3 text-xs sm:text-sm text-gray-600 align-top whitespace-nowrap">
                       {formatDate(row.updatedAt)}
                     </td>
-                    <td className="px-1 py-2 lg:px-2 lg:py-3 align-top sticky right-0 bg-white z-[1] shadow-[-8px_0_12px_-8px_rgba(0,0,0,0.08)]">
-                      <div className="flex flex-wrap items-center justify-end gap-1 max-w-[9.5rem] sm:max-w-none">
+                    <td className="min-w-[10rem] px-1 py-2 align-middle whitespace-nowrap sticky right-0 bg-white z-[1] shadow-[-8px_0_12px_-8px_rgba(0,0,0,0.08)]">
+                      <div className="flex flex-nowrap items-center justify-end gap-0.5">
                         <button
                           type="button"
                           onClick={() => setViewId(row._id)}
-                          className="inline-flex items-center justify-center p-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                          className="inline-flex shrink-0 items-center justify-center p-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
                           aria-label="View school"
                           title="View"
                         >
-                          <Eye size={18} />
+                          <Eye size={17} />
                         </button>
                         <button
                           type="button"
                           onClick={() => setEditId(row._id)}
-                          className="inline-flex items-center justify-center p-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700"
+                          className="inline-flex shrink-0 items-center justify-center p-1.5 rounded-md bg-orange-600 text-white hover:bg-orange-700"
                           aria-label="Edit school"
                           title="Edit"
                         >
-                          <Edit2 size={18} />
+                          <Edit2 size={17} />
                         </button>
                         <button
                           type="button"
                           onClick={() => setDeleteId(row._id)}
-                          className="inline-flex items-center justify-center p-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                          className="inline-flex shrink-0 items-center justify-center p-1.5 rounded-md bg-red-600 text-white hover:bg-red-700"
                           aria-label="Delete school"
                           title="Delete"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={17} />
                         </button>
                       </div>
                     </td>
@@ -325,7 +325,7 @@ export default function AdminSchoolsPage() {
                 ))}
               </tbody>
             </table>
-            {!isLoading && schools.length === 0 && (
+            {!isFetching && schools.length === 0 && (
               <div className="text-center py-12 text-gray-500">
                 <Building2 size={48} className="mx-auto mb-3 opacity-30" />
                 <p className="text-lg font-medium">No schools found</p>
@@ -358,7 +358,7 @@ export default function AdminSchoolsPage() {
                 <div className="flex items-center gap-1 flex-wrap justify-center">
                   <button
                     type="button"
-                    disabled={page <= 1 || isLoading}
+                    disabled={page <= 1 || isFetching}
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
@@ -376,8 +376,8 @@ export default function AdminSchoolsPage() {
                         <button
                           key={item}
                           type="button"
-                          disabled={isLoading}
-                          onClick={() => setPage(item)}
+                          disabled={isFetching}
+                          onClick={() => setPage(Number(item))}
                           className={`min-w-[2.25rem] px-2 py-2 rounded-lg text-sm font-semibold border transition-colors disabled:opacity-40 ${
                             item === page
                               ? "text-white border-transparent"
@@ -393,7 +393,7 @@ export default function AdminSchoolsPage() {
 
                   <button
                     type="button"
-                    disabled={page >= totalPages || isLoading}
+                    disabled={page >= totalPages || isFetching}
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
@@ -425,7 +425,7 @@ export default function AdminSchoolsPage() {
                   />
                   <button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isFetching}
                     className="px-4 py-2 rounded-lg text-sm font-semibold text-white disabled:opacity-40"
                     style={{ backgroundColor: primaryColor }}
                   >
