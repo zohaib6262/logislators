@@ -3,7 +3,7 @@ import api from "@/services/api";
 
 const BASE = "adminSchoolFinderFeeds/schools";
 
-export function useAdminSchoolsList(page = 1, limit = 25) {
+export function useAdminSchoolsList({ page = 1, limit = 25, search = "" } = {}) {
   const [schools, setSchools] = useState([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -18,7 +18,10 @@ export function useAdminSchoolsList(page = 1, limit = 25) {
     setIsFetching(true);
     setError(null);
     try {
-      const { data } = await api.get(BASE, { params: { page, limit } });
+      const params = { page, limit };
+      const q = (search || "").trim();
+      if (q) params.q = q;
+      const { data } = await api.get(BASE, { params });
       if (seq !== requestSeqRef.current) return;
       const t = data.total ?? 0;
       const lim = data.limit ?? limit;
@@ -34,7 +37,7 @@ export function useAdminSchoolsList(page = 1, limit = 25) {
     } finally {
       if (seq === requestSeqRef.current) setIsFetching(false);
     }
-  }, [page, limit]);
+  }, [page, limit, search]);
 
   useEffect(() => {
     fetchList();

@@ -25,6 +25,10 @@ const router = express.Router();
 
 const SCHOOL_TYPE_ENUM = ["public", "private", "charter", "homeschool", "other"];
 
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function buildLocation(lat, lng, locationBody) {
   if (locationBody && locationBody.type === "Point" && Array.isArray(locationBody.coordinates)) {
     const [lngVal, latVal] = locationBody.coordinates;
@@ -568,11 +572,25 @@ router.get("/schools", async (req, res) => {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limitRaw = parseInt(req.query.limit, 10) || 25;
     const limit = Math.min(100, Math.max(1, limitRaw));
-    const total = await School.countDocuments();
+    const q = (req.query.q || req.query.search || "").toString().trim();
+    const filter =
+      q.length > 0
+        ? {
+            $or: [
+              { schoolName: new RegExp(escapeRegex(q), "i") },
+              { city: new RegExp(escapeRegex(q), "i") },
+              { zip: new RegExp(escapeRegex(q), "i") },
+              { website: new RegExp(escapeRegex(q), "i") },
+              { phone: new RegExp(escapeRegex(q), "i") },
+              { schoolType: new RegExp(escapeRegex(q), "i") },
+            ],
+          }
+        : {};
+    const total = await School.countDocuments(filter);
     const totalPages = Math.max(1, Math.ceil(total / limit));
     const effectivePage = total === 0 ? 1 : Math.min(page, totalPages);
     const skip = (effectivePage - 1) * limit;
-    const schools = await School.find()
+    const schools = await School.find(filter)
       .sort({ createdAt: -1, _id: -1 })
       .skip(skip)
       .limit(limit)

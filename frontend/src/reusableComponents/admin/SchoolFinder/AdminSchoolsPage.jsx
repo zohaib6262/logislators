@@ -11,6 +11,7 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
+  Search,
 } from "lucide-react";
 import {
   useAdminSchoolsList,
@@ -57,6 +58,8 @@ export default function AdminSchoolsPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [jumpInput, setJumpInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const {
     schools,
@@ -68,7 +71,16 @@ export default function AdminSchoolsPage() {
     isFetching,
     error,
     refetch,
-  } = useAdminSchoolsList(page, pageSize);
+  } = useAdminSchoolsList({ page, limit: pageSize, search: debouncedSearch });
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm), 350);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
   const lastResolvedPageRef = useRef(null);
   const { school: viewSchool } = useAdminSchool(viewId);
   const { school: editSchool, isLoading: isEditSchoolLoading, error: editSchoolError } = useAdminSchool(editId);
@@ -183,8 +195,8 @@ export default function AdminSchoolsPage() {
 
       <div className="container mx-auto px-6 py-8">
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <h2 className="text-2xl font-bold text-gray-800">All Schools ({total})</h2>
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-4 sm:px-6 py-4 sm:py-5 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800">All Schools ({total})</h2>
             <label className="flex items-center gap-2 text-sm text-gray-700">
               <span className="font-medium whitespace-nowrap">Rows per page</span>
               <select
@@ -202,8 +214,24 @@ export default function AdminSchoolsPage() {
             </label>
           </div>
 
+          <div className="p-4 sm:p-6 bg-gray-50 border-b">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Search by school name, city, ZIP, website, phone, or school type..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-sm sm:text-base"
+                  style={{ outlineColor: primaryColor }}
+                />
+              </div>
+            </div>
+          </div>
+
           {error && schools.length > 0 && (
-            <div className="mx-6 mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+            <div className="mx-4 sm:mx-6 mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
               <span>{error}</span>
               <button
                 type="button"
