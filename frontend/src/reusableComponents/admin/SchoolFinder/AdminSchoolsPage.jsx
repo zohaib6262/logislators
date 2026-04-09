@@ -9,6 +9,8 @@ import {
   Trash2,
   X,
   ExternalLink,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   useAdminSchoolsList,
@@ -16,6 +18,7 @@ import {
   usePatchAdminSchool,
   useDeleteAdminSchool,
 } from "@/hooks/useAdminSchools";
+import { buildPaginationPages } from "./buildPaginationPages";
 
 const lightenColor = (color, percent) => {
   if (!color) return "#93c5fd";
@@ -51,16 +54,37 @@ export default function AdminSchoolsPage() {
   const [editId, setEditId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [jumpInput, setJumpInput] = useState("");
 
-  const { schools, total, isLoading, error, refetch } = useAdminSchoolsList(1, 100);
+  const {
+    schools,
+    total,
+    totalPages,
+    page: resolvedPage,
+    limit: activeLimit,
+    isLoading,
+    error,
+    refetch,
+  } = useAdminSchoolsList(page, pageSize);
   const { school: viewSchool } = useAdminSchool(viewId);
   const { school: editSchool, isLoading: isEditSchoolLoading, error: editSchoolError } = useAdminSchool(editId);
   const { patch, isLoading: isPatching } = usePatchAdminSchool();
   const { deleteSchool, isLoading: isDeleting } = useDeleteAdminSchool();
 
   useEffect(() => {
-    refetch();
-  }, [refetch]);
+    if (isLoading || error) return;
+    if (resolvedPage !== page) setPage(resolvedPage);
+  }, [isLoading, error, resolvedPage, page]);
+
+  useEffect(() => {
+    if (page > totalPages && totalPages >= 1) setPage(totalPages);
+  }, [totalPages, page]);
+
+  useEffect(() => {
+    setJumpInput(String(page));
+  }, [page]);
 
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
@@ -155,61 +179,145 @@ export default function AdminSchoolsPage() {
 
       <div className="container mx-auto px-6 py-8">
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 border-b">
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <h2 className="text-2xl font-bold text-gray-800">All Schools ({total})</h2>
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <span className="font-medium whitespace-nowrap">Rows per page</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="border border-gray-300 rounded-lg px-3 py-2 bg-white font-medium text-gray-800 min-w-[5rem]"
+              >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+              </select>
+            </label>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          {error && schools.length > 0 && (
+            <div className="mx-6 mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+              <span>{error}</span>
+              <button
+                type="button"
+                onClick={() => refetch()}
+                className="shrink-0 px-4 py-2 rounded-lg font-semibold text-white text-sm"
+                style={{ backgroundColor: primaryColor }}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          <div className="relative max-w-full overflow-x-auto">
+            {isLoading && schools.length > 0 && (
+              <div
+                className="absolute inset-0 bg-white/70 flex items-center justify-center z-10 min-h-[200px]"
+                aria-busy="true"
+                aria-label="Loading schools"
+              >
+                <Loader2 className="animate-spin" size={40} style={{ color: primaryColor }} />
+              </div>
+            )}
+            <table className="w-full table-fixed sm:table-auto">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">School Name</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">City</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">State</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">ZIP</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">School Type</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Website</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Phone</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Updated</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 min-w-[220px]">Actions</th>
+                  <th className="px-2 py-2 lg:px-4 lg:py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 w-[32%] sm:w-auto max-w-[min(280px,40vw)]">
+                    School Name
+                  </th>
+                  <th className="hidden sm:table-cell px-2 py-2 lg:px-4 lg:py-3 text-left text-xs sm:text-sm font-semibold text-gray-700">
+                    City
+                  </th>
+                  <th className="hidden md:table-cell px-2 py-2 lg:px-4 lg:py-3 text-left text-xs sm:text-sm font-semibold text-gray-700">
+                    State
+                  </th>
+                  <th className="hidden md:table-cell px-2 py-2 lg:px-4 lg:py-3 text-left text-xs sm:text-sm font-semibold text-gray-700">
+                    ZIP
+                  </th>
+                  <th className="hidden lg:table-cell px-2 py-2 lg:px-4 lg:py-3 text-left text-xs sm:text-sm font-semibold text-gray-700">
+                    Type
+                  </th>
+                  <th className="hidden lg:table-cell px-2 py-2 lg:px-4 lg:py-3 text-left text-xs sm:text-sm font-semibold text-gray-700">
+                    Website
+                  </th>
+                  <th className="hidden lg:table-cell px-2 py-2 lg:px-4 lg:py-3 text-left text-xs sm:text-sm font-semibold text-gray-700">
+                    Phone
+                  </th>
+                  <th className="hidden md:table-cell px-2 py-2 lg:px-4 lg:py-3 text-left text-xs sm:text-sm font-semibold text-gray-700">
+                    Updated
+                  </th>
+                  <th className="px-1 py-2 lg:px-2 lg:py-3 text-right text-xs sm:text-sm font-semibold text-gray-700 w-[1%] align-top sticky right-0 bg-gray-100 z-[1] shadow-[-8px_0_12px_-8px_rgba(0,0,0,0.12)]">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {schools.map((row) => (
                   <tr key={row._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{row.schoolName || "—"}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.city || "—"}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.state || "—"}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.zip || "—"}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 capitalize">{row.schoolType || "—"}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td
+                      className="px-2 py-2 lg:px-4 lg:py-3 text-xs sm:text-sm font-medium text-gray-900 align-top"
+                      title={row.schoolName || undefined}
+                    >
+                      <span className="line-clamp-2 sm:line-clamp-none break-words">{row.schoolName || "—"}</span>
+                    </td>
+                    <td className="hidden sm:table-cell px-2 py-2 lg:px-4 lg:py-3 text-xs sm:text-sm text-gray-600 align-top">
+                      {row.city || "—"}
+                    </td>
+                    <td className="hidden md:table-cell px-2 py-2 lg:px-4 lg:py-3 text-xs sm:text-sm text-gray-600 align-top">
+                      {row.state || "—"}
+                    </td>
+                    <td className="hidden md:table-cell px-2 py-2 lg:px-4 lg:py-3 text-xs sm:text-sm text-gray-600 align-top">
+                      {row.zip || "—"}
+                    </td>
+                    <td className="hidden lg:table-cell px-2 py-2 lg:px-4 lg:py-3 text-xs sm:text-sm text-gray-600 capitalize align-top">
+                      {row.schoolType || "—"}
+                    </td>
+                    <td className="hidden lg:table-cell px-2 py-2 lg:px-4 lg:py-3 text-xs sm:text-sm text-gray-600 align-top">
                       {row.website ? (
                         <a href={row.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                           Link
                         </a>
-                      ) : "—"}
+                      ) : (
+                        "—"
+                      )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.phone || "—"}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{formatDate(row.updatedAt)}</td>
-                    <td className="px-6 py-4 min-w-[220px]">
-                      <div className="flex items-center gap-2 flex-nowrap">
+                    <td className="hidden lg:table-cell px-2 py-2 lg:px-4 lg:py-3 text-xs sm:text-sm text-gray-600 align-top break-all">
+                      {row.phone || "—"}
+                    </td>
+                    <td className="hidden md:table-cell px-2 py-2 lg:px-4 lg:py-3 text-xs sm:text-sm text-gray-600 align-top whitespace-nowrap">
+                      {formatDate(row.updatedAt)}
+                    </td>
+                    <td className="px-1 py-2 lg:px-2 lg:py-3 align-top sticky right-0 bg-white z-[1] shadow-[-8px_0_12px_-8px_rgba(0,0,0,0.08)]">
+                      <div className="flex flex-wrap items-center justify-end gap-1 max-w-[9.5rem] sm:max-w-none">
                         <button
+                          type="button"
                           onClick={() => setViewId(row._id)}
-                          className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap border border-gray-300 text-gray-700 hover:bg-gray-50"
+                          className="inline-flex items-center justify-center p-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                          aria-label="View school"
+                          title="View"
                         >
-                          <Eye size={16} /> View
+                          <Eye size={18} />
                         </button>
                         <button
+                          type="button"
                           onClick={() => setEditId(row._id)}
-                          className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-orange-600 text-white hover:bg-orange-700"
+                          className="inline-flex items-center justify-center p-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700"
+                          aria-label="Edit school"
+                          title="Edit"
                         >
-                          <Edit2 size={16} /> Edit
+                          <Edit2 size={18} />
                         </button>
                         <button
+                          type="button"
                           onClick={() => setDeleteId(row._id)}
-                          className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-red-600 text-white hover:bg-red-700"
+                          className="inline-flex items-center justify-center p-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                          aria-label="Delete school"
+                          title="Delete"
                         >
-                          <Trash2 size={16} /> Delete
+                          <Trash2 size={18} />
                         </button>
                       </div>
                     </td>
@@ -217,13 +325,116 @@ export default function AdminSchoolsPage() {
                 ))}
               </tbody>
             </table>
-            {schools.length === 0 && (
+            {!isLoading && schools.length === 0 && (
               <div className="text-center py-12 text-gray-500">
                 <Building2 size={48} className="mx-auto mb-3 opacity-30" />
                 <p className="text-lg font-medium">No schools found</p>
               </div>
             )}
           </div>
+
+          {total > 0 && (
+            <div className="border-t border-gray-200 px-4 sm:px-6 py-4 flex flex-col gap-4">
+              <div className="text-sm text-gray-600 text-center sm:text-left">
+                {(() => {
+                  const start = (page - 1) * activeLimit + 1;
+                  const end = Math.min(page * activeLimit, total);
+                  return (
+                    <>
+                      Showing <span className="font-semibold text-gray-800">{start}</span>–
+                      <span className="font-semibold text-gray-800">{end}</span> of{" "}
+                      <span className="font-semibold text-gray-800">{total}</span>
+                      <span className="hidden sm:inline">
+                        {" "}
+                        · Page <span className="font-semibold text-gray-800">{page}</span> of{" "}
+                        <span className="font-semibold text-gray-800">{totalPages}</span>
+                      </span>
+                    </>
+                  );
+                })()}
+              </div>
+
+              <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-between gap-3">
+                <div className="flex items-center gap-1 flex-wrap justify-center">
+                  <button
+                    type="button"
+                    disabled={page <= 1 || isLoading}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft size={18} />
+                    Previous
+                  </button>
+
+                  <div className="flex items-center gap-1 flex-wrap justify-center px-1">
+                    {buildPaginationPages(page, totalPages).map((item, idx) =>
+                      item === "ellipsis" ? (
+                        <span key={`e-${idx}`} className="px-2 text-gray-400 select-none">
+                          …
+                        </span>
+                      ) : (
+                        <button
+                          key={item}
+                          type="button"
+                          disabled={isLoading}
+                          onClick={() => setPage(item)}
+                          className={`min-w-[2.25rem] px-2 py-2 rounded-lg text-sm font-semibold border transition-colors disabled:opacity-40 ${
+                            item === page
+                              ? "text-white border-transparent"
+                              : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                          }`}
+                          style={item === page ? { backgroundColor: primaryColor } : undefined}
+                        >
+                          {item}
+                        </button>
+                      ),
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={page >= totalPages || isLoading}
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Next
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+
+                <form
+                  className="flex items-center gap-2 justify-center"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const n = parseInt(jumpInput, 10);
+                    if (Number.isFinite(n) && n >= 1) setPage(Math.min(totalPages, n));
+                    else setJumpInput(String(page));
+                  }}
+                >
+                  <label htmlFor="admin-schools-jump-page" className="text-sm text-gray-700 whitespace-nowrap">
+                    Go to page
+                  </label>
+                  <input
+                    id="admin-schools-jump-page"
+                    type="number"
+                    min={1}
+                    max={totalPages}
+                    value={jumpInput}
+                    onChange={(e) => setJumpInput(e.target.value)}
+                    className="w-16 border border-gray-300 rounded-lg px-2 py-2 text-sm text-center font-medium text-gray-800"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="px-4 py-2 rounded-lg text-sm font-semibold text-white disabled:opacity-40"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    Go
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

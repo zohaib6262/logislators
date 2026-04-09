@@ -3,9 +3,12 @@ import api from "@/services/api";
 
 const BASE = "adminSchoolFinderFeeds/schools";
 
-export function useAdminSchoolsList(page = 1, limit = 20) {
+export function useAdminSchoolsList(page = 1, limit = 25) {
   const [schools, setSchools] = useState([]);
   const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [resolvedPage, setResolvedPage] = useState(page);
+  const [resolvedLimit, setResolvedLimit] = useState(limit);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -14,8 +17,14 @@ export function useAdminSchoolsList(page = 1, limit = 20) {
     setError(null);
     try {
       const { data } = await api.get(BASE, { params: { page, limit } });
+      const t = data.total ?? 0;
+      const lim = data.limit ?? limit;
+      const tp = data.totalPages ?? Math.max(1, Math.ceil(t / lim));
       setSchools(data.data || []);
-      setTotal(data.total ?? 0);
+      setTotal(t);
+      setTotalPages(tp);
+      setResolvedPage(data.page ?? page);
+      setResolvedLimit(lim);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch schools");
     } finally {
@@ -23,7 +32,20 @@ export function useAdminSchoolsList(page = 1, limit = 20) {
     }
   }, [page, limit]);
 
-  return { schools, total, isLoading, error, refetch: fetchList };
+  useEffect(() => {
+    fetchList();
+  }, [fetchList]);
+
+  return {
+    schools,
+    total,
+    totalPages,
+    page: resolvedPage,
+    limit: resolvedLimit,
+    isLoading,
+    error,
+    refetch: fetchList,
+  };
 }
 
 export function useAdminSchool(id) {

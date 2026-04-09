@@ -566,13 +566,25 @@ router.post("/schools", async (req, res) => {
 router.get("/schools", async (req, res) => {
   try {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
-    const skip = (page - 1) * limit;
-    const [schools, total] = await Promise.all([
-      School.find().sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
-      School.countDocuments(),
-    ]);
-    res.json({ success: true, data: schools, total, page, limit });
+    const limitRaw = parseInt(req.query.limit, 10) || 25;
+    const limit = Math.min(100, Math.max(1, limitRaw));
+    const total = await School.countDocuments();
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const effectivePage = total === 0 ? 1 : Math.min(page, totalPages);
+    const skip = (effectivePage - 1) * limit;
+    const schools = await School.find()
+      .sort({ createdAt: -1, _id: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    res.json({
+      success: true,
+      data: schools,
+      total,
+      page: effectivePage,
+      limit,
+      totalPages,
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message || "Error fetching schools" });
   }

@@ -11,21 +11,70 @@ const router = express.Router();
 router.use(protect);
 router.use(adminOnly);
 
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 /**
  * GET /api/adminSchoolSubmissions
- * Query: status (optional) - filter by pending|approved|rejected
+ * Query:
+ *   - status (optional): pending|approved|rejected
+ *   - page, limit (pagination)
+ *   - q or search (optional): case-insensitive match on schoolName, contactName, contactEmail, city
  */
 router.get("/", async (req, res) => {
   try {
     const status = (req.query.status || "").toString().trim().toLowerCase();
-    const filter = {};
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limitRaw = parseInt(req.query.limit, 10) || 25;
+    const limit = Math.min(100, Math.max(1, limitRaw));
+    const q = (req.query.q || req.query.search || "").toString().trim();
+
+    const statusFilter = {};
     if (status && ["pending", "approved", "rejected"].includes(status)) {
-      filter.status = status;
+      statusFilter.status = status;
     }
-    const list = await SchoolSubmission.find(filter)
-      .sort({ createdAt: -1 })
+
+    const searchFilter =
+      q.length > 0
+        ? {
+            $or: [
+              { schoolName: new RegExp(escapeRegex(q), "i") },
+              { contactName: new RegExp(escapeRegex(q), "i") },
+              { contactEmail: new RegExp(escapeRegex(q), "i") },
+              { city: new RegExp(escapeRegex(q), "i") },
+            ],
+          }
+        : {};
+
+    const listFilter = { ...statusFilter, ...searchFilter };
+
+    const [pendingCount, approvedCount, rejectedCount, total] = await Promise.all([
+      SchoolSubmission.countDocuments({ status: "pending" }),
+      SchoolSubmission.countDocuments({ status: "approved" }),
+      SchoolSubmission.countDocuments({ status: "rejected" }),
+      SchoolSubmission.countDocuments(listFilter),
+    ]);
+
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const effectivePage = total === 0 ? 1 : Math.min(page, totalPages);
+    const skip = (effectivePage - 1) * limit;
+
+    const list = await SchoolSubmission.find(listFilter)
+      .sort({ createdAt: -1, _id: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
-    res.json({ success: true, data: list });
+
+    res.json({
+      success: true,
+      data: list,
+      total,
+      page: effectivePage,
+      limit,
+      totalPages,
+      counts: { pending: pendingCount, approved: approvedCount, rejected: rejectedCount },
+    });
   } catch (err) {
     console.error("adminSchoolSubmissions list error:", err);
     res.status(500).json({ success: false, message: err.message || "Server error." });

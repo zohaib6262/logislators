@@ -12,6 +12,8 @@ import {
   X,
   ExternalLink,
   FileText,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   useAdminSchoolSubmissionsList,
@@ -19,6 +21,7 @@ import {
   usePatchAdminSchoolSubmission,
   useApproveAdminSchoolSubmission,
 } from "@/hooks/useAdminSchoolSubmissions";
+import { buildPaginationPages } from "./buildPaginationPages";
 
 const lightenColor = (color, percent) => {
   if (!color) return "#93c5fd";
@@ -59,51 +62,67 @@ export default function SchoolSubmissionsPage() {
 
   const [statusFilter, setStatusFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [jumpInput, setJumpInput] = useState("");
   const [detailId, setDetailId] = useState(null);
   const [editId, setEditId] = useState(null);
+  const [editInitialSnapshot, setEditInitialSnapshot] = useState(null);
   const [rejectId, setRejectId] = useState(null);
   const [rejectNotes, setRejectNotes] = useState("");
   const [notification, setNotification] = useState(null);
 
-  const { list, isLoading, error, refetch } =
-    useAdminSchoolSubmissionsList(statusFilter);
-  const { submission: detailSubmission, refetch: refetchDetail } =
-    useAdminSchoolSubmission(detailId);
+  const {
+    list,
+    total,
+    totalPages,
+    page: resolvedPage,
+    limit: activeLimit,
+    counts,
+    isLoading,
+    error,
+    refetch,
+  } = useAdminSchoolSubmissionsList({
+    status: statusFilter,
+    page,
+    limit: pageSize,
+    search: debouncedSearch,
+  });
+  const { submission: detailSubmission, isLoading: detailLoading } = useAdminSchoolSubmission(detailId);
   const { patch, isLoading: isPatching } = usePatchAdminSchoolSubmission();
-  const { approve, isLoading: isApproving } =
-    useApproveAdminSchoolSubmission();
+  const { approve, isLoading: isApproving } = useApproveAdminSchoolSubmission();
 
   useEffect(() => {
-    refetch();
-  }, [refetch]);
+    const t = setTimeout(() => setDebouncedSearch(searchTerm), 350);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   useEffect(() => {
-    if (detailId) refetchDetail();
-  }, [detailId, refetchDetail]);
+    setPage(1);
+  }, [statusFilter, debouncedSearch]);
+
+  useEffect(() => {
+    if (isLoading || error) return;
+    if (resolvedPage !== page) setPage(resolvedPage);
+  }, [isLoading, error, resolvedPage, page]);
+
+  useEffect(() => {
+    if (page > totalPages && totalPages >= 1) setPage(totalPages);
+  }, [totalPages, page]);
+
+  useEffect(() => {
+    setJumpInput(String(page));
+  }, [page]);
 
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);
   };
 
-  const filteredList = list.filter((item) => {
-    const term = (searchTerm || "").toLowerCase().trim();
-    if (!term) return true;
-    const school = (item.schoolName || "").toLowerCase();
-    const contact = (item.contactName || "").toLowerCase();
-    const email = (item.contactEmail || "").toLowerCase();
-    const city = (item.city || "").toLowerCase();
-    return (
-      school.includes(term) ||
-      contact.includes(term) ||
-      email.includes(term) ||
-      city.includes(term)
-    );
-  });
-
-  const pendingCount = list.filter((s) => s.status === "pending").length;
-  const approvedCount = list.filter((s) => s.status === "approved").length;
-  const rejectedCount = list.filter((s) => s.status === "rejected").length;
+  const pendingCount = counts.pending;
+  const approvedCount = counts.approved;
+  const rejectedCount = counts.rejected;
 
   const handleApprove = async (id) => {
     try {
@@ -138,9 +157,9 @@ export default function SchoolSubmissionsPage() {
       await patch(id, updates);
       showNotification("Submission updated.");
       setEditId(null);
+      setEditInitialSnapshot(null);
       setDetailId(null);
       refetch();
-      if (detailId === id) refetchDetail();
     } catch {
       showNotification("Failed to update submission.", "error");
     }
@@ -239,11 +258,26 @@ export default function SchoolSubmissionsPage() {
         </div>
 
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 border-b">
-            <h2 className="text-2xl font-bold text-gray-800">All Submissions</h2>
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-4 sm:px-6 py-4 sm:py-5 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800">All Submissions ({total})</h2>
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <span className="font-medium whitespace-nowrap">Rows per page</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="border border-gray-300 rounded-lg px-3 py-2 bg-white font-medium text-gray-800 min-w-[5rem]"
+              >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+              </select>
+            </label>
           </div>
 
-          <div className="p-6 bg-gray-50 border-b">
+          <div className="p-4 sm:p-6 bg-gray-50 border-b">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -252,14 +286,14 @@ export default function SchoolSubmissionsPage() {
                   placeholder="Search by school, contact, email, or city..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-sm sm:text-base"
                   style={{ outlineColor: primaryColor }}
                 />
               </div>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full md:w-auto px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 bg-white cursor-pointer"
+                className="w-full md:w-auto px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 bg-white cursor-pointer text-sm sm:text-base"
                 style={{ outlineColor: primaryColor }}
               >
                 {STATUS_OPTIONS.map((o) => (
@@ -271,77 +305,161 @@ export default function SchoolSubmissionsPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          {error && list.length > 0 && (
+            <div className="mx-4 sm:mx-6 mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+              <span>{error}</span>
+              <button
+                type="button"
+                onClick={() => refetch()}
+                className="shrink-0 px-4 py-2 rounded-lg font-semibold text-white text-sm"
+                style={{ backgroundColor: primaryColor }}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          <div className="relative max-w-full overflow-x-auto">
+            {isLoading && list.length > 0 && (
+              <div
+                className="absolute inset-0 bg-white/70 flex items-center justify-center z-10 min-h-[200px]"
+                aria-busy="true"
+                aria-label="Loading submissions"
+              >
+                <Loader2 className="animate-spin" size={40} style={{ color: primaryColor }} />
+              </div>
+            )}
+            <table className="w-full table-fixed border-collapse text-xs sm:text-sm">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">School Name</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Contact</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Contact Email</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">City</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">State</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">ZIP</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">School Type</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Submitted</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 min-w-[260px]">Actions</th>
+                  <th className="min-w-0 px-2 py-2 text-left font-semibold text-gray-700 w-[55%] sm:w-[30%] md:w-[26%] lg:w-[19%]">
+                    School Name
+                  </th>
+                  <th className="hidden sm:table-cell min-w-0 px-2 py-2 text-left font-semibold text-gray-700 sm:w-[17%] md:w-[13%] lg:w-[11%]">
+                    Contact
+                  </th>
+                  <th className="hidden lg:table-cell min-w-0 px-2 py-2 text-left font-semibold text-gray-700 lg:w-[13%]">
+                    Email
+                  </th>
+                  <th className="hidden sm:table-cell min-w-0 px-2 py-2 text-left font-semibold text-gray-700 sm:w-[16%] md:w-[12%] lg:w-[8%]">
+                    City
+                  </th>
+                  <th className="hidden md:table-cell min-w-0 px-1.5 py-2 text-left font-semibold text-gray-700 md:w-[5%] lg:w-[4%]">
+                    State
+                  </th>
+                  <th className="hidden lg:table-cell min-w-0 px-1.5 py-2 text-left font-semibold text-gray-700 lg:w-[5%]">
+                    ZIP
+                  </th>
+                  <th className="hidden lg:table-cell min-w-0 px-1.5 py-2 text-left font-semibold text-gray-700 lg:w-[6%]">
+                    Type
+                  </th>
+                  <th className="min-w-0 px-1.5 py-2 text-left font-semibold text-gray-700 w-[18%] sm:w-[14%] md:w-[10%] lg:w-[7%]">
+                    Status
+                  </th>
+                  <th className="hidden md:table-cell min-w-0 px-1.5 py-2 text-left font-semibold text-gray-700 md:w-[17%] lg:w-[12%]">
+                    Submitted
+                  </th>
+                  <th className="min-w-0 px-1 py-2 text-right font-semibold text-gray-700 align-top w-[27%] sm:w-[23%] md:w-[17%] lg:w-[15%]">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {filteredList.map((row) => (
+                {list.map((row) => (
                   <tr key={row._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{row.schoolName || "—"}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.contactName || "—"}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.contactEmail || "—"}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.city || "—"}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.state || "—"}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.zipCode || "—"}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 capitalize">{row.schoolType || "—"}</td>
-                    <td className="px-6 py-4">
+                    <td className="min-w-0 px-2 py-2 font-medium text-gray-900 align-middle" title={row.schoolName || undefined}>
+                      <span className="line-clamp-2 sm:truncate sm:whitespace-nowrap sm:block">{row.schoolName || "—"}</span>
+                    </td>
+                    <td
+                      className="hidden sm:table-cell min-w-0 px-2 py-2 text-gray-600 align-middle truncate"
+                      title={row.contactName || undefined}
+                    >
+                      {row.contactName || "—"}
+                    </td>
+                    <td
+                      className="hidden lg:table-cell min-w-0 px-2 py-2 text-gray-600 align-middle truncate"
+                      title={row.contactEmail || undefined}
+                    >
+                      {row.contactEmail || "—"}
+                    </td>
+                    <td
+                      className="hidden sm:table-cell min-w-0 px-2 py-2 text-gray-600 align-middle truncate"
+                      title={row.city || undefined}
+                    >
+                      {row.city || "—"}
+                    </td>
+                    <td className="hidden md:table-cell min-w-0 px-1.5 py-2 text-gray-600 align-middle text-center sm:text-left">
+                      {row.state || "—"}
+                    </td>
+                    <td className="hidden lg:table-cell min-w-0 px-1.5 py-2 text-gray-600 align-middle tabular-nums">
+                      {row.zipCode || "—"}
+                    </td>
+                    <td className="hidden lg:table-cell min-w-0 px-1.5 py-2 text-gray-600 capitalize align-middle truncate" title={row.schoolType || undefined}>
+                      {row.schoolType || "—"}
+                    </td>
+                    <td className="min-w-0 px-1.5 py-2 align-middle">
                       <span
-                        className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                        className={`inline-flex max-w-full px-1.5 py-0.5 text-[10px] sm:text-[11px] font-semibold rounded-full truncate ${
                           row.status === "approved"
                             ? "bg-green-100 text-green-700"
                             : row.status === "rejected"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-yellow-100 text-yellow-700"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-yellow-100 text-yellow-700"
                         }`}
                       >
                         {row.status || "pending"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{formatDate(row.createdAt)}</td>
-                    <td className="px-6 py-4 min-w-[260px]">
-                      <div className="flex items-center gap-2 flex-nowrap">
+                    <td className="hidden md:table-cell min-w-0 px-1.5 py-2 text-gray-600 align-middle text-[11px] sm:text-xs leading-tight whitespace-nowrap">
+                      {formatDate(row.createdAt)}
+                    </td>
+                    <td className="min-w-0 px-1 py-2 align-middle">
+                      <div className="flex flex-wrap items-center justify-end gap-0.5">
                         <button
+                          type="button"
                           onClick={() => setDetailId(row._id)}
-                          className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap border border-gray-300 text-gray-700 hover:bg-gray-50"
+                          className="inline-flex shrink-0 items-center justify-center p-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
+                          aria-label="View submission"
                           title="View"
                         >
-                          <Eye size={16} /> View
+                          <Eye size={17} />
                         </button>
                         {row.status === "pending" && (
                           <>
                             <button
-                              onClick={() => setEditId(row._id)}
-                              className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-orange-600 text-white hover:bg-orange-700"
+                              type="button"
+                              onClick={() => {
+                                setEditInitialSnapshot(null);
+                                setEditId(row._id);
+                              }}
+                              className="inline-flex shrink-0 items-center justify-center p-1.5 rounded-md bg-orange-600 text-white hover:bg-orange-700"
+                              aria-label="Edit submission"
                               title="Edit"
                             >
-                              <Edit2 size={16} /> Edit
+                              <Edit2 size={17} />
                             </button>
                             <button
+                              type="button"
                               onClick={() => handleApprove(row._id)}
                               disabled={isApproving}
-                              className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                              className="inline-flex shrink-0 items-center justify-center p-1.5 rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                              aria-label="Approve submission"
+                              title="Approve"
                             >
-                              {isApproving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />} Approve
+                              {isApproving ? <Loader2 size={17} className="animate-spin" /> : <CheckCircle size={17} />}
                             </button>
                             <button
-                              onClick={() => { setRejectId(row._id); setRejectNotes(row.adminNotes || ""); }}
+                              type="button"
+                              onClick={() => {
+                                setRejectId(row._id);
+                                setRejectNotes(row.adminNotes || "");
+                              }}
                               disabled={isPatching}
-                              className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+                              className="inline-flex shrink-0 items-center justify-center p-1.5 rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+                              aria-label="Reject submission"
+                              title="Reject"
                             >
-                              <XCircle size={16} /> Reject
+                              <XCircle size={17} />
                             </button>
                           </>
                         )}
@@ -351,7 +469,7 @@ export default function SchoolSubmissionsPage() {
                 ))}
               </tbody>
             </table>
-            {filteredList.length === 0 && (
+            {!isLoading && list.length === 0 && (
               <div className="text-center py-12 text-gray-500">
                 <Building2 size={48} className="mx-auto mb-3 opacity-30" />
                 <p className="text-lg font-medium">No submissions found</p>
@@ -359,6 +477,109 @@ export default function SchoolSubmissionsPage() {
               </div>
             )}
           </div>
+
+          {total > 0 && (
+            <div className="border-t border-gray-200 px-4 sm:px-6 py-4 flex flex-col gap-4">
+              <div className="text-sm text-gray-600 text-center sm:text-left">
+                {(() => {
+                  const start = (page - 1) * activeLimit + 1;
+                  const end = Math.min(page * activeLimit, total);
+                  return (
+                    <>
+                      Showing <span className="font-semibold text-gray-800">{start}</span>–
+                      <span className="font-semibold text-gray-800">{end}</span> of{" "}
+                      <span className="font-semibold text-gray-800">{total}</span>
+                      <span className="hidden sm:inline">
+                        {" "}
+                        · Page <span className="font-semibold text-gray-800">{page}</span> of{" "}
+                        <span className="font-semibold text-gray-800">{totalPages}</span>
+                      </span>
+                    </>
+                  );
+                })()}
+              </div>
+
+              <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-between gap-3">
+                <div className="flex items-center gap-1 flex-wrap justify-center">
+                  <button
+                    type="button"
+                    disabled={page <= 1 || isLoading}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft size={18} />
+                    Previous
+                  </button>
+
+                  <div className="flex items-center gap-1 flex-wrap justify-center px-1">
+                    {buildPaginationPages(page, totalPages).map((item, idx) =>
+                      item === "ellipsis" ? (
+                        <span key={`e-${idx}`} className="px-2 text-gray-400 select-none">
+                          …
+                        </span>
+                      ) : (
+                        <button
+                          key={item}
+                          type="button"
+                          disabled={isLoading}
+                          onClick={() => setPage(item)}
+                          className={`min-w-[2.25rem] px-2 py-2 rounded-lg text-sm font-semibold border transition-colors disabled:opacity-40 ${
+                            item === page
+                              ? "text-white border-transparent"
+                              : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                          }`}
+                          style={item === page ? { backgroundColor: primaryColor } : undefined}
+                        >
+                          {item}
+                        </button>
+                      ),
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={page >= totalPages || isLoading}
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Next
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+
+                <form
+                  className="flex items-center gap-2 justify-center"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const n = parseInt(jumpInput, 10);
+                    if (Number.isFinite(n) && n >= 1) setPage(Math.min(totalPages, n));
+                    else setJumpInput(String(page));
+                  }}
+                >
+                  <label htmlFor="admin-submissions-jump-page" className="text-sm text-gray-700 whitespace-nowrap">
+                    Go to page
+                  </label>
+                  <input
+                    id="admin-submissions-jump-page"
+                    type="number"
+                    min={1}
+                    max={totalPages}
+                    value={jumpInput}
+                    onChange={(e) => setJumpInput(e.target.value)}
+                    className="w-16 border border-gray-300 rounded-lg px-2 py-2 text-sm text-center font-medium text-gray-800"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="px-4 py-2 rounded-lg text-sm font-semibold text-white disabled:opacity-40"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    Go
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -366,13 +587,21 @@ export default function SchoolSubmissionsPage() {
       {detailId && (
         <DetailDrawer
           submission={detailSubmission}
-          isLoading={detailId && !detailSubmission && !error}
+          isLoading={!!detailId && detailLoading}
           onClose={() => setDetailId(null)}
           primaryColor={primaryColor}
           lighterPrimary={lighterPrimary}
-          onEdit={() => { setEditId(detailId); setDetailId(null); }}
+          onEdit={() => {
+            setEditInitialSnapshot(detailSubmission);
+            setEditId(detailId);
+            setDetailId(null);
+          }}
           onApprove={() => handleApprove(detailId)}
-          onReject={() => { setRejectId(detailId); setRejectNotes(detailSubmission?.adminNotes || ""); setDetailId(null); }}
+          onReject={() => {
+            setRejectId(detailId);
+            setRejectNotes(detailSubmission?.adminNotes || "");
+            setDetailId(null);
+          }}
           isApproving={isApproving}
         />
       )}
@@ -380,9 +609,13 @@ export default function SchoolSubmissionsPage() {
       {/* Edit modal */}
       {editId && (
         <EditSubmissionModal
+          key={editId}
           submissionId={editId}
-          initialData={list.find((s) => s._id === editId) || detailSubmission}
-          onClose={() => setEditId(null)}
+          initialData={list.find((s) => s._id === editId) || editInitialSnapshot}
+          onClose={() => {
+            setEditId(null);
+            setEditInitialSnapshot(null);
+          }}
           onSave={handleEditSave}
           primaryColor={primaryColor}
           lighterPrimary={lighterPrimary}
