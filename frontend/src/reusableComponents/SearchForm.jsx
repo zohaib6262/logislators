@@ -16,6 +16,17 @@ const SearchForm = ({ onSearch, isLoading, homeData }) => {
     zipcode: "",
   });
   const [localError, setLocalError] = useState(null);
+  const [formStartTracked, setFormStartTracked] = useState(false);
+
+  const handleFieldFocus = () => {
+    if (!formStartTracked) {
+      setFormStartTracked(true);
+      if (typeof window.fbq === "function") {
+        window.fbq("trackCustom", "FillOutForm");
+      }
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -35,6 +46,9 @@ const SearchForm = ({ onSearch, isLoading, homeData }) => {
       return;
     }
 
+    if (typeof window.fbq === "function") {
+      window.fbq("track", "Lead");
+    }
     onSearch(formData);
   };
 
@@ -85,6 +99,7 @@ const SearchForm = ({ onSearch, isLoading, homeData }) => {
                     placeholder="John"
                     value={formData.firstName}
                     onChange={handleChange}
+                    onFocus={handleFieldFocus}
                     className="w-full"
                   />
                 </div>
@@ -96,6 +111,7 @@ const SearchForm = ({ onSearch, isLoading, homeData }) => {
                     placeholder="Doe"
                     value={formData.lastName}
                     onChange={handleChange}
+                    onFocus={handleFieldFocus}
                     className="w-full"
                   />
                 </div>
@@ -111,6 +127,7 @@ const SearchForm = ({ onSearch, isLoading, homeData }) => {
                     placeholder="your@email.com"
                     value={formData.email}
                     onChange={handleChange}
+                    onFocus={handleFieldFocus}
                     className="w-full"
                   />
                 </div>
@@ -124,6 +141,7 @@ const SearchForm = ({ onSearch, isLoading, homeData }) => {
                       placeholder="ZIP Code"
                       value={formData.zipcode}
                       onChange={handleChange}
+                      onFocus={handleFieldFocus}
                       className="w-full"
                     />
                   </div>
@@ -141,6 +159,7 @@ const SearchForm = ({ onSearch, isLoading, homeData }) => {
                     }
                     value={formData.street}
                     onChange={handleChange}
+                    onFocus={handleFieldFocus}
                     className="w-full"
                   />
                 </div>
@@ -157,6 +176,7 @@ const SearchForm = ({ onSearch, isLoading, homeData }) => {
                       }
                       value={formData.city}
                       onChange={handleChange}
+                      onFocus={handleFieldFocus}
                       className="w-full"
                     />
                   </div>

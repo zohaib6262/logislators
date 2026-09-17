@@ -58,6 +58,7 @@ export const SearchRepresentative = () => {
   } = useLegislators();
 
   const sliderRef = useRef(null);
+  const hasSubmittedContactRef = useRef(false);
   useEffect(() => {
     if (street && city && zipCode) {
       searchByAddress(fullAddress);
@@ -77,15 +78,23 @@ export const SearchRepresentative = () => {
           rep.current_role.title?.toLowerCase().includes("assembly member") &&
           rep.jurisdiction?.classification === "state"
       );
+      const assemblyDistrictValue = assemblyMember?.current_role?.district || "";
+      const stateDistrictValue = senator?.current_role?.district || "";
       if (assemblyMember) {
-        setAssemblyDistrict(assemblyMember?.current_role?.district || "");
+        setAssemblyDistrict(assemblyDistrictValue);
       }
       if (senator) {
-        setStateDistrict(senator?.current_role?.district || "");
+        setStateDistrict(stateDistrictValue);
       }
-      // Submit user info if available
-      if (userInfo) {
-        submitUserContact(userInfo);
+      // Submit user info if available — guarded so this only fires once per
+      // page load (this effect can otherwise re-run once the district state
+      // above updates, which used to send a second, duplicate submission).
+      if (userInfo && !hasSubmittedContactRef.current) {
+        hasSubmittedContactRef.current = true;
+        submitUserContact(userInfo, {
+          assemblyDistrict: assemblyDistrictValue,
+          stateDistrict: stateDistrictValue,
+        });
       }
       const senators = representatives.filter((rep) => rep.id !== senator?.id);
       const senator2 = senators.find((rep) =>

@@ -8,11 +8,12 @@ const useUserContactSubmit = () => {
   const [stateDistrict, setStateDistrict] = useState("");
 
   const submitUserContact = useCallback(
-    async (formData) => {
+    async (formData, districtOverrides = {}) => {
       const obj = {
         ...formData,
-        assemblyDistrict: assemblyDistrict && assemblyDistrict,
-        stateDistrict: stateDistrict && stateDistrict,
+        assemblyDistrict:
+          districtOverrides.assemblyDistrict ?? assemblyDistrict ?? "",
+        stateDistrict: districtOverrides.stateDistrict ?? stateDistrict ?? "",
       };
       try {
         setIsLoading(true);

@@ -14,33 +14,30 @@ router.post("/", async (req, res) => {
     const userData = req.body;
     console.log("Received user data:", userData);
 
-    // Check if email exists in MongoDB
-    const existingUser = await UserContact.findOne({ email: userData.email });
-    if (existingUser) {
-      console.log("User exists, updating record");
-      await UserContact.updateOne({ email: userData.email }, userData);
-      const keapResult = await addToKeapCRM(userData);
-      return res.status(200).json({
-        success: true,
-        message: "User data updated successfully",
-        user: userData,
-        keapResult,
-      });
-    }
+    // Atomic upsert — avoids a find-then-write race where two near-simultaneous
+    // submissions for the same email (the frontend can fire twice) both see
+    // "no existing user" and both try to insert, crashing one of them on the
+    // unique email index before it ever reaches the CRM sync below.
+    // `new: false` returns the pre-update doc (null if this was an insert),
+    // which is what reliably tells us new vs. existing here.
+    const previousDoc = await UserContact.findOneAndUpdate(
+      { email: userData.email },
+      { $set: userData },
+      { upsert: true, new: false, setDefaultsOnInsert: true }
+    );
+    const isNewContact = previousDoc === null;
+    const savedUser = userData;
 
-    // Save new user to MongoDB
-    console.log("Creating new user");
-    const newUser = new UserContact(userData);
-    await newUser.save();
+    // Add to CRM
+    const crmResult = await addToCrm(userData);
 
-    // Add to Keap CRM
-    const keapResult = await addToKeapCRM(userData);
-
-    res.status(201).json({
+    res.status(isNewContact ? 201 : 200).json({
       success: true,
-      message: "User data saved successfully",
-      user: newUser,
-      keapResult,
+      message: isNewContact
+        ? "User data saved successfully"
+        : "User data updated successfully",
+      user: savedUser,
+      crmResult,
     });
   } catch (error) {
     console.error("Error saving user:", error);
@@ -52,6 +49,61 @@ router.post("/", async (req, res) => {
   }
 });
 
+// New CRM integration — replaces Keap. Same tag names as before
+// (Assembly District-X, State District-X, 2025 legislative scorecard), just
+// sent to the new CRM's lead-ingestion endpoint instead of Infusionsoft.
+async function addToCrm(userData) {
+  try {
+    const crmUrl = process.env.CRM_LEAD_INTEGRATION_URL;
+    const crmKey = process.env.CRM_LEAD_INTEGRATION_KEY;
+
+    const tagNames = ["2025 legislative scorecard"];
+    if (userData.assemblyDistrict) {
+      tagNames.push(`${ASSEMBLY_DISTRICT_TAG_PREFIX}${userData.assemblyDistrict}`);
+    }
+    if (userData.stateDistrict) {
+      tagNames.push(`${SENATE_DISTRICT_TAG_PREFIX}${userData.stateDistrict}`);
+    }
+
+    const response = await axios.post(
+      crmUrl,
+      {
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        address: userData.street || "",
+        city: userData.city || "",
+        state: userData.state || "",
+        zipCode: userData.zipcode || "",
+        tagNames,
+      },
+      {
+        headers: {
+          "x-lead-integration-key": crmKey,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("CRM integration error:", {
+      message: error.message,
+      response: error.response?.data,
+    });
+    return {
+      success: false,
+      error: error.response?.data || error.message,
+    };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Keap CRM integration — replaced by the new CRM (addToCrm above, 2026-07-28).
+// Left in place (commented out) rather than deleted, per instruction.
+// ---------------------------------------------------------------------------
+
+/*
 // Enhanced Keap CRM Integration
 async function addToKeapCRM(userData) {
   try {
@@ -443,5 +495,6 @@ async function applyTagToContact(accessToken, contactId, tagId) {
     };
   }
 }
+*/
 
 export default router;
